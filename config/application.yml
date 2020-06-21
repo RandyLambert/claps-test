@@ -1,0 +1,14 @@
+server:
+  port: 3001
+datasource:
+  driverName: mysql
+  host: 127.0.0.1
+  port: 3306
+  database: Claps_test
+  username: root
+  password: 123456
+  charset: utf8
+#github:
+#  ClientID: 365a426af206381a9344
+#  ClientSecret: c6a8e8c87f5f8353a488e920ce547ac9cece5a03
+#  OauthCallBack: http://local:3001/api/oauth
