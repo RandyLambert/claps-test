@@ -56,7 +56,7 @@ func GetOauthToken(code string) string{
 		"https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s",
 		viper.GetString("github.ClientID"),viper.GetString("github.ClientSecret"), code,
 		)
-	fmt.Println(str)
+	//fmt.Println(str)
 	return str
 }
 
