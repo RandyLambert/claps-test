@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"claps-test/common"
 	"claps-test/controllers"
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +22,7 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 		}
 
 
-		apiGroup.GET("/authInfo",controllers.AuthInfo)
+		apiGroup.GET("/authInfo",common.AuthInfo)
 
 		mixinGroup := apiGroup.Group("/mixin")
 		{
@@ -31,7 +32,7 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 
 		userGroup := apiGroup.Group("/user")
 		{
-			userGroup.GET("/profile")
+			userGroup.GET("/profile",controllers.Profile)
 			userGroup.GET("/assets")
 			userGroup.GET("/transactions")
 		}
