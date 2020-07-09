@@ -9,12 +9,14 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/spf13/viper"
 )
 
 func main() {
 
 	common.InitConfig()
-
+	common.InitMixin()
+	common.InitLog()
 	db := dao.InitDB()
 	defer db.Close()
 
@@ -32,12 +34,12 @@ func main() {
 	r.Use(sessions.Sessions("mysession",store))
 
 	r = routers.CollectRoute(r)
-	//port := viper.GetString("server.port")
-	//if port != "" {
+	serverport := viper.GetString("serverport")
+	if serverport != ""{
+		panic(r.Run(":"+serverport))
+	} else {
 		panic(r.Run(":3001"))
-	//}
-	//panic(r.Run())
-
+	}
 }
 
 
