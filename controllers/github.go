@@ -48,7 +48,6 @@ func Oauth(ctx *gin.Context){
 	//user["envs"] =
 
 	ctx.JSON(http.StatusOK,user)
-
 }
 
 func GetOauthToken(code string) string{

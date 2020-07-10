@@ -36,6 +36,9 @@ func InitDB() *gorm.DB {
 	return db
 }
 
+/*
+获取数据库句柄
+ */
 func GetDB() *gorm.DB {
 	return DB
 }

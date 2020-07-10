@@ -8,6 +8,7 @@ import (
 
 func CollectRoute(r *gin.Engine) * gin.Engine{
 	r.GET("/",controllers.Hello)
+
 	apiGroup := r.Group("/api")
 	{
 		apiGroup.GET("/oauth",controllers.Oauth)
