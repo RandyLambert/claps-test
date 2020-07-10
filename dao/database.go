@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"claps-test/common"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
@@ -23,11 +24,10 @@ func InitDB() *gorm.DB {
 		port,
 		database,
 		charset)
-	//log.Println(ar)
 	db, err := gorm.Open(driverName, args)
 
 	if err != nil {
-		panic("failed to connect database,err :" + err.Error())
+		common.Logger().Panic("failed to connect database,err :" + err.Error())
 	}
 
 	db.SingularTable(true)

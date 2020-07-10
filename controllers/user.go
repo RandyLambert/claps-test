@@ -17,7 +17,6 @@ func Hello(ctx *gin.Context) {
 		"ClientID":viper.GetString("GITHUB_CLIENT_ID"),
 		"OauthCallBack":viper.GetString("GITHUB_OAUTH_CALLBACK"),
 	})
-
 }
 func Profile(ctx *gin.Context){
 	//session := sessions.Default(ctx)

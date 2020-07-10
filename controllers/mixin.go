@@ -1,7 +1,17 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"claps-test/common"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 func Assets(ctx *gin.Context){
-	//需要env信息
+	client := common.GetMixin()
+	asserts,err := client.ReadAssets(ctx)
+	if err != nil {
+		common.Logger().Error("ReadAssets: ", err.Error())
+		ctx.JSON(http.StatusUnauthorized,"Bad Request" + err.Error())
+	}
+	ctx.JSON(http.StatusOK,&asserts)
 }

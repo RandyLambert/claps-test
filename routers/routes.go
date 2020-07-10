@@ -7,6 +7,7 @@ import (
 )
 
 func CollectRoute(r *gin.Engine) * gin.Engine{
+	r.Use(common.LoggerToFile())
 	r.GET("/",controllers.Hello)
 
 	apiGroup := r.Group("/api")
