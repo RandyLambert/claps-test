@@ -9,7 +9,7 @@ require (
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
-	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/jinzhu/gorm v1.9.13

@@ -1,21 +1,21 @@
 package dao
 
 import (
-	"claps-test/common"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	log "github.com/sirupsen/logrus"
 )
 
 var DB *gorm.DB
 
 func InitDB() *gorm.DB {
 	driverName := "mysql"
-	host := viper.GetString("host")
-	port := viper.GetString("port")
-	database := viper.GetString("database")
-	username := viper.GetString("username")
-	password := viper.GetString("password")
+	host := viper.GetString("DATABASE_HOST")
+	port := viper.GetString("DATABASE_PORT")
+	database := viper.GetString("DATABASE_DATABASE")
+	username := viper.GetString("DATABASE_USERNAME")
+	password := viper.GetString("DATABASE_PASSWORD")
 	charset := "utf8"
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true",
 		username,
@@ -27,7 +27,7 @@ func InitDB() *gorm.DB {
 	db, err := gorm.Open(driverName, args)
 
 	if err != nil {
-		common.Logger().Panic("failed to connect database,err :" + err.Error())
+		log.Panic("failed to connect database,err :" + err.Error())
 	}
 
 	db.SingularTable(true)

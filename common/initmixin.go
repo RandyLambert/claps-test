@@ -2,6 +2,7 @@ package common
 
 import (
 	"github.com/fox-one/mixin-sdk-go"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -17,7 +18,7 @@ func InitMixin() *mixin.Client {
 	var err error
 	MixinClient,err = mixin.NewFromKeystore(s)
 	if err != nil {
-		Logger().Error(err.Error())
+		log.Error(err.Error())
 	}
 	return MixinClient
 }

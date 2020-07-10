@@ -8,6 +8,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -23,9 +24,9 @@ func main() {
 	db := dao.InitDB()
 	defer db.Close()
 
-	common.Logger().Debug("debug")
-	common.Logger().Warningf("Warning")
-	common.Logger().Error("Error")
+	log.Debug("debug")
+	log.Warningf("Warning")
+	log.Error("Error")
 
 	//自动迁移
 	/*
@@ -45,7 +46,7 @@ func main() {
 	r.Use(sessions.Sessions("mysession",store))
 
 	r = routers.CollectRoute(r)
-	serverport := viper.GetString("serverport")
+	serverport := viper.GetString("server.port")
 	if serverport != ""{
 		panic(r.Run(":"+serverport))
 	} else {
