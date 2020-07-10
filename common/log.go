@@ -54,10 +54,10 @@ func InitLog(){
 		}
 	}
 
-	//
+	//设置输出
 	Log.SetOutput(io.MultiWriter(writer))
 	//设置日志级别
-	Log.SetLevel(logrus.InfoLevel)
+	Log.SetLevel(logrus.DebugLevel)
 	//设置日志格式
 	Log.SetFormatter(&logrus.TextFormatter{})
 }

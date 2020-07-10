@@ -15,12 +15,17 @@ func main() {
 
 
 	/*
-	初始化Mixin,log和DB
+	初始化配置文件,Mixin,log和DB
 	 */
+	common.InitConfig()
 	common.InitMixin()
 	common.InitLog()
 	db := dao.InitDB()
 	defer db.Close()
+
+	common.Logger().Debug("debug")
+	common.Logger().Warningf("Warning")
+	common.Logger().Error("Error")
 
 	//自动迁移
 	/*
