@@ -2,7 +2,6 @@ package main
 
 import (
 	"claps-test/common"
-	"claps-test/dao"
 	"claps-test/routers"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -21,7 +20,7 @@ func main() {
 	common.InitConfig()
 	common.InitMixin()
 	common.InitLog()
-	db := dao.InitDB()
+	db := common.InitDB()
 	defer db.Close()
 
 	log.Debug("debug")

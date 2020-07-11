@@ -21,7 +21,10 @@ func Hello(ctx *gin.Context) {
 func Profile(ctx *gin.Context){
 	//session := sessions.Default(ctx)
 	//gitHubToken := session.Get("gitHubToken")
-	//
+	////伪码,具体怎么获得userid还不清楚
+	//userId := session.Get("user")
+	////获取emails数据
+
 }
 
 
