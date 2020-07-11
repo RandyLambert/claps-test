@@ -3,28 +3,36 @@ package controllers
 import (
 	"claps-test/dao"
 	"claps-test/models"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/go-github/v32/github"
 	"github.com/spf13/viper"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 	"net/http"
 )
 
 func Oauth(ctx *gin.Context){
-	//获取code
+	//获取code,path和state
 	code := ctx.Query("code")
+	path := ctx.Query("path")
+	state := ctx.Query("state")
+
+	log.Debug("获得的code,path和state",code,path,state)
+
 	//获取token
 	var oauthTokenUrl = GetOauthToken(code)
-	//fmt.Println(oauthTokenUrl)
+	//处理请求的URL,获得Token指针
 	token,err := GetToken(oauthTokenUrl)
 	if err != nil {
-		log.Println(err.Error())
+		log.Debug(err.Error())
 		ctx.JSON(http.StatusBadRequest,"invalid oauth redirect")
 		return
 	}
-	// 通过token，获取用户信息
 
+	// 通过token，获取用户信息
 	user, err := GetUserInfo(token)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError,err.Error())
@@ -33,7 +41,9 @@ func Oauth(ctx *gin.Context){
 
 	db := dao.GetDB()
 	userInDb := 0
+	//尝试获取该user
 	db.Debug().Model(models.User{}).Select("id=?",uint32(user["id"].(float64))).Count(&userInDb)
+	//没有则插入数据库中
 	if userInDb != 1 {
 		userInfo := models.User{
 			Id:          uint32(user["id"].(float64)),
@@ -44,12 +54,19 @@ func Oauth(ctx *gin.Context){
 		}
 		db.Debug().Create(&userInfo)
 	}
+	//存在则加入session里面
 
 	//user["envs"] =
-
 	ctx.JSON(http.StatusOK,user)
+
+	//重定向到/profile
+
 }
 
+/*
+拼接含有code和clientID和client_secret，成一个URL用来换取Token,返回一个拼接的URL
+code 表示github认证服务器返回的code
+ */
 func GetOauthToken(code string) string{
 	str:= fmt.Sprintf(
 		"https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s",
@@ -59,6 +76,9 @@ func GetOauthToken(code string) string{
 	return str
 }
 
+/*
+根据参数URL去请求，然后换取Token,返回Token指针和错误信息
+ */
 func GetToken(url string)(*Token,error){
 
 	req,err := http.NewRequest(http.MethodGet,url,nil)
@@ -78,14 +98,39 @@ func GetToken(url string)(*Token,error){
 	//将相应体解析为token,返回
 	var token Token
 
+	//将返回的信息解析到Token
 	if err = json.NewDecoder(res.Body).Decode(&token); err!= nil{
+		log.Error(err.Error())
 		return nil,err
 	}
 	return &token,nil
 }
 
+//用获得的Token获得UserInfo,返回User指针
 func GetUserInfo(token *Token)(map[string]interface{},error){
 
+	log.Debug("GitHub Token: ")
+
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token.AccessToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	client := github.NewClient(tc)
+
+	user, _, err := client.Users.Get(ctx, "")
+
+	tmp := make(map[string]interface{})
+	if err != nil {
+		fmt.Printf("\nerror: %v\n", err)
+		return tmp,err
+	}
+
+	log.Debug("\n获得的用户信息是%v\n", github.Stringify(user))
+	return tmp,err
+
+	/*
 	userInfoUrl := "https://api.github.com/user"
 	req, err := http.NewRequest(http.MethodGet,userInfoUrl,nil)
 	if err != nil {
@@ -108,4 +153,5 @@ func GetUserInfo(token *Token)(map[string]interface{},error){
 
 	//fmt.Printf("+%v",user)
 	return user, nil
+	 */
 }
