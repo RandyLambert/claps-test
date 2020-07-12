@@ -3,6 +3,8 @@ package routers
 import (
 	"claps-test/common"
 	"claps-test/controllers"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,10 +13,17 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 	r.Use(common.LoggerToFile())
 	//测试
 	r.GET("/",controllers.Hello)
+	//设置创建基于cookie的存储引擎,secret是加密的秘钥
+	store := cookie.NewStore([]byte("secret11111"))
+	//注册session中间件,设置session的sssion的名字,也是cookie的key
+	r.Use(sessions.Sessions("SessionId", store))
 
 	// /api
 	apiGroup := r.Group("/api")
 	{
+		// /api/authinfo
+		apiGroup.GET("/authInfo",common.AuthInfo)
+
 		// /api/oauth
 		apiGroup.GET("/oauth",controllers.Oauth)
 
@@ -28,8 +37,6 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 			//projectsGroup.GET("/:name/donations",controllers.ProgectMembers)
 		}
 
-		// /api/authinfo
-		apiGroup.GET("/authInfo",common.AuthInfo)
 
 		// /api/mixin
 		mixinGroup := apiGroup.Group("/mixin")
