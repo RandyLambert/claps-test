@@ -15,6 +15,8 @@ import (
 )
 
 func Oauth(ctx *gin.Context){
+	log.Debug("开始处理Oauth授权")
+
 	//获取code,path和state
 	code := ctx.Query("code")
 	path := ctx.Query("path")
@@ -103,13 +105,15 @@ func GetToken(url string)(*Token,error){
 		log.Error(err.Error())
 		return nil,err
 	}
+	log.Debug("获得胡Token是",token)
 	return &token,nil
 }
 
 //用获得的Token获得UserInfo,返回User指针
 func GetUserInfo(token *Token)(map[string]interface{},error){
 
-	log.Debug("GitHub Token: ")
+	log.Debug(token)
+	log.Debug("GitHub Token: ",token.AccessToken)
 
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
@@ -123,7 +127,7 @@ func GetUserInfo(token *Token)(map[string]interface{},error){
 
 	tmp := make(map[string]interface{})
 	if err != nil {
-		fmt.Printf("\nerror: %v\n", err)
+		log.Error("n",err)
 		return tmp,err
 	}
 
