@@ -37,7 +37,7 @@ func GetProjectMembers(name string)(users *[]models.User,err error){
 	// SELECT * FROM "orders"  WHERE "orders"."deleted_at" IS NULL AND (amount > (SELECT AVG(amount) FROM "orders"  WHERE (state = 'paid')));
 	users = &[]models.User{}
 	err = common.DB.Debug().Where("user.id IN (?)",
-		common.DB.Debug().Table("member").Select("project_id=?",
+		common.DB.Debug().Table("member").Select("user_id").Where("project_id=?",
 			common.DB.Debug().Table("project").Select("project.id").Where("project.name=?",name).SubQuery()).SubQuery()).Find(&users).Error
 	// IN
 	//db.Where("name IN (?)", []string{"jinzhu", "jinzhu 2"}).Find(&users)
