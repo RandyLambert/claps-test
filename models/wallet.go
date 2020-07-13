@@ -14,3 +14,7 @@ type Wallet struct {
 
 }
 
+type ProjectTotal struct {
+	Total float64 `gorm:"type:double unsigned;not null;default:0"`
+	AssetId string `gorm:"type:double unsigned;not null;default:0"`
+}

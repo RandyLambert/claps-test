@@ -31,7 +31,4 @@ func InitConfig() {
 		log.Println(err.Error())
 	}
 
-	//2.注释加上
-	//4.Level 配置
-
 }
