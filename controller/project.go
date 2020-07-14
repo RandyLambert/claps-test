@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"claps-test/service"
@@ -32,7 +32,7 @@ func Project(ctx *gin.Context){
 		ctx.JSON(http.StatusOK,projectInfo)
 	}
 
-	//var bots []models.Bot
+	//var bots []model.Bot
 	//db.Debug().Find(&bots)
 	//ctx.JSON(http.StatusOK,bots)
 
@@ -57,6 +57,8 @@ func ProjectTransactions(ctx *gin.Context){
 		ctx.JSON(http.StatusUnauthorized,gin.H{
 			"error":err,
 		})
+	}else {
+		ctx.JSON(http.StatusOK,transactions)
 	}
-	ctx.JSON(http.StatusOK,transactions)
+
 }

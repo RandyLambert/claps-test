@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"claps-test/service"
@@ -13,9 +13,9 @@ func Assets(ctx *gin.Context){
 	if err != nil {
 		log.Error("Assets",err.Error())
 		ctx.JSON(http.StatusUnauthorized,"Bad Request" + err.Error())
+	}else {
+		ctx.JSON(http.StatusOK,assets)
 	}
-
-	ctx.JSON(http.StatusOK,assets)
 }
 
 //func DoAsset(ctx context.Context, user *sdk.User) string {

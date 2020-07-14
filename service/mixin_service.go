@@ -1,7 +1,7 @@
 package service
 
 import (
-	"claps-test/common"
+	"claps-test/util"
 	"context"
 	"errors"
 	"github.com/fox-one/mixin-sdk-go"
@@ -10,12 +10,12 @@ import (
 
 func GetAssets()(assets []*mixin.Asset,err error){
 
-	assets,err = common.MixinClient.ReadAssets(context.Background())
+	assets,err = util.MixinClient.ReadAssets(context.Background())
 	return
 }
 
 func GetAsset(assetID string) (asset *mixin.Asset,err error){
-	asset,err =  common.MixinClient.ReadAsset(context.Background(),assetID)
+	asset,err =  util.MixinClient.ReadAsset(context.Background(),assetID)
 	if asset != nil{
 		if assetID != asset.AssetID {
 			log.Error("asset should be %s but get %s\n", assetID, asset.AssetID)
@@ -24,3 +24,4 @@ func GetAsset(assetID string) (asset *mixin.Asset,err error){
 	}
 	return
 }
+

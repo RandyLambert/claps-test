@@ -2,7 +2,7 @@ package service
 
 import (
 	"claps-test/dao"
-	"claps-test/models"
+	"claps-test/model"
 	"github.com/fox-one/mixin-sdk-go"
 	"github.com/shopspring/decimal"
 )
@@ -56,7 +56,7 @@ func GetProjects() (projectInfos []*map[string]interface{},err error){
 	return
 }
 
-func GetProjectInfo(project *models.Project)(projectInfo *map[string]interface{},err error){
+func GetProjectInfo(project *model.Project)(projectInfo *map[string]interface{},err error){
 
 	projectTotal,err := dao.GetProjectTotal(project.Id)
 	if err != nil {
@@ -82,7 +82,7 @@ func GetProjectInfo(project *models.Project)(projectInfo *map[string]interface{}
 	return
 }
 
-func GetProjectTransactions(name string,assetId string)(transactions *[]models.Transaction,err error){
+func GetProjectTransactions(name string,assetId string)(transactions *[]model.Transaction,err error){
 	transactions,err = dao.GetProjectTransactions(name,assetId)
 	return
 }
@@ -96,7 +96,7 @@ func GetProjectRepositories(projectId uint32)(repositoriesInfo []*map[string]int
 		//todo github star
 		var stars uint32
 		//(*repositories)[i].Id
-		//models.Repository{
+		//model.Repository{
 		//	Id:          0,
 		//	ProjectId:   0,
 		//	Type:        "",
@@ -121,13 +121,13 @@ func GetProjectRepositories(projectId uint32)(repositoriesInfo []*map[string]int
 	return
 }
 
-func GetProjectMembers(name string)(members *[]models.User,err error){
+func GetProjectMembers(name string)(members *[]model.User,err error){
 	//mambers格式不同,删除project_id和userid字段
 	members,err = dao.GetProjectMembers(name)
 	return
 }
 
-func GetProjectBotIds(projectId uint32)(botids *[]models.BotId,err error){
+func GetProjectBotIds(projectId uint32)(botids *[]model.BotId,err error){
 	botids,err = dao.GetProjectBotIds(projectId)
 	return
 }

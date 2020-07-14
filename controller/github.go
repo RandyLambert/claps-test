@@ -1,7 +1,6 @@
-package controllers
+package controller
 
 import (
-	"claps-test/common"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -28,7 +27,7 @@ func Oauth(ctx *gin.Context){
 
 	uid,ok := session.Get("uid").(string)
 	//不存在state
-	ok2 := common.If(state!="",false,true).(bool)
+	ok2 := If(state!="",false,true).(bool)
 	log.Debug("ok2",ok2)
 	log.Debug("ok",ok)
 	log.Debug("uid",uid)
@@ -65,7 +64,7 @@ func Oauth(ctx *gin.Context){
 	tmp := session.Get("user")
 	log.Debug("刚刚存储的session是",tmp)
 
-	//db := common.GetDB()
+	//db := util.GetDB()
 
 	//从数据库中读取user信息
 
@@ -75,10 +74,10 @@ func Oauth(ctx *gin.Context){
 	/*
 	userInDb := 0
 	//尝试获取该user
-	db.Debug().Model(models.User{}).Select("id=?",uint32(user["id"].(float64))).Count(&userInDb)
+	db.Debug().Model(model.User{}).Select("id=?",uint32(user["id"].(float64))).Count(&userInDb)
 	//没有则插入数据库中
 	if userInDb != 1 {
-		userInfo := models.User{
+		userInfo := model.User{
 			Id:          uint32(user["id"].(float64)),
 			Name:        user["login"].(string),
 			DisplayName: user["name"].(string),

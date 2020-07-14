@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"github.com/gin-gonic/gin"
@@ -18,7 +18,7 @@ func Hello(ctx *gin.Context) {
 		"OauthCallBack":viper.GetString("GITHUB_OAUTH_CALLBACK"),
 	})
 }
-func Profile(ctx *gin.Context){
+func UserProfile(ctx *gin.Context){
 
 	ctx.JSON(http.StatusOK,gin.H{
 		"emails": 111,
@@ -31,6 +31,16 @@ func Profile(ctx *gin.Context){
 	////获取emails数据
 
 }
+
+func UserAssets(ctx *gin.Context){
+
+}
+
+func UserTransactions(ctx *gin.Context){
+
+
+}
+
 
 
 

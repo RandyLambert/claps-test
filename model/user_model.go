@@ -1,4 +1,4 @@
-package models
+package model
 
 type User struct{
 	Id uint32 `json:"id" gorm:"type:int unsigned;primary_key;unique_index:id_UNIQUE;not null;"`

@@ -1,4 +1,4 @@
-package models
+package model
 
 type Bot struct{
 	Id string `gorm:"type:varchar(50);primary_key;unique_index:id_UNIQUE;not null"`

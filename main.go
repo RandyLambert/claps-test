@@ -1,8 +1,8 @@
 package main
 
 import (
-	"claps-test/common"
-	"claps-test/routers"
+	"claps-test/util"
+	"claps-test/router"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -17,14 +17,14 @@ func main() {
 	/*
 	初始化配置文件,Mixin,log和DB
 	 */
-	common.InitConfig()
-	common.InitMixin()
-	common.InitLog()
-	db := common.InitDB()
+	util.InitConfig()
+	util.InitMixin()
+	util.InitLog()
+	db := util.InitDB()
 	defer db.Close()
 
-	common.RegisterType()
-	common.Cors()
+	util.RegisterType()
+	util.Cors()
 
 	log.Debug("debug")
 	log.Warningf("Warning")
@@ -32,12 +32,12 @@ func main() {
 
 	//自动迁移
 	/*
-	db.Debug().AutoMigrate(&models.Project{})
-	db.Debug().AutoMigrate(&models.MemberWallet{})
-	db.Debug().AutoMigrate(&models.Repository{})
-	db.Debug().AutoMigrate(&models.Transaction{})
-	db.Debug().AutoMigrate(&models.Transfer{})
-	db.Debug().AutoMigrate(&models.Wallet{})
+	db.Debug().AutoMigrate(&model.Project{})
+	db.Debug().AutoMigrate(&model.MemberWallet{})
+	db.Debug().AutoMigrate(&model.Repository{})
+	db.Debug().AutoMigrate(&model.Transaction{})
+	db.Debug().AutoMigrate(&model.Transfer{})
+	db.Debug().AutoMigrate(&model.Wallet{})
 	 */
 
 	r := gin.Default()
@@ -47,7 +47,7 @@ func main() {
 	store := cookie.NewStore([]byte("claps-test"))
 	r.Use(sessions.Sessions("mysession",store))
 
-	r = routers.CollectRoute(r)
+	r = router.CollectRoute(r)
 	serverport := viper.GetString("server.port")
 	if serverport != ""{
 		panic(r.Run(":"+serverport))
