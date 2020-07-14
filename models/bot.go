@@ -10,6 +10,10 @@ type Bot struct{
 	PrivateKey string `gorm:"type:text;not null"`
 }
 
+type BotId struct{
+	Id string `gorm:"type:varchar(50);primary_key;unique_index:id_UNIQUE;not null"`
+}
+
 const (
 	PersperAlgorithm = iota+1
 	Commits

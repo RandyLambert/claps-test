@@ -1,24 +1,36 @@
 package controllers
 
 import (
-	"claps-test/dao"
+	"claps-test/service"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
 func Projects(ctx *gin.Context){
-	//todo 数组前缀items
-	projects := dao.GetProjects()
+	//
+	projects,err := service.GetProjects()
+	if err !=nil {
+		log.Error("Projects",err.Error())
+		ctx.JSON(http.StatusUnauthorized,gin.H{
+			"error":err,
+		})
+	}
 	ctx.JSON(http.StatusOK,projects)
 
 }
 
 
 func Project(ctx *gin.Context){
-    //todo github star
-	project := dao.GetProject(ctx.Param("name"))
-	//projectinfo :=
-	ctx.JSON(http.StatusOK,project)
+	projectInfo,err := service.GetProject(ctx.Param("name"))
+	if err != nil {
+		log.Error("Project",err.Error())
+		ctx.JSON(http.StatusUnauthorized,gin.H{
+			"error":err,
+		})
+	}else{
+		ctx.JSON(http.StatusOK,projectInfo)
+	}
 
 	//var bots []models.Bot
 	//db.Debug().Find(&bots)
@@ -27,17 +39,24 @@ func Project(ctx *gin.Context){
 }
 
 func ProjectMembers(ctx *gin.Context){
-	//todo mambers格式
-	members := dao.GetProjectMembers(ctx.Param("name"))
-	users := map[string]interface{}{
-		"members":members,
-	}
 
-	ctx.JSON(http.StatusOK,users)
+	members,err := service.GetProjectMembers(ctx.Param("name"))
+	if err != nil {
+		log.Error("Project",err.Error())
+		ctx.JSON(http.StatusUnauthorized,gin.H{
+			"error":err,
+		})
+	}
+	ctx.JSON(http.StatusOK,members)
 }
 
 func ProjectTransactions(ctx *gin.Context){
-
-	transactions := dao.GetProjectTransactions(ctx.Param("name"),ctx.Query("assetId"))
+	transactions,err := service.GetProjectTransactions(ctx.Param("name"),ctx.Query("assetId"))
+	if err != nil {
+		log.Error("Project",err.Error())
+		ctx.JSON(http.StatusUnauthorized,gin.H{
+			"error":err,
+		})
+	}
 	ctx.JSON(http.StatusOK,transactions)
 }
