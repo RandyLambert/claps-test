@@ -38,6 +38,7 @@ func AuthInfo(ctx *gin.Context){
 	mixinToken := session.Get("mixinToken")
 
 	log.Debug("从session中获取的user",user)
+	log.Debug("session中的Token",session.Get("githubToken"))
 	log.Debug("从session中获取的mixinToken",mixinToken)
 	log.Debug("从session中获取的foxoneToken",foxoneToken)
 
@@ -45,7 +46,7 @@ func AuthInfo(ctx *gin.Context){
 		//没有登录的话随机生成uid
 		randomUid = string(RandUp(32))
 		//存入session
-		session.Set("randomUid",randomUid)
+		session.Set("uid",randomUid)
 		session.Save()
 	}
 

@@ -23,6 +23,9 @@ func main() {
 	db := common.InitDB()
 	defer db.Close()
 
+	common.RegisterType()
+	common.Cors()
+
 	log.Debug("debug")
 	log.Warningf("Warning")
 	log.Error("Error")
