@@ -1,6 +1,7 @@
 package main
 
 import (
+	"claps-test/model"
 	"claps-test/util"
 	"claps-test/router"
 	"github.com/gin-contrib/sessions"
@@ -31,14 +32,13 @@ func main() {
 	log.Error("Error")
 
 	//自动迁移
-	/*
 	db.Debug().AutoMigrate(&model.Project{})
 	db.Debug().AutoMigrate(&model.MemberWallet{})
 	db.Debug().AutoMigrate(&model.Repository{})
 	db.Debug().AutoMigrate(&model.Transaction{})
 	db.Debug().AutoMigrate(&model.Transfer{})
 	db.Debug().AutoMigrate(&model.Wallet{})
-	 */
+	db.Debug().AutoMigrate(&model.User{})
 
 	r := gin.Default()
 	r.LoadHTMLGlob("views/*")

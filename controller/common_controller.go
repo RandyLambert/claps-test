@@ -33,12 +33,14 @@ func AuthInfo(ctx *gin.Context){
 	session := sessions.Default(ctx)
 	var randomUid string = ""
 
+	gxk := session.Get("gxk")
+	log.Debug("gxk=======>",gxk)
+
 	foxoneToken := session.Get("foxoneToken")
 	user := session.Get("user")
 	mixinToken := session.Get("mixinToken")
 
 	log.Debug("从session中获取的user",user)
-	log.Debug("session中的Token",session.Get("githubToken"))
 	log.Debug("从session中获取的mixinToken",mixinToken)
 	log.Debug("从session中获取的foxoneToken",foxoneToken)
 

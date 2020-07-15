@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"claps-test/dao"
+	"claps-test/model"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -28,9 +30,6 @@ func Oauth(ctx *gin.Context){
 	uid,ok := session.Get("uid").(string)
 	//不存在state
 	ok2 := If(state!="",false,true).(bool)
-	log.Debug("ok2",ok2)
-	log.Debug("ok",ok)
-	log.Debug("uid",uid)
 	if (ok && uid != state ) || ok2 {
 		session.Set("user",nil)
 		session.Set("githubToken",nil)
@@ -57,6 +56,8 @@ func Oauth(ctx *gin.Context){
 	log.Debug("\n获得的用户信息是:\n", *user)
 
 	//存储session
+	session.Set("gxk","gaoxingkun")
+	session.Save()
 	session.Set("user",*user)
 	session.Set("githubToken",token.AccessToken)
 	session.Save()
@@ -64,38 +65,35 @@ func Oauth(ctx *gin.Context){
 	tmp := session.Get("user")
 	log.Debug("刚刚存储的session是",tmp)
 
-	//db := util.GetDB()
-
-	//从数据库中读取user信息
-
-	//没有则插入数据库
-
-
-	/*
-	userInDb := 0
-	//尝试获取该user
-	db.Debug().Model(model.User{}).Select("id=?",uint32(user["id"].(float64))).Count(&userInDb)
-	//没有则插入数据库中
-	if userInDb != 1 {
-		userInfo := model.User{
-			Id:          uint32(user["id"].(float64)),
-			Name:        user["login"].(string),
-			DisplayName: user["name"].(string),
-			Email:       user["email"].(string),
-			AvatarUrl:   user["avatar_url"].(string),
-		}
-		db.Debug().Create(&userInfo)
+	//尝试获取数据库中该user信息
+	u := model.User{}
+	u.Id = *user.ID
+	u.Name = *user.Login
+	if user.AvatarURL != nil{
+		u.AvatarUrl = *user.AvatarURL
 	}
-	//存在则加入session里面
-	 */
+	if user.Name != nil{
+		u.DisplayName = *user.Name
+	}
+	if user.Email != nil{
+		u.Email = *user.Email
+	}
 
-	//user["envs"] =
-	//ctx.JSON(http.StatusOK,user)
+	CreateOrUpdateUser(&u)
+
 
 	//重定向到http://localhost:3000/profile
 	newpath := "http://localhost:3000"+path
 	log.Debug("重定向",newpath)
 	ctx.Redirect(http.StatusMovedPermanently, newpath)
+}
+
+func CreateOrUpdateUser(user *model.User) {
+	dao.CreateOrUpdateUser(user)
+}
+
+func GetUserById(user *model.User,Id int64){
+	dao.SelectUserById(user,Id)
 }
 
 /*
@@ -166,28 +164,4 @@ func GetUserInfo(token *Token)(*github.User,error){
 
 	return user,err
 
-	/*
-	userInfoUrl := "https://api.github.com/user"
-	req, err := http.NewRequest(http.MethodGet,userInfoUrl,nil)
-	if err != nil {
-		return nil,err
-	}
-
-	req.Header.Set("accept", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("token %s", token.AccessToken))
-
-	// 发送请求并获取响应
-	var client = http.Client{}
-	var res *http.Response
-	if res, err = client.Do(req); err != nil {
-		return nil, err
-	}
-	var user = make(map[string]interface{})
-	if err = json.NewDecoder(res.Body).Decode(&user); err != nil {
-		return nil, err
-	}
-
-	//fmt.Printf("+%v",user)
-	return user, nil
-	 */
 }
