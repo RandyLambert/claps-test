@@ -23,7 +23,8 @@ func GetEmailInfo(githubToken string) (error, []*github.UserEmail) {
 }
 
 //通过Id获取某个用户的所有项目信息
-func GetProjectById(id int64) (projects *[]model.Project) {
+func GetProjectByUserId(id int64) (projects *[]model.Project,err error) {
+	projects,err = GetProjectsByUserId(id)
 	return
 
 }
