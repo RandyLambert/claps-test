@@ -9,8 +9,8 @@ type MemberWallet struct {
 	AssetId string `gorm:"type:varchar(50);primary_key;not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Total string `gorm:"type:varchar(50);not null;default:0"`
-	Balance string `gorm:"type:varchar(50);not null;default:0"`
+	Total string `gorm:"type:varchar(50);default:null"`
+	Balance string `gorm:"type:varchar(50);default:null"`
 }
 
 
