@@ -11,12 +11,6 @@ import (
 	"time"
 )
 
-type Token struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"` // 这个字段暂时没用到
-	Scope       string `json:"scope"`      // 这个字段暂时没用到
-}
-
 func Hello(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK,"hello.html",gin.H{ //模板渲染
 		"ClientID":viper.GetString("GITHUB_CLIENT_ID"),
@@ -44,6 +38,8 @@ func UserProfile(ctx *gin.Context){
 
 	//获取email信息
 	err,emails := service.GetEmailInfo(token)
+	//如果因为超时出错,重新请求
+
 	if err != nil {
 		log.Errorf("Users.ListEmails returned error: %v", err)
 		ctx.JSON(http.StatusBadRequest,err)
@@ -61,7 +57,6 @@ func UserProfile(ctx *gin.Context){
 
 
 
-	mp := make(map[string]interface{})
 
 	//给每个项目添加Totol字段和patrons字段
 	projects := []project_pro{}

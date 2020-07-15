@@ -60,7 +60,8 @@ func GetProjects() (projectInfos []*map[string]interface{},err error){
 
 
 //查询某用户的所有项目,获取数据库中所有project
-func GetProjectsByUserId(userId int64) (projectInfos []*model.Project_pro{},err error){
+func GetProjectsByUserId(userId int64) (){
+	/*
 	projects,err := dao.GetProjectsByUserId(userId)
 	if err != nil{
 		return
@@ -68,12 +69,13 @@ func GetProjectsByUserId(userId int64) (projectInfos []*model.Project_pro{},err 
 
 	for i :=range *projects {
 		var projectInfo *map[string]interface{}
-		projectInfo,err = GetProjectInfo(&(*projects)[i])
+		//projectInfo,err = GetProjectInfo(&(*projects)[i])
 		if err != nil {
 			return
 		}
 		projectInfos = append(projectInfos,projectInfo)
 	}
+	 */
 	return
 }
 
