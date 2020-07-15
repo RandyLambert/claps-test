@@ -7,6 +7,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+//通过projectName查询,查询某个项目的详情
 func GetProject(name string) (projectDetailInfo *map[string]interface{},err error){
 
 	project,err := dao.GetProject(name)
@@ -39,8 +40,28 @@ func GetProject(name string) (projectDetailInfo *map[string]interface{},err erro
 	return
 }
 
+//获取数据库中所有project
 func GetProjects() (projectInfos []*map[string]interface{},err error){
 	projects,err := dao.GetProjects()
+	if err != nil{
+		return
+	}
+
+	for i :=range *projects {
+		var projectInfo *map[string]interface{}
+		projectInfo,err = GetProjectInfo(&(*projects)[i])
+		if err != nil {
+			return
+		}
+		projectInfos = append(projectInfos,projectInfo)
+	}
+	return
+}
+
+
+//查询某用户的所有项目,获取数据库中所有project
+func GetProjectsByUserId(userId int64) (projectInfos []*model.Project_pro{},err error){
+	projects,err := dao.GetProjectsByUserId(userId)
 	if err != nil{
 		return
 	}

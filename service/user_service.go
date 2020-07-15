@@ -1,6 +1,7 @@
 package service
 
 import (
+	"claps-test/model"
 	"context"
 	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
@@ -19,4 +20,10 @@ func GetEmailInfo(githubToken string) (error, []*github.UserEmail) {
 	emails, _, err := client.Users.ListEmails(context.Background(), nil)
 	log.Debug("获取的email是",emails)
 	return err,emails
+}
+
+//通过Id获取某个用户的所有项目信息
+func GetProjectById(id int64) (projects *[]model.Project) {
+	return
+
 }
