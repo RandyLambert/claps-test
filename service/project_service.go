@@ -110,37 +110,8 @@ func GetProjectTransactions(name string,assetId string)(transactions *[]model.Tr
 	return
 }
 
-func GetProjectRepositories(projectId uint32)(repositoriesInfo []*map[string]interface{},err error){
-	repositories,err := dao.GetProjectRepositories(projectId)
-	if err!=nil{
-		return
-	}
-	for i := range *repositories{
-		//todo github star
-		var stars uint32
-		//(*repositories)[i].Id
-		//model.Repository{
-		//	Id:          0,
-		//	ProjectId:   0,
-		//	Type:        "",
-		//	Name:        "",
-		//	Slug:        "",
-		//	Description: "",
-		//	CreatedAt:   time.Time{},
-		//	UpdatedAt:   time.Time{},
-		//}
-		repositoriesInfo = append(repositoriesInfo,&map[string]interface{}{
-			"stars":stars,
-			"repository":(*repositories)[i],
-			//"id":(*repositories)[i].Id,
-			//"project_id":(*repositories)[i].ProjectId,
-			//"type":(*repositories)[i].Type,
-			//"project_id":(*repositories)[i].Id,
-			//"project_id":(*repositories)[i].Id,
-			//"project_id":(*repositories)[i].Id,
-		})
-	}
-
+func GetProjectRepositories(projectId uint32)(repositories *[]model.Repository,err error){
+	repositories,err = dao.GetProjectRepositories(projectId)
 	return
 }
 

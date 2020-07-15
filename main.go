@@ -28,7 +28,7 @@ func main() {
 	util.Cors()
 
 	log.Debug("debug")
-	log.Warningf("Warning")
+	log.Warning("Warning")
 	log.Error("Error")
 
 	//自动迁移
