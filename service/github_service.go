@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 	"net/http"
+	"strings"
 )
 
 func CreateOrUpdateUser(user *model.User) {
@@ -88,7 +89,8 @@ func GetUserInfo(token *model.Token)(user *github.User,err error){
 	return
 }
 
-func GetRepositoryStars(c gin.Context,slug string) {
+//获取仓库的star数目,如果出错err信息不为空
+func GetRepositoryStars(c gin.Context,slug string)(int,error) {
 	session := sessions.Default(c)
 	githubToken := session.Get("githubToken")
 
@@ -99,6 +101,9 @@ func GetRepositoryStars(c gin.Context,slug string) {
 	log.Debug("获取star数量",githubToken)
 	log.Debug("传入的slug是",slug)
 	//把slug分成owner和repo
+	str := strings.Split(slug,"/")
+	log.Debug("owner是",str[0])
+	log.Debug("repo是",str[1])
 
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
@@ -107,6 +112,7 @@ func GetRepositoryStars(c gin.Context,slug string) {
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
-	client.Repositories.Get()
+	repo,_,err := client.Repositories.Get(ctx,str[0],str[1])
+	return *repo.StargazersCount,err
 }
 

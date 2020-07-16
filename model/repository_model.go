@@ -9,6 +9,7 @@ type Repository struct {
 	Name string `gorm:"type:varchar(50);not null"`
 	Slug string `gorm:"type:varchar(100);not null"`
 	Description string `gorm:"type:varchar(120);default:null"`
+	Stars uint32 `grom:"type:int unsigned;default:0"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

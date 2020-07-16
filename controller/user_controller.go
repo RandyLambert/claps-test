@@ -1,14 +1,12 @@
 package controller
 
 import (
-	"claps-test/model"
 	"claps-test/service"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"net/http"
-	"time"
 )
 
 func Hello(ctx *gin.Context) {
@@ -23,7 +21,7 @@ func UserProfile(ctx *gin.Context){
 
 	session := sessions.Default(ctx)
 	//从session中获取user和githubToken信息
-	user:=  session.Get("user")
+	user := session.Get("user")
 	githubToken := session.Get("githubToken")
 
 	if user == nil || githubToken == nil{
@@ -45,54 +43,17 @@ func UserProfile(ctx *gin.Context){
 		ctx.JSON(http.StatusBadRequest,err)
 	}
 
-
-	//project_pro信息
-	type project_pro struct {
-		model.Project
-		Patrons int64 `json:"patrons"`
-		Total float64 `json:"total"`
+	//根据userId获取所有project信息,Total和Patrons字段添加
+	projects,err := service.GetProjectByUserId(1)
+	if err != nil {
+		log.Errorf("Users.ProjectByUserId returned error: %v", err)
+		ctx.JSON(http.StatusBadRequest,err)
 	}
 
-	//根据userId获取所有project信息,Total和Patrons字段添加
-
-
-
-
-	//给每个项目添加Totol字段和patrons字段
-	projects := []project_pro{}
-	p := project_pro{}
-	p.Name = "claps.dev"
-	p.Patrons = 1
-	p.Id = 1
-	p.DisplayName = "Claps.dev"
-	p.AvatarUrl = "http://dmimg.5054399.com/allimg/pkm/pk/13.jpg"
-	p.CreatedAt = time.Now()
-	p.UpdatedAt = time.Now()
-	p.Description = "abc abc asdw qwerasdfzxc "
-	p.Total = 0.1234
-	projects = append(projects,p )
-
-	/*
-	"total":4.6176027,
-		"patrons":1,
-		"id":1,
-		"name":"claps.dev",
-		"displayName":"Claps.dev",
-		"description":"abc",
-		"avatarUrl":"abc",
-		"createdAt":"2020-04-06T03:46:08.000Z",
-		"updatedAt":"2020-04-06T03:46:08.000Z"
-	 */
 	ctx.JSON(http.StatusOK,gin.H{
 		"emails": emails,
 		"projects": projects,
 	})
-	//session := sessions.Default(ctx)
-	//gitHubToken := session.Get("gitHubToken")
-	////伪码,具体怎么获得userid还不清楚
-	//userId := session.Get("user")
-	////获取emails数据
-
 }
 
 func UserAssets(ctx *gin.Context){
@@ -100,7 +61,6 @@ func UserAssets(ctx *gin.Context){
 }
 
 func UserTransactions(ctx *gin.Context){
-
 
 }
 

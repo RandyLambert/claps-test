@@ -75,3 +75,11 @@ func GetProjectBotIds(projectId uint32)(botId *[]model.BotId,err error){
 	err = util.DB.Debug().Table("bot").Where("project_id=?",projectId).Find(botId).Error
 	return
 }
+
+//根据userid获取所有项目
+func GetProjectsByUserId(userId int64)(projects *[]model.Project,err error){
+	projects = &[]model.Project{}
+	err = util.DB.Debug().Where("project_id IN(?)",
+		util.DB.Debug().Table("member").Select("project_id").Where("user_id=?",userId).SubQuery()).Find(projects).Error
+	return
+}
