@@ -4,6 +4,7 @@ import (
 	"claps-test/service"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"net/http"
@@ -44,11 +45,12 @@ func UserProfile(ctx *gin.Context){
 	}
 
 	//根据userId获取所有project信息,Total和Patrons字段添加
-	projects,err := service.GetProjectByUserId(1)
+	projects,err := service.GetProjectByUserId(*user.(github.User).ID)
 	if err != nil {
 		log.Errorf("Users.ProjectByUserId returned error: %v", err)
 		ctx.JSON(http.StatusBadRequest,err)
 	}
+	log.Debug("获得的projects是",projects)
 
 	ctx.JSON(http.StatusOK,gin.H{
 		"emails": emails,

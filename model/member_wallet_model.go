@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type MemberWallet struct {
 	ProjectId uint32 `gorm:"type:int unsigned;primary_key;not null"`

@@ -39,6 +39,7 @@ func main() {
 	db.Debug().AutoMigrate(&model.Transfer{})
 	db.Debug().AutoMigrate(&model.Wallet{})
 	db.Debug().AutoMigrate(&model.User{})
+	db.Debug().AutoMigrate(&model.Member{})
 
 	r := gin.Default()
 	r.LoadHTMLGlob("views/*")
