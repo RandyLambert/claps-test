@@ -16,8 +16,9 @@ import (
 	"strings"
 )
 
-func CreateOrUpdateUser(user *model.User) {
-	dao.CreateOrUpdateUser(user)
+func InsertOrUpdateUser(user *model.User) (err error){
+	err = dao.InsertOrUpdateUser(user)
+	return
 }
 
 /*

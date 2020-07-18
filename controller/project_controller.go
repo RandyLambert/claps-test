@@ -9,7 +9,7 @@ import (
 
 func Projects(ctx *gin.Context){
 	//
-	projects,err := service.GetProjects()
+	projects,err := service.ListProjectsAll()
 	if err !=nil {
 		log.Error("Projects",err.Error())
 		ctx.JSON(http.StatusUnauthorized,gin.H{
@@ -22,7 +22,7 @@ func Projects(ctx *gin.Context){
 
 
 func Project(ctx *gin.Context){
-	projectInfo,err := service.GetProject(ctx.Param("name"))
+	projectInfo,err := service.GetProjectByName(ctx.Param("name"))
 	if err != nil {
 		log.Error("Project",err.Error())
 		ctx.JSON(http.StatusUnauthorized,gin.H{
@@ -40,7 +40,7 @@ func Project(ctx *gin.Context){
 
 func ProjectMembers(ctx *gin.Context){
 
-	members,err := service.GetProjectMembers(ctx.Param("name"))
+	members,err := service.ListMembersByProjectName(ctx.Param("name"))
 	if err != nil {
 		log.Error("Project",err.Error())
 		ctx.JSON(http.StatusUnauthorized,gin.H{
@@ -51,7 +51,7 @@ func ProjectMembers(ctx *gin.Context){
 }
 
 func ProjectTransactions(ctx *gin.Context){
-	transactions,err := service.GetProjectTransactions(ctx.Param("name"),ctx.Query("assetId"))
+	transactions,err := service.ListTransactionsByProjectNameAndAssetId(ctx.Param("name"),ctx.Query("assetId"))
 	if err != nil {
 		log.Error("Project",err.Error())
 		ctx.JSON(http.StatusUnauthorized,gin.H{
@@ -60,5 +60,4 @@ func ProjectTransactions(ctx *gin.Context){
 	}else {
 		ctx.JSON(http.StatusOK,transactions)
 	}
-
 }

@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"github.com/shopspring/decimal"
+	"time"
+)
 
 type Transfer struct {
 	//机器人ID
@@ -10,7 +13,7 @@ type Transfer struct {
 	TraceId string `json:"trace_id" gorm:"type:varchar(50);not null"`
 	OpponentId string `json:"opponent_id" gorm:"type:varchar(50);not null"`
 	AssetId string `json:"asset_id" gorm:"type:varchar(50);not null"`
-	Amount float64 `json:"amount" gorm:"type:double unsigned;not null"`
+	Amount decimal.Decimal `json:"amount" gorm:"type:varchar(128);not null"`
 	Memo string `json:"memo" gorm:"type:varchar(120);not null"`
 	CreatedAt time.Time
 }

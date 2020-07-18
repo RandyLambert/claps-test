@@ -36,7 +36,7 @@ func UserProfile(ctx *gin.Context){
 	log.Debugf("\n\nprofile中的githubToken:",token)
 
 	//获取email信息
-	err,emails := service.GetEmailInfo(token)
+	err,emails := service.ListEmailsByToken(token)
 	//如果因为超时出错,重新请求
 
 	if err != nil {
@@ -45,7 +45,7 @@ func UserProfile(ctx *gin.Context){
 	}
 
 	//根据userId获取所有project信息,Total和Patrons字段添加
-	projects,err := service.GetProjectByUserId(*user.(github.User).ID)
+	projects,err := service.ListProjectsByUserId(*user.(github.User).ID)
 	if err != nil {
 		log.Errorf("Users.ProjectByUserId returned error: %v", err)
 		ctx.JSON(http.StatusBadRequest,err)

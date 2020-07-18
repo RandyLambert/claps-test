@@ -74,7 +74,10 @@ func Oauth(ctx *gin.Context){
 		u.Email = *user.Email
 	}
 
-	service.CreateOrUpdateUser(&u)
+	err = service.InsertOrUpdateUser(&u)
+	if err != nil {
+		log.Error(err.Error())
+	}
 
 	//重定向到http://localhost:3000/profile
 	newpath := "http://localhost:3000"+path

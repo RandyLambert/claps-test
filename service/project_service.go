@@ -8,9 +8,9 @@ import (
 )
 
 //通过projectName查询,查询某个项目的详情
-func GetProject(name string) (projectDetailInfo *map[string]interface{},err error){
+func GetProjectByName(name string) (projectDetailInfo *map[string]interface{},err error){
 
-	project,err := dao.GetProject(name)
+	project,err := dao.GetProjectByName(name)
 	if err != nil {
 		return
 	}
@@ -19,15 +19,15 @@ func GetProject(name string) (projectDetailInfo *map[string]interface{},err erro
 	//if err != nil {
 	//	return
 	//}
-	repositories,err := GetProjectRepositories(project.Id)
+	repositories,err := ListRepositoriesByProjectId(project.Id)
 	if err!=nil {
 		return
 	}
-	members,err := GetProjectMembers(name)
+	members,err := ListMembersByProjectName(name)
 	if err!=nil {
 		return
 	}
-	botIds,err := GetProjectBotIds(project.Id)
+	botIds,err := ListBotIdsByProjectId(project.Id)
 	if err != nil {
 		return
 	}
@@ -41,8 +41,8 @@ func GetProject(name string) (projectDetailInfo *map[string]interface{},err erro
 }
 
 //获取数据库中所有project
-func GetProjects() (projects *[]model.Project,err error){
-	projects,err = dao.GetProjects()
+func ListProjectsAll() (projects *[]model.Project,err error){
+	projects,err = dao.ListProjectsAll()
 	if err != nil{
 		return
 	}
@@ -60,8 +60,8 @@ func GetProjects() (projects *[]model.Project,err error){
 
 
 //查询某用户的所有项目,获取数据库中所有project
-func GetProjectsByUserId(userId int64) (projects *[]model.Project,err error){
-	projects,err = dao.GetProjectsByUserId(userId)
+func ListProjectsByUserId(userId int64) (projects *[]model.Project,err error){
+	projects,err = dao.ListProjectsByUserId(userId)
 	//if err != nil{
 	//	return
 	//}
@@ -105,23 +105,23 @@ func GetProjectsByUserId(userId int64) (projects *[]model.Project,err error){
 //	return
 //}
 
-func GetProjectTransactions(name string,assetId string)(transactions *[]model.Transaction,err error){
-	transactions,err = dao.GetProjectTransactions(name,assetId)
+func ListTransactionsByProjectNameAndAssetId(name string,assetId string)(transactions *[]model.Transaction,err error){
+	transactions,err = dao.ListTransactionsByProjectNameAndAssetId(name,assetId)
 	return
 }
 
-func GetProjectRepositories(projectId uint32)(repositories *[]model.Repository,err error){
-	repositories,err = dao.GetProjectRepositories(projectId)
+func ListRepositoriesByProjectId(projectId uint32)(repositories *[]model.Repository,err error){
+	repositories,err = dao.ListRepositoriesByProjectId(projectId)
 	return
 }
 
-func GetProjectMembers(name string)(members *[]model.User,err error){
+func ListMembersByProjectName(name string)(members *[]model.User,err error){
 	//mambers格式不同,删除project_id和userid字段
-	members,err = dao.GetProjectMembers(name)
+	members,err = dao.ListMembersByProjectName(name)
 	return
 }
 
-func GetProjectBotIds(projectId uint32)(botids *[]model.BotId,err error){
-	botids,err = dao.GetProjectBotIds(projectId)
+func ListBotIdsByProjectId(projectId uint32)(botids *[]model.BotId,err error){
+	botids,err = dao.ListBotIdsByProjectId(projectId)
 	return
 }

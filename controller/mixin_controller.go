@@ -9,7 +9,7 @@ import (
 
 func Assets(ctx *gin.Context){
 
-	assets,err := service.GetAssets()
+	assets,err := service.ListAssets()
 	if err != nil {
 		log.Error("Assets",err.Error())
 		ctx.JSON(http.StatusUnauthorized,"Bad Request" + err.Error())

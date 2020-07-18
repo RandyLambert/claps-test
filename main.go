@@ -2,8 +2,9 @@ package main
 
 import (
 	"claps-test/model"
-	"claps-test/util"
 	"claps-test/router"
+	"claps-test/service"
+	"claps-test/util"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,7 @@ func main() {
 
 	util.RegisterType()
 	util.Cors()
-
+	go service.SyncSnapshots()
 	log.Debug("debug")
 	log.Warning("Warning")
 	log.Error("Error")
