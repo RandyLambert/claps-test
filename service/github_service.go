@@ -16,6 +16,9 @@ import (
 	"strings"
 )
 
+/*
+	第一次登录没有插入,有就更新
+ */
 func InsertOrUpdateUser(user *model.User) (err error){
 	err = dao.InsertOrUpdateUser(user)
 	return

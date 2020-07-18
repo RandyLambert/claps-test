@@ -14,7 +14,13 @@ func GetUserById(Id int64)(user *model.User,err error) {
 
 //不管记录是否找到，都将参数赋值给 struct 并保存至数据库
 func InsertOrUpdateUser(user *model.User)(err error) {
-	err = util.DB.Debug().FirstOrCreate(user).Error
+	var cnt int64
+	util.DB.Debug().Where("id = ?",user.Id).Count(&cnt)
+	if cnt == 0{
+		err = util.DB.Debug().Create(user).Error
+		return
+	}
+	util.DB.Save(user)
 	return
 }
 

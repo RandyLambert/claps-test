@@ -50,28 +50,43 @@ func CreateMixinClient(botId string)(client *mixin.Client,err error){
 func SyncSnapshots() {
 
 	ctx := context.TODO()
+
+	//获取当前时间
 	since := time.Now()
+
+	//死循环,读到上次最后一条就break
 	for {
+		//获取最后一次跟新记录
 		property,_ := dao.GetPropertyByKey("last_snapshot_id")
 		lastSnapshotID := property.Value
+
+		//从mixin获取当前时间之前的
 		snapshots, err := util.MixinClient.ReadNetworkSnapshots(ctx, "", since, "ASC", 100)
+		//这个时间端没有交易记录
 		if len(snapshots) == 0 {
 			time.Sleep(time.Second)
 			continue
 		}
 
+		//错误处理
 		if err != nil {
 			log.Error(err.Error())
 			continue
 		}
 
+		//遍历100记录
 		for i,_ := range snapshots {
+			log.Debug(*snapshots[i])
+			log.Debug("\n")
 			if lastSnapshotID == snapshots[i].SnapshotID {
 				continue
 			}
 
+			//筛选自己的转入
 			if snapshots[i].UserID != "" && snapshots[i].Amount.Cmp(decimal.Zero) > 0 {
+				//根据机器人从数据库里找到项目
 				project,err := dao.GetProjectByBotId(snapshots[i].OpponentID)
+				//错误处理有问题
 				if err != nil {
 					log.Error(err.Error())
 				}
@@ -79,22 +94,27 @@ func SyncSnapshots() {
 				transaction := &model.Transaction{
 					Id:        snapshots[i].SnapshotID,
 					ProjectId: project.Id,
-					BotId:     snapshots[i].UserID,
+					BotId:     snapshots[i].OpponentID,
 					AssetId:   snapshots[i].AssetID,
 					Amount:    snapshots[i].Amount,
 					CreatedAt: snapshots[i].CreatedAt,
 					Sender:    snapshots[i].UserID,
 					Receiver:  snapshots[i].OpponentID,
 				}
+				//插入捐赠记录
 				err = dao.InsertTransaction(transaction)
 				if err != nil {
 					log.Error(err.Error())
 				}
 
+				//查找汇率等详细信息,目前还是及时获取的
+				//可以建一张表,来缓存AssetId信息
 				asset,err := GetAssetById(snapshots[i].AssetID)
 				if err != nil {
 					log.Error(err.Error())
 				}
+
+				//更新Total字段
 				project.Total = project.Total.Add(asset.PriceUSD.Mul(snapshots[i].Amount))
 				count,err := dao.CountPatronByProjectIdAndSender(project.Id,snapshots[i].UserID)
 				if count == 0 {
@@ -105,6 +125,8 @@ func SyncSnapshots() {
 				if err != nil {
 					log.Error(err.Error())
 				}
+
+				//更新项目钱包
 
 				//根据不同的分配算法进行配置
 			}
@@ -125,6 +147,8 @@ func SyncSnapshots() {
 }
 
 func DoTransfer(ctx context.Context, botId, assetID, opponentID string, amount decimal.Decimal, memo, pin string,userId uint32) (err error) {
+
+
 	//opponentid是转给谁
 	// Transfer transfer to account
 	//	asset_id, opponent_id, amount, traceID, memo

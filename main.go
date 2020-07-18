@@ -27,7 +27,9 @@ func main() {
 
 	util.RegisterType()
 	util.Cors()
+	//开一个协程,定期更新数据库
 	go service.SyncSnapshots()
+
 	log.Debug("debug")
 	log.Warning("Warning")
 	log.Error("Error")

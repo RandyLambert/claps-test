@@ -11,7 +11,7 @@ func AuthMiddleware() gin.HandlerFunc{
 	return func(ctx *gin.Context){
 		//获取session
 		session := sessions.Default(ctx)
-		loginuser := session.Get("claps-test")
+		loginuser := session.Get("user")
 		fmt.Println("loginuser:",loginuser)
 
 		if loginuser == nil{
