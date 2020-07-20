@@ -3,8 +3,10 @@ package service
 import (
 	"claps-test/dao"
 	"claps-test/model"
+	"claps-test/util"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -40,36 +42,39 @@ func GetOauthToken(code string) string{
 /*
 根据参数URL去请求，然后换取Token,返回Token指针和错误信息
 */
-func GetToken(url string)(*oauth2.Token,error){
+func GetToken(url string)(token *oauth2.Token,err *util.Err){
 
-	req,err := http.NewRequest(http.MethodGet,url,nil)
-	if err != nil {
-		return nil,err
+	req,err1 := http.NewRequest(http.MethodGet,url,nil)
+	if err1 != nil {
+		err =  util.NewErr(err1,util.ErrInternalServer,"构建请求时发生错误")
+		return
 	}
 	req.Header.Set("accept","application/json")
 
 	//发送请求并获得响应
 	var httpClient = http.Client{}
 
-	res,err := httpClient.Do(req);
-	if err != nil {
-		return nil,err
+	res,err2 := httpClient.Do(req);
+	if err2 != nil {
+		err =  util.NewErr(err2,util.ErrInternalServer,"发送请求时候发生错误")
+		return
 	}
 
 	//将相应体解析为token,返回
-	var token oauth2.Token
+	var token1 oauth2.Token
+	token = &token1
 
 	//将返回的信息解析到Token
-	if err = json.NewDecoder(res.Body).Decode(&token); err!= nil{
-		log.Error(err.Error())
-		return nil,err
+	if err3 := json.NewDecoder(res.Body).Decode(token); err3!= nil{
+		err =  util.NewErr(err3,util.ErrInternalServer,"解析Token结构体出错")
+		return
 	}
-	log.Debug("获得胡Token是",token)
-	return &token,nil
+	log.Debug("获得的Token是",token)
+	return
 }
 
 //用获得的Token获得UserInfo,返回User指针
-func GetUserInfo(token *oauth2.Token)(user *github.User,err error){
+func GetUserInfo(token *oauth2.Token)(user *github.User,err *util.Err){
 
 	log.Debug(token)
 	log.Debug("GitHub Token: ",token.AccessToken)
@@ -82,11 +87,11 @@ func GetUserInfo(token *oauth2.Token)(user *github.User,err error){
 
 	client := github.NewClient(tc)
 
-	user, _, err = client.Users.Get(ctx, "")
+	user, _, err1 := client.Users.Get(ctx, "")
 
 
-	if err != nil {
-		log.Error("n",err)
+	if err1 != nil {
+		err =  util.NewErr(err1,util.ErrThirdParty,"向github请求userinfo出错")
 		return
 	}
 
@@ -94,12 +99,12 @@ func GetUserInfo(token *oauth2.Token)(user *github.User,err error){
 }
 
 //获取仓库的star数目,如果出错err信息不为空
-func GetRepositoryStars(c *gin.Context,slug string)(starCount int,err error) {
+func GetRepositoryStars(c *gin.Context,slug string)(starCount int,err *util.Err) {
 	session := sessions.Default(c)
 	githubToken := session.Get("githubToken")
 
 	if githubToken == nil{
-		log.Error("获取star没有Token")
+		err =  util.NewErr(errors.New("无Token"),util.ErrUnauthorized,"无Token")
 		return
 	}
 	log.Debug("获取star数量",githubToken)
@@ -116,8 +121,12 @@ func GetRepositoryStars(c *gin.Context,slug string)(starCount int,err error) {
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
-	var repo *github.Repository
-	repo,_,err = client.Repositories.Get(ctx,str[0],str[1])
+
+	repo,_,err1 := client.Repositories.Get(ctx,str[0],str[1])
+	if err1 != nil{
+		err =  util.NewErr(err1,util.ErrThirdParty,"获取repo信息出错")
+		return
+	}
 	starCount =  *repo.StargazersCount
 	return
 }
