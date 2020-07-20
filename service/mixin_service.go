@@ -5,7 +5,6 @@ import (
 	"claps-test/model"
 	"claps-test/util"
 	"context"
-	"errors"
 	"github.com/fox-one/mixin-sdk-go"
 	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"
@@ -13,26 +12,31 @@ import (
 	"time"
 )
 
-func ListAssets()(assets []*mixin.Asset,err error){
+func ListAssets()(assets []*mixin.Asset,err *util.Err){
 
-	assets,err = util.MixinClient.ReadAssets(context.Background())
-	return
-}
-
-func GetAssetById(assetID string) (asset *mixin.Asset,err error){
-	asset,err =  util.MixinClient.ReadAsset(context.Background(),assetID)
-	if asset != nil{
-		if assetID != asset.AssetID {
-			log.Error("asset should be %s but get %s\n", assetID, asset.AssetID)
-			return nil,errors.New("GetAsset error")
-		}
+	assets,err1 := util.MixinClient.ReadAssets(context.Background())
+	if err1 != nil {
+		err = util.NewErr(err1,util.ErrThirdParty,"获取全部asset信息错误")
 	}
 	return
 }
 
-func CreateMixinClient(botId string)(client *mixin.Client,err error){
-	bot,err := dao.GetBotById(botId)
-	if err != nil {
+func GetAssetById(assetID string) (asset *mixin.Asset,err *util.Err){
+	asset,err1 := util.MixinClient.ReadAsset(context.Background(),assetID)
+	if err1 != nil {
+		return nil,util.NewErr(err1,util.ErrThirdParty,"获取单个asset信息错误")
+	}
+
+	if assetID != asset.AssetID {
+		return nil,util.NewErr(err1,util.ErrThirdParty,"获取信息Id不一致")
+	}
+	return
+}
+
+func CreateMixinClient(botId string)(client *mixin.Client,err *util.Err){
+	bot,err1 := dao.GetBotById(botId)
+	if err1 != nil {
+		err = util.NewErr(err1,util.ErrDataBase,"获取bot信息失败")
 		return
 	}
 	s := &mixin.Keystore{
@@ -42,7 +46,10 @@ func CreateMixinClient(botId string)(client *mixin.Client,err error){
 		PinToken: bot.PinToken,
 	}
 
-	client, err = mixin.NewFromKeystore(s)
+	client, err1 = mixin.NewFromKeystore(s)
+	if err1 != nil {
+		err = util.NewErr(err1,util.ErrThirdParty,"创建mixinclient失败")
+	}
 	return
 }
 
@@ -148,7 +155,7 @@ func SyncSnapshots() {
 	}
 }
 
-func DoTransfer(ctx context.Context, botId, assetID, opponentID string, amount decimal.Decimal, memo, pin string,userId uint32) (err error) {
+func DoTransfer(ctx context.Context, botId, assetID, opponentID string, amount decimal.Decimal, memo, pin string,userId uint32) (err *util.Err) {
 
 
 	//opponentid是转给谁
@@ -160,7 +167,7 @@ func DoTransfer(ctx context.Context, botId, assetID, opponentID string, amount d
 		return
 	}
 	//traceid暂时不应该这样
-	snapshot, err := user.Transfer(ctx, &mixin.TransferInput{
+	snapshot, err1 := user.Transfer(ctx, &mixin.TransferInput{
 		TraceID:    uuid.Must(uuid.NewV4()).String(),
 		AssetID:    assetID,
 		OpponentID: opponentID,
@@ -168,31 +175,36 @@ func DoTransfer(ctx context.Context, botId, assetID, opponentID string, amount d
 		Memo:       memo,
 	}, pin)
 
-	if err != nil {
+	if err1 != nil {
+		err = util.NewErr(err,util.ErrThirdParty,"转账失败")
 		return
 	}
 
 	//这里的memberwallet,是通过外部获取的,业务逻辑不是这样,暂时这么写,这里的wallet里面的balance功能存疑
-	memberWallet,err := dao.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(1,1,botId,assetID)
-	if err != nil {
+	memberWallet,err1 := dao.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(1,1,botId,assetID)
+	if err1 != nil {
+		err = util.NewErr(err,util.ErrDataBase,"获取用户钱包失败")
 		return
 	}
 	memberWallet.Balance = memberWallet.Balance.Sub(amount)
 
-	err = dao.UpdateMemberWallet(memberWallet)
-	if err != nil {
+	err1 = dao.UpdateMemberWallet(memberWallet)
+	if err1 != nil {
+		err = util.NewErr(err,util.ErrDataBase,"更新用户钱包失败")
 		return
 	}
 
-	wallet,err := dao.GetWalletByBotIdAndAssetId(botId,assetID)
-	if err != nil {
+	wallet,err1 := dao.GetWalletByBotIdAndAssetId(botId,assetID)
+	if err1 != nil {
+		err = util.NewErr(err,util.ErrDataBase,"获取项目钱包失败")
 		return
 	}
 
 	wallet.Balance = wallet.Balance.Sub(amount)
 
-	err = dao.UpdateWallet(wallet)
-	if err != nil {
+	err1 = dao.UpdateWallet(wallet)
+	if err1 != nil {
+		err = util.NewErr(err,util.ErrDataBase,"更新项目钱包失败")
 		return
 	}
 
@@ -207,7 +219,10 @@ func DoTransfer(ctx context.Context, botId, assetID, opponentID string, amount d
 		Memo:       memo,
 		CreatedAt:  snapshot.CreatedAt,
 	}
-	err = dao.InsertTransfer(transfer)
 
+	err1 = dao.InsertTransfer(transfer)
+	if err1 != nil {
+		err = util.NewErr(err,util.ErrDataBase,"交易记录插入数据库失败")
+	}
 	return
 }

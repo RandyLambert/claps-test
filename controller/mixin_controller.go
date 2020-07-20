@@ -2,20 +2,14 @@ package controller
 
 import (
 	"claps-test/service"
+	"claps-test/util"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 func Assets(ctx *gin.Context){
 
 	assets,err := service.ListAssets()
-	if err != nil {
-		log.Error("Assets",err.Error())
-		ctx.JSON(http.StatusUnauthorized,"Bad Request" + err.Error())
-	}else {
-		ctx.JSON(http.StatusOK,assets)
-	}
+	util.HandleResponse(ctx,err,assets)
 }
 
 //func DoAsset(ctx context.Context, user *sdk.User) string {

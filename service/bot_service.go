@@ -1,18 +1,21 @@
 package service
 
 import (
+	"claps-test/util"
 	"context"
 	"github.com/fox-one/mixin-sdk-go"
 )
 
-func GetBotAssetByIdAndAssetId(botId string,assetId string)(asset *mixin.Asset,err error){
+func GetAssetByBotIdAndAssetId(botId string,assetId string)(asset *mixin.Asset,err *util.Err){
 
 	client,err := CreateMixinClient(botId)
 	if err != nil {
 		return
 	}
-	asset,err = client.ReadAsset(context.Background(),assetId)
-
+	asset,err1 := client.ReadAsset(context.Background(),assetId)
+	if err1 != nil {
+		err = util.NewErr(err,util.ErrThirdParty,"通过botid读取asset信息失败")
+	}
 	return
 }
 
