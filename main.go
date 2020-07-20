@@ -46,7 +46,6 @@ func main() {
 	db.Debug().AutoMigrate(&model.Property{})
 
 	r := gin.Default()
-	r.LoadHTMLGlob("views/*")
 
 	//设置session middleware
 	store := cookie.NewStore([]byte("claps-test"))
