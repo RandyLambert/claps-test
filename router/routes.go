@@ -11,8 +11,6 @@ import (
 func CollectRoute(r *gin.Engine) * gin.Engine{
 	//添加日志中间件
 	r.Use(middleware.LoggerToFile())
-	//测试
-	r.GET("/", controller.Hello)
 	//设置创建基于cookie的存储引擎,secret是加密的秘钥
 	store := cookie.NewStore([]byte("secret11111"))
 	//注册session中间件,设置session的sssion的名字,也是cookie的key
@@ -55,6 +53,7 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 			userGroup.GET("/profile", controller.UserProfile)
 			userGroup.GET("/assets", controller.UserAssets)
 			userGroup.GET("/transactions", controller.UserTransactions)
+			userGroup.GET("/donation", controller.UserTransactions)
 		}
 
 	}

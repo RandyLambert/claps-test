@@ -3,6 +3,8 @@ package controller
 import (
 	"claps-test/model"
 	"claps-test/service"
+	"claps-test/util"
+	"errors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -11,6 +13,8 @@ import (
 
 
 func Oauth(ctx *gin.Context){
+	var err *util.Err
+	resp := make(map[string]interface{})
 	log.Debug("开始处理Oauth授权")
 
 	//获取code,path和state
@@ -28,7 +32,8 @@ func Oauth(ctx *gin.Context){
 	if (ok && uid != state ) || ok2 {
 		session.Set("user",nil)
 		session.Set("githubToken",nil)
-		ctx.JSON(http.StatusBadRequest,"invalid oauth redirect")
+		err = util.NewErr(errors.New("invalid oauth redirect"),util.ErrBadRequest,"")
+		util.HandleResponse(ctx,err,resp)
 		return
 	}
 
@@ -36,18 +41,18 @@ func Oauth(ctx *gin.Context){
 	var oauthTokenUrl = service.GetOauthToken(code)
 	//处理请求的URL,获得Token指针
 	token,err := service.GetToken(oauthTokenUrl)
-	if err != nil {
-		log.Debug(err.Error())
-		ctx.JSON(http.StatusBadRequest,"invalid oauth redirect")
+	if err.Errord != nil {
+		util.HandleResponse(ctx,err,resp)
 		return
 	}
 
 	// 通过token，获取用户信息,user是指针类型
 	user, err := service.GetUserInfo(token)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError,err.Error())
+	if err.Errord != nil {
+		util.HandleResponse(ctx,err,resp)
 		return
 	}
+
 	log.Debugf("\n获得的用户信息是:\n", *user)
 
 	//存储session
@@ -73,8 +78,9 @@ func Oauth(ctx *gin.Context){
 	}
 
 	err = service.InsertOrUpdateUser(&u)
-	if err != nil {
-		log.Error(err.Error())
+	if err.Errord != nil {
+		util.HandleResponse(ctx,err,resp)
+		return
 	}
 
 	//重定向到http://localhost:3000/profile

@@ -53,6 +53,7 @@ func UserProfile(ctx *gin.Context){
 
 }
 
+//获取用户钱包中所有币种的余额
 func UserAssets(ctx *gin.Context){
 
 }

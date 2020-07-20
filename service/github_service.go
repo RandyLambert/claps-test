@@ -21,8 +21,11 @@ import (
 /*
 	第一次登录没有插入,有就更新
  */
-func InsertOrUpdateUser(user *model.User) (err error){
-	err = dao.InsertOrUpdateUser(user)
+func InsertOrUpdateUser(user *model.User) (err *util.Err){
+	err1 := dao.InsertOrUpdateUser(user)
+	if err1  != nil{
+		err = util.NewErr(err,util.ErrDataBase,"数据库查询错误")
+	}
 	return
 }
 
