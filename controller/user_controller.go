@@ -2,6 +2,7 @@ package controller
 
 import (
 	"claps-test/service"
+	"claps-test/util"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
@@ -19,6 +20,7 @@ func Hello(ctx *gin.Context) {
 
 //获取用户的邮箱和项目
 func UserProfile(ctx *gin.Context){
+	resp := map[string]interface{}
 
 	session := sessions.Default(ctx)
 	//从session中获取user和githubToken信息
@@ -36,12 +38,12 @@ func UserProfile(ctx *gin.Context){
 	log.Debugf("\n\nprofile中的githubToken:",token)
 
 	//获取email信息
-	err,emails := service.ListEmailsByToken(token)
+	emails,err := service.ListEmailsByToken(token)
 	//如果因为超时出错,重新请求
 
-	if err != nil {
-		log.Errorf("Users.ListEmails returned error: %v", err)
-		ctx.JSON(http.StatusBadRequest,err)
+	if err.Errord != nil {
+		util.HandleResponse(ctx,err,resp)
+		return
 	}
 
 	//根据userId获取所有project信息,Total和Patrons字段添加
@@ -52,10 +54,10 @@ func UserProfile(ctx *gin.Context){
 	}
 	log.Debug("获得的projects是",projects)
 
-	ctx.JSON(http.StatusOK,gin.H{
-		"emails": emails,
-		"projects": projects,
-	})
+	resp["emails"] = emails
+	resp["projects"] = projects
+	util.HandleResponse(ctx,err,resp)
+
 }
 
 func UserAssets(ctx *gin.Context){

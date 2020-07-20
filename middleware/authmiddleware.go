@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"claps-test/model"
 	"claps-test/util"
 	"errors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,12 +15,12 @@ func AuthMiddleware() gin.HandlerFunc{
 		//获取session
 		session := sessions.Default(ctx)
 		loginuser := session.Get("user")
-
 		if loginuser == nil{
 			err := util.NewErr(errors.New("用户没有登录"),util.ErrUnauthorized,"用户没有登录")
 			util.HandleResponse(ctx,err,nil)
+			ctx.Abort()
 		} else {
-			log.Debug("登录的用户是",loginuser.(model.User).Name)
+			log.Debug("登录的用户是",loginuser.(github.User).Name)
 			ctx.Next()
 		}
 	}

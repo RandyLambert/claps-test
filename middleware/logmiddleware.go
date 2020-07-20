@@ -44,6 +44,7 @@ func LoggerToFile() gin.HandlerFunc {
 			reqMethod,
 			reqUri,
 		)
+
 	}
 }
 

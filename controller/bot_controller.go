@@ -10,6 +10,7 @@ import (
 func Bot(ctx *gin.Context){
 
 	asset,err := service.GetBotAssetByIdAndAssetId(ctx.Param("botId"),ctx.Param("assetId"))
+
 	if err != nil {
 		log.Error("Bot",err.Error())
 		ctx.JSON(http.StatusUnauthorized,gin.H{

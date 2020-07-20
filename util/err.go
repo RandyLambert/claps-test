@@ -70,7 +70,7 @@ func test(ctx *gin.Context) {
  */
 func HandleResponse(c *gin.Context, err *Err, data interface{} ) {
 	// 如果没有错误，也就是没有Errod字段,就是正常请求
-	if err == OK{
+	if err.Errord == nil{
 		sendSuccessResp(c, data)
 		return
 	}
@@ -89,8 +89,21 @@ func HandleResponse(c *gin.Context, err *Err, data interface{} ) {
 		sendFailResp(c,http.StatusUnauthorized,err)
 
 	}
+
+	// 请求方式
+	reqMethod := c.Request.Method
+
+	// 请求路由
+	reqUri := c.Request.RequestURI
+
+	// 请求IP
+	clientIP := c.ClientIP()
+
 	//结构化输出错误
 	log.WithFields(log.Fields{
+		"IP": clientIP,
+		"Method": reqMethod,
+		"Url": reqUri,
 		"code": err.Code,
 		"err": err.Errord,
 	}).Error(err.Message)

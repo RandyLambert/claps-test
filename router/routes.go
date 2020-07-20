@@ -3,7 +3,6 @@ package router
 import (
 	"claps-test/controller"
 	"claps-test/middleware"
-	"claps-test/util"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -51,6 +50,7 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 
 		// /api/user
 		userGroup := apiGroup.Group("/user")
+		userGroup.Use(middleware.AuthMiddleware())
 		{
 			userGroup.GET("/profile", controller.UserProfile)
 			userGroup.GET("/assets", controller.UserAssets)
