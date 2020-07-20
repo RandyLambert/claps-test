@@ -51,8 +51,6 @@ func Oauth(ctx *gin.Context){
 	log.Debugf("\n获得的用户信息是:\n", *user)
 
 	//存储session
-	session.Set("gxk","gaoxingkun")
-	session.Save()
 	session.Set("user",*user)
 	session.Set("githubToken",token.AccessToken)
 	session.Save()

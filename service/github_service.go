@@ -40,7 +40,7 @@ func GetOauthToken(code string) string{
 /*
 根据参数URL去请求，然后换取Token,返回Token指针和错误信息
 */
-func GetToken(url string)(*model.Token,error){
+func GetToken(url string)(*oauth2.Token,error){
 
 	req,err := http.NewRequest(http.MethodGet,url,nil)
 	if err != nil {
@@ -57,7 +57,7 @@ func GetToken(url string)(*model.Token,error){
 	}
 
 	//将相应体解析为token,返回
-	var token model.Token
+	var token oauth2.Token
 
 	//将返回的信息解析到Token
 	if err = json.NewDecoder(res.Body).Decode(&token); err!= nil{
@@ -69,7 +69,7 @@ func GetToken(url string)(*model.Token,error){
 }
 
 //用获得的Token获得UserInfo,返回User指针
-func GetUserInfo(token *model.Token)(user *github.User,err error){
+func GetUserInfo(token *oauth2.Token)(user *github.User,err error){
 
 	log.Debug(token)
 	log.Debug("GitHub Token: ",token.AccessToken)

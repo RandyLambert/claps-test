@@ -43,7 +43,7 @@ func (err *Err) Error() string {
 func sendSuccessResp(c *gin.Context,data interface{}) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    OK.Code,
-		"message": OK.Message
+		"message": OK.Message,
 		"data":    data,
 	})
 }

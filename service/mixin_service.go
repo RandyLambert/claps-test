@@ -76,8 +76,10 @@ func SyncSnapshots() {
 
 		//遍历100记录
 		for i,_ := range snapshots {
+			/*
 			log.Debug(*snapshots[i])
 			log.Debug("\n")
+			 */
 			if lastSnapshotID == snapshots[i].SnapshotID {
 				continue
 			}
