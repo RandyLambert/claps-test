@@ -70,7 +70,7 @@ func test(ctx *gin.Context) {
  */
 func HandleResponse(c *gin.Context, err *Err, data interface{} ) {
 	// 如果没有错误，也就是没有Errod字段,就是正常请求
-	if err.Code == 0{
+	if err == OK{
 		sendSuccessResp(c, data)
 		return
 	}
