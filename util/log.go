@@ -1,7 +1,6 @@
-package middleware
+package util
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"io"
@@ -13,7 +12,7 @@ import (
 
 /*
 初始化日志,logrus日志库
- */
+*/
 func setLogLevel(level string){
 	switch level {
 	case "InfoLevel": logrus.SetLevel(logrus.InfoLevel)
@@ -77,6 +76,7 @@ func setLogOutput(){
 	logrus.SetOutput(io.MultiWriter(writer))
 
 }
+
 func InitLog(){
 	//设置输出
 	setLogOutput()
@@ -86,42 +86,3 @@ func InitLog(){
 	setLogFormatter(viper.GetString("log.formatter"))
 
 }
-
-func LoggerToFile() gin.HandlerFunc {
-
-	return func(c *gin.Context) {
-		// 开始时间
-		startTime := time.Now()
-
-		// 处理请求
-		c.Next()
-
-		// 结束时间
-		endTime := time.Now()
-
-		// 执行时间
-		latencyTime := endTime.Sub(startTime)
-
-		// 请求方式
-		reqMethod := c.Request.Method
-
-		// 请求路由
-		reqUri := c.Request.RequestURI
-
-		// 状态码
-		statusCode := c.Writer.Status()
-
-		// 请求IP
-		clientIP := c.ClientIP()
-
-		//日志格式
-		logrus.Infof("| %3d | %13v | %15s | %s | %s |",
-			statusCode,
-			latencyTime,
-			clientIP,
-			reqMethod,
-			reqUri,
-		)
-	}
-}
-

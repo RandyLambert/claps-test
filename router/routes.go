@@ -2,6 +2,7 @@ package router
 
 import (
 	"claps-test/controller"
+	"claps-test/middleware"
 	"claps-test/util"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -10,7 +11,7 @@ import (
 
 func CollectRoute(r *gin.Engine) * gin.Engine{
 	//添加日志中间件
-	r.Use(util.LoggerToFile())
+	r.Use(middleware.LoggerToFile())
 	//测试
 	r.GET("/", controller.Hello)
 	//设置创建基于cookie的存储引擎,secret是加密的秘钥
