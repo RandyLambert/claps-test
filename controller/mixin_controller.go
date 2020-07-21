@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Assets(ctx *gin.Context){
+func MixinAssets(ctx *gin.Context){
 
 	assets,err := service.ListAssetsAllByDB()
 	util.HandleResponse(ctx,err,assets)
