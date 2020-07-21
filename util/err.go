@@ -16,9 +16,8 @@ type Err struct {
 
 
 //所有都是指针类型
-var (
-	OK = &Err{Code: 0, Message: "成功"}
-
+var ok = &Err{Code: 0, Message: "成功"}
+const (
 	//100表示服务端错误
 	ErrDataBase = 10001 //数据库出错
 	ErrInternalServer = 10002 //内部错误
@@ -42,8 +41,8 @@ func (err *Err) Error() string {
 // SendSuccessResp 返回成功请求
 func sendSuccessResp(c *gin.Context,data interface{}) {
 	c.JSON(http.StatusOK, gin.H{
-		"code":    OK.Code,
-		"message": OK.Message,
+		"code":    ok.Code,
+		"message": ok.Message,
 		"data":    data,
 	})
 }
@@ -73,6 +72,12 @@ func HandleResponse(c *gin.Context, err *Err, data interface{} ) {
 	if err.Errord == nil{
 		sendSuccessResp(c, data)
 		return
+	}
+
+	if err == nil{
+		sendSuccessResp(c, data)
+		return
+
 	}
 
 	//根据错误的不同

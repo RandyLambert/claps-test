@@ -10,13 +10,14 @@ type Bot struct{
 	PrivateKey string `gorm:"type:text;not null"`
 }
 
-type BotId struct{
-	Id string `gorm:"type:varchar(50);primary_key;unique_index:id_UNIQUE;not null"`
+type BotDto struct{
+	Id string `json:"id" gorm:"type:varchar(50);primary_key;unique_index:id_UNIQUE;not null"`
+	Distribution rune `json:"distribution" gorm:"type:enum('0','1','2','3');primary_key;not null"`
 }
 
 const (
-	PersperAlgorithm = iota+1
-	Commits
-	ChangedLines
-	IdenticalAmount
+	PersperAlgorithm = '0'
+	Commits = '1'
+	ChangedLines = '2'
+	IdenticalAmount = '3'
 )

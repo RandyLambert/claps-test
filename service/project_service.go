@@ -25,7 +25,7 @@ func GetProjectByName(name string) (projectDetailInfo *map[string]interface{},er
 		return
 	}
 
-	botIds,err := ListBotIdsByProjectId(project.Id)
+	botIds,err := ListBotDtosByProjectId(project.Id)
 	if err != nil {
 		return
 	}
@@ -131,8 +131,8 @@ func ListMembersByProjectName(name string)(members *[]model.User,err *util.Err){
 	return
 }
 
-func ListBotIdsByProjectId(projectId uint32)(botids *[]model.BotId,err *util.Err){
-	botids,err1 := dao.ListBotIdsByProjectId(projectId)
+func ListBotDtosByProjectId(projectId uint32)(botDtos *[]model.BotDto,err *util.Err){
+	botDtos,err1 := dao.ListBotDtosByProjectId(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1,util.ErrDataBase,"获取项目机器人失败")
 	}

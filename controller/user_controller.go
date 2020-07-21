@@ -35,14 +35,14 @@ func UserProfile(ctx *gin.Context){
 	emails,err := service.ListEmailsByToken(token)
 	//如果因为超时出错,重新请求
 
-	if err.Errord != nil {
+	if err != nil {
 		util.HandleResponse(ctx,err,resp)
 		return
 	}
 
 	//根据userId获取所有project信息,Total和Patrons字段添加
 	projects,err := service.ListProjectsByUserId(*user.(github.User).ID)
-	if err.Errord != nil {
+	if err != nil {
 		util.HandleResponse(ctx,err,resp)
 	}
 

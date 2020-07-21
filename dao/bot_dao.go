@@ -12,8 +12,8 @@ func GetBotById(botId string)(bot *model.Bot,err error){
 }
 
 //根据projectId获取所有的机器人Id
-func ListBotIdsByProjectId(projectId uint32)(botId *[]model.BotId,err error){
-	botId = &[]model.BotId{}
-	err = util.DB.Debug().Table("bot").Where("project_id=?",projectId).Find(botId).Error
+func ListBotDtosByProjectId(projectId uint32)(botDto *[]model.BotDto,err error){
+	botDto = &[]model.BotDto{}
+	err = util.DB.Debug().Table("bot").Where("project_id=?",projectId).Find(botDto).Error
 	return
 }

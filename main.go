@@ -15,7 +15,6 @@ import (
 
 func main() {
 
-
 	/*
 	初始化配置文件,Mixin,log和DB
 	 */
@@ -27,8 +26,12 @@ func main() {
 
 	util.RegisterType()
 	util.Cors()
-	//开一个协程,定期更新数据库
+	//开一个协程,定期更新数据库snapshot信息
 	go service.SyncSnapshots()
+	//开一个协程,定期更新数据库asset信息
+	go service.SyncAssets()
+	//开一个协程,定期进行提现操作,并更改数据库
+	go service.SyncTransfer()
 
 	log.Debug("debug")
 	log.Warning("Warning")
@@ -44,6 +47,7 @@ func main() {
 	db.Debug().AutoMigrate(&model.User{})
 	db.Debug().AutoMigrate(&model.Member{})
 	db.Debug().AutoMigrate(&model.Property{})
+	db.Debug().AutoMigrate(&model.Asset{})
 
 	r := gin.Default()
 
