@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"claps-test/util"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -28,13 +29,11 @@ func RandUp(n int) []byte {
 
 //认证身份信息
 func AuthInfo(ctx *gin.Context){
-
+	resp := make(map[string]interface{})
 	//从session中尝试获取用户信息
 	session := sessions.Default(ctx)
 	var randomUid string = ""
 
-	gxk := session.Get("gxk")
-	log.Debug("gxk=======>",gxk)
 
 	foxoneToken := session.Get("foxoneToken")
 	user := session.Get("user")
@@ -49,8 +48,27 @@ func AuthInfo(ctx *gin.Context){
 		randomUid = string(RandUp(32))
 		//存入session
 		session.Set("uid",randomUid)
-		session.Save()
+		err1 := session.Save()
+		if err1 != nil{
+			err := util.NewErr(err1,util.ErrInternalServer,"session保存出错")
+			util.HandleResponse(ctx,err,resp)
+			return
+		}
 	}
+
+	/*
+	resp["user"] = user
+	resp["randomUid"] = randomUid
+	resp["mixinAuth"] = If(mixinToken != nil,true,false).(bool)
+	resp["foxoneAuth"] = If(foxoneToken!= nil,true,false).(bool)
+	resp["envs"] = gin.H{
+		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
+		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
+		"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
+	}
+
+	util.HandleResponse(ctx,nil,resp)
+	 */
 
 	ctx.JSON(http.StatusOK,gin.H{
 		"user":user,

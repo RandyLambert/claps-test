@@ -41,14 +41,14 @@ func Oauth(ctx *gin.Context){
 	var oauthTokenUrl = service.GetOauthToken(code)
 	//处理请求的URL,获得Token指针
 	token,err := service.GetToken(oauthTokenUrl)
-	if err.Errord != nil {
+	if err != nil {
 		util.HandleResponse(ctx,err,resp)
 		return
 	}
 
 	// 通过token，获取用户信息,user是指针类型
 	user, err := service.GetUserInfo(token)
-	if err.Errord != nil {
+	if err != nil {
 		util.HandleResponse(ctx,err,resp)
 		return
 	}
@@ -58,14 +58,19 @@ func Oauth(ctx *gin.Context){
 	//存储session
 	session.Set("user",*user)
 	session.Set("githubToken",token.AccessToken)
-	session.Save()
+	err1 := session.Save()
+	if err1 != nil{
+		err = util.NewErr(err1,util.ErrInternalServer,"session保存出错")
+		util.HandleResponse(ctx,err,resp)
+		return
+	}
 
 	tmp := session.Get("user")
 	log.Debug("刚刚存储的session是",tmp)
 
 	//尝试获取数据库中该user信息
 	u := model.User{}
-	u.Id = *user.ID
+	u.Id = uint32(*user.ID)
 	u.Name = *user.Login
 	if user.AvatarURL != nil{
 		u.AvatarUrl = *user.AvatarURL
@@ -78,7 +83,7 @@ func Oauth(ctx *gin.Context){
 	}
 
 	err = service.InsertOrUpdateUser(&u)
-	if err.Errord != nil {
+	if err != nil {
 		util.HandleResponse(ctx,err,resp)
 		return
 	}

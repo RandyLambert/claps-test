@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+//获取所有币的信息
 func ListAssetsAllByMixinClient(client *mixin.Client)(assets []*mixin.Asset,err *util.Err){
 
 	assets,err1 := client.ReadAssets(context.Background())
@@ -50,6 +51,7 @@ func SyncAssets() {
 		}
 
 		for i := range assetsInfo {
+			//log.Debug(assetsInfo[i].Name)
 			if assetsInfo[i].AssetID == util.BTC ||
 				assetsInfo[i].AssetID == util.BCH ||
 				assetsInfo[i].AssetID == util.ETC ||

@@ -16,7 +16,7 @@ require (
 	github.com/jinzhu/gorm v1.9.13
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/lib/pq v1.3.0 // indirect
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/shopspring/decimal v1.2.0
