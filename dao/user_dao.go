@@ -39,3 +39,17 @@ func ListMembersByProjectName(projectName string)(users *[]model.User,err error)
 
 	return
 }
+
+func ListMembersByProjectId(projectId uint32)(users *[]model.User,err error){
+
+	//db.Where("amount > ?", db.Table("orders").Select("AVG(amount)").Where("state = ?", "paid").SubQuery()).Find(&orders)
+	// SELECT * FROM "orders"  WHERE "orders"."deleted_at" IS NULL AND (amount > (SELECT AVG(amount) FROM "orders"  WHERE (state = 'paid')));
+	users = &[]model.User{}
+	err = util.DB.Debug().Where("user.id IN (?)",
+		util.DB.Debug().Table("member").Select("user_id").Where("project_id=?", projectId).SubQuery()).Find(users).Error
+	// IN
+	//db.Where("name IN (?)", []string{"jinzhu", "jinzhu 2"}).Find(&users)
+	//// SELECT * FROM users WHERE name in ('jinzhu','jinzhu 2');
+
+	return
+}

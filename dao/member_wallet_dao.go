@@ -15,9 +15,9 @@ func InsertMemberWallet(memberWallet *model.MemberWallet)(err error){
 	return
 }
 
-func GetMemeberWalletByUserIdAndAssetId(userId uint32,assetId string)(memberWallets *[]model.MemberWalletDto,err error) {
-	memberWallets = &[]model.MemberWalletDto{}
-	err = util.DB.Debug().Table("member_wallet").Where("user_id = ? AND asset_id = ?",userId,assetId).Find(memberWallets).Error
+func GetMemeberWalletByUserIdAndAssetId(userId uint32,assetId string)(memberWalletDtos *[]model.MemberWalletDto,err error) {
+	memberWalletDtos = &[]model.MemberWalletDto{}
+	err = util.DB.Debug().Table("member_wallet").Where("user_id = ? AND asset_id = ?",userId,assetId).Scan(memberWalletDtos).Error
 	return
 }
 

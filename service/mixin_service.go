@@ -85,7 +85,7 @@ func SyncTransfer() {
 
 	ctx := context.TODO()
 	for {
-		transfers,err := dao.ListTransfersByStatus('0')
+		transfers,err := dao.ListTransfersByStatus('1')
 		if err != nil {
 			log.Error(err.Error())
 			continue
@@ -117,7 +117,7 @@ func SyncTransfer() {
 			snapshot, err := user.Transfer(ctx, &mixin.TransferInput{
 				TraceID:    uuid.Must(uuid.NewV4()).String(),
 				AssetID:    (*transfers)[i].AssetId,
-				OpponentID: (*transfers)[i].OpponentId,
+				OpponentID: (*transfers)[i].BotId,
 				Amount:     (*transfers)[i].Amount,
 				Memo:       (*transfers)[i].Memo,
 			}, bot.Pin)
@@ -187,6 +187,7 @@ func SyncSnapshots() {
 				//错误处理有问题
 				if err != nil {
 					log.Error(err.Error())
+					continue
 				}
 
 				transaction := &model.Transaction{
@@ -202,12 +203,14 @@ func SyncSnapshots() {
 				err = dao.InsertTransaction(transaction)
 				if err != nil {
 					log.Error(err.Error())
+					continue
 				}
 
-				//查找汇率等详细信息,目前还是及时获取的
-				asset,err := GetAssetById(snapshots[i].AssetID)
+				//查找汇率等详细信息
+				asset,err := dao.GetPriceUsdByAssetId(snapshots[i].AssetID)
 				if err != nil {
 					log.Error(err.Error())
+					continue
 				}
 
 				//更新Total字段
@@ -220,11 +223,35 @@ func SyncSnapshots() {
 				err = dao.UpdateProjectTotal(projectTotal)
 				if err != nil {
 					log.Error(err.Error())
+					continue
 				}
 
 				//更新项目钱包
-
+				walletTotal,err := dao.GetWalletTotalByBotIdAndAssetId(snapshots[i].OpponentID,snapshots[i].AssetID)
+				if err != nil {
+					log.Error(err.Error())
+					continue
+				}
+				walletTotal.Total = walletTotal.Total.Add(snapshots[i].Amount)
+				err = dao.UpdateWalletTotal(walletTotal)
+				if err != nil {
+					log.Error(err.Error())
+					continue
+				}
 				//根据不同的分配算法进行配置
+				bot,err := dao.GetBotDtoById(snapshots[i].OpponentID)
+
+				switch bot.Distribution {
+				case model.PersperAlgorithm:
+					go distributionByPersperAlgorithm(transaction)
+				case model.Commits:
+					go distributionByCommits(transaction)
+				case model.ChangedLines:
+					go distributionByChangedLines(transaction)
+				case model.IdenticalAmount:
+					go distributionByIdenticalAmount(transaction)
+				}
+
 			}
 		}
 
@@ -240,41 +267,4 @@ func SyncSnapshots() {
 		since = snapshots[len(snapshots)-1].CreatedAt
 		time.Sleep(100 * time.Millisecond)
 	}
-}
-
-func DoTransfer(botId, assetID ,opponentID, memo string, amount decimal.Decimal, userId uint32) (err *util.Err) {
-
-	transfer := &model.Transfer{
-		BotId:      botId,
-		UserId:     userId,
-		TraceId:    string(userId)+assetID+botId,
-		OpponentId: opponentID,
-		AssetId:    assetID,
-		Amount:     amount,
-		Memo:       memo,
-		Status:    '0',
-	}
-
-	err1 := dao.InsertTransfer(transfer)
-
-	if err1 != nil {
-		err = util.NewErr(err,util.ErrDataBase,"提现记录首次写入数据库失败导致提现失败,确认当时是否有一笔提现记录未被确认?")
-		return
-	}
-
-	//这里的memberwallet,是通过外部获取的,业务逻辑不是这样,暂时这么写
-	memberWallet,err1 := dao.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(1,1,botId,assetID)
-	if err1 != nil {
-		err = util.NewErr(err,util.ErrDataBase,"获取用户钱包失败导致提现失败")
-		return
-	}
-
-	memberWallet.Balance = memberWallet.Balance.Sub(amount)
-
-	err1 = dao.UpdateMemberWallet(memberWallet)
-	if err1 != nil {
-		err = util.NewErr(err,util.ErrDataBase,"更新用户钱包可提现值导致提现失败")
-	}
-
-	return
 }

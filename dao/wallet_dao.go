@@ -5,14 +5,14 @@ import (
 	"claps-test/util"
 )
 
-func GetWalletByBotIdAndAssetId(botId string,assetId string)(wallet *model.Wallet,err error){
-	wallet = &model.Wallet{}
-	err = util.DB.Where("bot_id=? AND asset_id=?",botId,assetId).Find(wallet).Error
+func GetWalletTotalByBotIdAndAssetId(botId string,assetId string)(total *model.WalletTotal,err error){
+	total = &model.WalletTotal{}
+	err = util.DB.Where("bot_id=? AND asset_id=?",botId,assetId).Find(total).Error
 	return
 }
 
-func UpdateWallet(wallet *model.Wallet)(err error){
-	err = util.DB.Save(wallet).Error
+func UpdateWalletTotal(walletTotal *model.WalletTotal)(err error){
+	err = util.DB.Save(walletTotal).Error
 	return
 }
 

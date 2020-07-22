@@ -14,7 +14,7 @@ func InsertTransaction(transaction *model.Transaction)(err error){
 func ListTransactionsByProjectNameAndAssetId(name string,assetId string)(transactions *[]model.Transaction,err error){
 
 	transactions = &[]model.Transaction{}
-	err = util.DB.Debug().Where("asset_id=?",assetId).Where("project.id=?",
+	err = util.DB.Debug().Where("asset_id=? AND project.id=?",assetId,
 		util.DB.Debug().Table("project").Select("project.id").Where("project.name=?",name).SubQuery()).Find(transactions).Error
 	//err = util.DB.Debug().Joins("INNER JOIN project ON project.name=?",name).Where("asset_id=?",assetId).Find(transactions).Error
 	return
