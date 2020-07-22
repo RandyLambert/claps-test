@@ -15,26 +15,33 @@ func GetProjectByName(name string) (projectDetailInfo *map[string]interface{},er
 		return
 	}
 
-	repositories,err := ListRepositoriesByProjectId(project.Id)
-	if err != nil {
+	repositories,err1 := dao.ListRepositoriesByProjectId(project.Id)
+	if err1 != nil {
+		err = util.NewErr(err1,util.ErrDataBase,"获取项目仓库失败")
 		return
 	}
 
-	members,err := ListMembersByProjectName(name)
-	if err != nil {
+
+	//mambers格式不同,删除project_id和userid字段
+	members,err1 := dao.ListMembersByProjectName(project.Name)
+	if err1 != nil {
+		err = util.NewErr(err1,util.ErrDataBase,"获取项目成员失败")
 		return
 	}
 
-	botIds,err := ListBotDtosByProjectId(project.Id)
-	if err != nil {
+
+	botDtos,err1 := dao.ListBotDtosByProjectId(project.Id)
+	if err1 != nil {
+		err = util.NewErr(err1,util.ErrDataBase,"获取项目机器人失败")
 		return
 	}
+
 
 	projectDetailInfo = &map[string]interface{}{
 		"project":project,
 		"repositories":repositories,
 		"members":members,
-		"botIds":botIds,
+		"botIds":botDtos,
 	}
 	return
 }
@@ -44,9 +51,7 @@ func ListProjectsAll() (projects *[]model.Project,err *util.Err){
 	projects,err1 := dao.ListProjectsAll()
 	if err1 != nil {
 		err = util.NewErr(err1,util.ErrDataBase,"获取所有项目失败")
-		return
 	}
-
 	return
 }
 
@@ -56,7 +61,6 @@ func ListProjectsByUserId(userId uint32) (projects *[]model.Project,err *util.Er
 	projects,err1 := dao.ListProjectsByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err1,util.ErrDataBase,"获取项目机器人失败")
-		return
 	}
 
 	return
@@ -70,27 +74,10 @@ func ListTransactionsByProjectNameAndAssetId(name string,assetId string)(transac
 	return
 }
 
-func ListRepositoriesByProjectId(projectId uint32)(repositories *[]model.Repository,err *util.Err){
-	repositories,err1 := dao.ListRepositoriesByProjectId(projectId)
-	if err1 != nil {
-		err = util.NewErr(err1,util.ErrDataBase,"获取项目仓库失败")
-	}
-	return
-}
-
-func ListMembersByProjectName(name string)(members *[]model.User,err *util.Err){
-	//mambers格式不同,删除project_id和userid字段
-	members,err1 := dao.ListMembersByProjectName(name)
+func ListMembersByProjectName(projectName string)(members *[]model.User,err *util.Err){
+	members,err1 := dao.ListMembersByProjectName(projectName)
 	if err1 != nil {
 		err = util.NewErr(err1,util.ErrDataBase,"获取项目成员失败")
-	}
-	return
-}
-
-func ListBotDtosByProjectId(projectId uint32)(botDtos *[]model.BotDto,err *util.Err){
-	botDtos,err1 := dao.ListBotDtosByProjectId(projectId)
-	if err1 != nil {
-		err = util.NewErr(err1,util.ErrDataBase,"获取项目机器人失败")
 	}
 	return
 }

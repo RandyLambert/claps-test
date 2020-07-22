@@ -21,6 +21,5 @@ func ListAssetsAllByDB()(assets *[]model.Asset,err *util.Err){
 		err = util.NewErr(err1,util.ErrDataBase,"获取全部assets信息失败")
 	}
 	return
-
 }
 

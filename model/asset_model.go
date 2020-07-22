@@ -11,4 +11,7 @@ type Asset struct{
 	PriceUsd decimal.Decimal `json:"price_usd" gorm:"type:varchar(128);not null"`
 }
 
-
+type AssetIdToPriceUsd struct {
+	AssetId string `json:"asset_id" gorm:"type:varchar(36);primary_key;not null;"`
+	PriceUsd decimal.Decimal `json:"price_usd" gorm:"type:varchar(128);not null"`
+}

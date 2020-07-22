@@ -24,9 +24,9 @@ func GetTransferByUserIdAndAssetId(userid uint32, assetId string)(transfers *[]m
 	return
 }
 
-//status only '0' or '1'
+//status only '0' or '1' or '2'
 func ListTransfersByStatus(status rune)(transfer *[]model.Transfer,err error){
 	transfer = &[]model.Transfer{}
-	err = util.DB.Select("status=?",status).Find(transfer).Error
+	err = util.DB.Where("status=?",status).Find(transfer).Error
 	return
 }
