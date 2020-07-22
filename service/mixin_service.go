@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+//获取所有币的信息
 func ListAssets()(assets []*mixin.Asset,err *util.Err){
 
 	assets,err1 := util.MixinClient.ReadAssets(context.Background())

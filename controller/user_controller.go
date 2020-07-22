@@ -35,14 +35,14 @@ func UserProfile(ctx *gin.Context){
 	emails,err := service.ListEmailsByToken(token)
 	//如果因为超时出错,重新请求
 
-	if err.Errord != nil {
+	if err != nil {
 		util.HandleResponse(ctx,err,resp)
 		return
 	}
 
 	//根据userId获取所有project信息,Total和Patrons字段添加
 	projects,err := service.ListProjectsByUserId(*user.(github.User).ID)
-	if err.Errord != nil {
+	if err != nil {
 		util.HandleResponse(ctx,err,resp)
 	}
 
@@ -56,9 +56,31 @@ func UserProfile(ctx *gin.Context){
 //获取用户钱包中所有币种的余额
 func UserAssets(ctx *gin.Context){
 
+	var err *util.Err
+	resp := make(map[string]interface{})
+
+	//请求
+	assets,err := service.ListAssets()
+
+	log.Debug(assets,err)
+
+	//
+	util.HandleResponse(ctx,err,resp)
 }
 
+
+//读取交易记录
 func UserTransactions(ctx *gin.Context){
+	resp := make(map[string]interface{})
+
+	assetId := ctx.Query("assetId")
+	if assetId == ""{
+		err := util.NewErr(nil,util.ErrBadRequest,"没有币种参数")
+		util.HandleResponse(ctx,err,resp)
+		return
+	}
+	log.Debug("assetId = ",assetId)
+
 
 }
 
