@@ -117,7 +117,7 @@ func SyncTransfer() {
 			snapshot, err := user.Transfer(ctx, &mixin.TransferInput{
 				TraceID:    uuid.Must(uuid.NewV4()).String(),
 				AssetID:    (*transfers)[i].AssetId,
-				OpponentID: (*transfers)[i].OpponentId,
+				//OpponentID: (*transfers)[i].OpponentId,
 				Amount:     (*transfers)[i].Amount,
 				Memo:       (*transfers)[i].Memo,
 			}, bot.Pin)
@@ -248,7 +248,7 @@ func DoTransfer(botId, assetID ,opponentID, memo string, amount decimal.Decimal,
 		BotId:      botId,
 		UserId:     userId,
 		TraceId:    string(userId)+assetID+botId,
-		OpponentId: opponentID,
+		//OpponentId: opponentID,
 		AssetId:    assetID,
 		Amount:     amount,
 		Memo:       memo,

@@ -99,7 +99,7 @@ func UserAssets(ctx *gin.Context){
 }
 
 
-//读取某种货币的交易记录
+//读取某种货币的交易记录,读取transfer里面的记录
 func UserTransactions(ctx *gin.Context){
 	resp := make(map[string]interface{})
 
@@ -111,10 +111,28 @@ func UserTransactions(ctx *gin.Context){
 	}
 	log.Debug("assetId = ",assetId)
 
-	//从transaction表中获取该用户的所有捐赠记录
+	//从transfer表中获取该用户的所有捐赠记录
 
 }
 
+func UserTransfer(ctx *gin.Context) {
+	resp := make(map[string]interface{})
+	session := sessions.Default(ctx)
+	userId := uint32(*(session.Get("user").(github.User).ID))
+
+	assetId := ctx.Query("assetId")
+	if assetId == ""{
+		err := util.NewErr(nil,util.ErrBadRequest,"没有币种参数")
+		util.HandleResponse(ctx,err,resp)
+		return
+	}
+	log.Debug("assetId = ",assetId)
+
+	//从transfer表中获取该用户的所有捐赠记录
+	transfers,err := service.GetTransferByUserIdAndAssetId(userId,assetId)
+	resp["transfers"] = transfers
+	util.HandleResponse(ctx,err,resp)
+}
 
 
 
