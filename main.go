@@ -24,6 +24,19 @@ func main() {
 	db := util.InitDB()
 	defer db.Close()
 
+	//自动迁移
+	db.Debug().AutoMigrate(&model.Project{})
+	db.Debug().AutoMigrate(&model.MemberWallet{})
+	db.Debug().AutoMigrate(&model.Repository{})
+	db.Debug().AutoMigrate(&model.Transaction{})
+	db.Debug().AutoMigrate(&model.Transfer{})
+	db.Debug().AutoMigrate(&model.Wallet{})
+	db.Debug().AutoMigrate(&model.User{})
+	db.Debug().AutoMigrate(&model.Member{})
+	db.Debug().AutoMigrate(&model.Property{})
+	db.Debug().AutoMigrate(&model.Bot{})
+	db.Debug().AutoMigrate(&model.Asset{})
+
 	util.RegisterType()
 	util.Cors()
 	//开一个协程,定期更新数据库snapshot信息
@@ -37,17 +50,7 @@ func main() {
 	log.Warning("Warning")
 	log.Error("Error")
 
-	//自动迁移
-	db.Debug().AutoMigrate(&model.Project{})
-	db.Debug().AutoMigrate(&model.MemberWallet{})
-	db.Debug().AutoMigrate(&model.Repository{})
-	db.Debug().AutoMigrate(&model.Transaction{})
-	db.Debug().AutoMigrate(&model.Transfer{})
-	db.Debug().AutoMigrate(&model.Wallet{})
-	db.Debug().AutoMigrate(&model.User{})
-	db.Debug().AutoMigrate(&model.Member{})
-	db.Debug().AutoMigrate(&model.Property{})
-	db.Debug().AutoMigrate(&model.Asset{})
+
 
 	r := gin.Default()
 

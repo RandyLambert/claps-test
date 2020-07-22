@@ -51,6 +51,7 @@ func SyncAssets() {
 		}
 
 		for i := range assetsInfo {
+			//log.Debug(assetsInfo[i].Name)
 			if assetsInfo[i].AssetID == util.BTC ||
 				assetsInfo[i].AssetID == util.BCH ||
 				assetsInfo[i].AssetID == util.ETC ||

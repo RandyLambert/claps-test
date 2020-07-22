@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"claps-test/model"
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
@@ -58,18 +59,33 @@ func UserAssets(ctx *gin.Context){
 
 	var err *util.Err
 	resp := make(map[string]interface{})
+	session := sessions.Default(ctx)
+	//user不为空
+	user := session.Get("user")
+	userId := user.(model.User).Id
 
-	//请求
-	assets,err := service.ListAssets()
+	//获得所有币的信息
+	assets,err := service.ListAssetsAllByDB()
+	if err != nil{
+		util.HandleResponse(ctx,err,resp)
+		return
+	}
+	log.Debug(*assets)
 
-	log.Debug(assets,err)
+	//查询用户钱包,获得相应的余额,添加到币信息的后面
+	err2,dto := service.GetUserBalanceByAllAssets(userId,assets)
+	if err2 != nil{
+		util.HandleResponse(ctx,err,resp)
+		return
+	}
 
-	//
+	log.Debug(*dto)
+	resp["assets"] = dto
 	util.HandleResponse(ctx,err,resp)
 }
 
 
-//读取交易记录
+//读取某种货币的交易记录
 func UserTransactions(ctx *gin.Context){
 	resp := make(map[string]interface{})
 
@@ -81,6 +97,7 @@ func UserTransactions(ctx *gin.Context){
 	}
 	log.Debug("assetId = ",assetId)
 
+	//从transaction表中获取该用户的所有捐赠记录
 
 }
 

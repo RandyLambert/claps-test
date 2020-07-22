@@ -14,6 +14,7 @@ func GetAssetById(assetID string) (asset *model.Asset,err *util.Err){
 	return
 }
 
+//把数据库中asset表中的数据读出来
 func ListAssetsAllByDB()(assets *[]model.Asset,err *util.Err){
 	assets,err1 := dao.ListAssetsAllByDB()
 	if err1 != nil {
@@ -22,3 +23,4 @@ func ListAssetsAllByDB()(assets *[]model.Asset,err *util.Err){
 	return
 
 }
+

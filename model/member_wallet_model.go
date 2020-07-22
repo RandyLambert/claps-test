@@ -7,6 +7,7 @@ import (
 
 type MemberWallet struct {
 	ProjectId uint32 `gorm:"type:int unsigned;primary_key;not null"`
+	//user表的Id
 	UserId uint32 `gorm:"type:int unsigned;primary_key;not null"`
 	BotId string `gorm:"type:varchar(50);primary_key;not null"`
 	AssetId string `gorm:"type:varchar(50);primary_key;not null"`
@@ -16,4 +17,7 @@ type MemberWallet struct {
 	Balance decimal.Decimal `gorm:"type:varchar(128);default:null"`
 }
 
-
+type MemberWalletDto struct {
+	AssetId string `gorm:"type:varchar(50);primary_key;not null"`
+	Balance decimal.Decimal `gorm:"type:varchar(128);default:null"`
+}

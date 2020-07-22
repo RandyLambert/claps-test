@@ -10,3 +10,5 @@ type Asset struct{
 	PriceBtc decimal.Decimal `json:"price_btc" gorm:"type:varchar(128);not null"`
 	PriceUsd decimal.Decimal `json:"price_usd" gorm:"type:varchar(128);not null"`
 }
+
+
