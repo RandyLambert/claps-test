@@ -54,7 +54,8 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 			userGroup.GET("/assets", controller.UserAssets)
 			//userGroup.GET("/transactions", controller.UserTransactions)
 			userGroup.GET("/transfers", controller.UserTransfer)
-			userGroup.GET("/donation", controller.UserTransactions)
+			//请求获得某个用户的捐赠信息的汇总,包括总金额和捐赠人数
+			userGroup.GET("/donation", controller.UserDonation)
 		}
 
 	}

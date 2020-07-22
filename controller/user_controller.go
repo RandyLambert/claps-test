@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
+	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -41,7 +42,7 @@ func UserProfile(ctx *gin.Context){
 	}
 
 	//根据userId获取所有project信息,Total和Patrons字段添加
-	projects,err := service.ListProjectsByUserId(*user.(github.User).ID)
+	projects,err := service.ListProjectsByUserId(uint32(*user.(github.User).ID))
 	if err != nil {
 		util.HandleResponse(ctx,err,resp)
 	}
@@ -99,7 +100,7 @@ func UserAssets(ctx *gin.Context){
 }
 
 
-//读取某种货币的交易记录,读取transfer里面的记录
+
 func UserTransactions(ctx *gin.Context){
 	resp := make(map[string]interface{})
 
@@ -115,6 +116,7 @@ func UserTransactions(ctx *gin.Context){
 
 }
 
+//读取某种货币的交易记录,读取transfer里面的记录/
 func UserTransfer(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 	session := sessions.Default(ctx)
@@ -134,6 +136,48 @@ func UserTransfer(ctx *gin.Context) {
 	util.HandleResponse(ctx,err,resp)
 }
 
+//获取某用户的所有的受捐赠记录的汇总
+func UserDonation(ctx *gin.Context) {
+	resp := make(map[string]interface{})
+	session := sessions.Default(ctx)
+	userId := uint32(*(session.Get("user").(github.User)).ID)
+
+	//读取所有的member_wallet表然后汇总
+	//获得所有币的信息
+	assets,err := service.ListAssetsAllByDB()
+	if err != nil{
+		util.HandleResponse(ctx,err,resp)
+		return
+	}
+	log.Debug(*assets)
+
+	//查询用户钱包,获得相应的余额,添加到币信息的后面
+	err2,dto := service.GetUserBalanceByAllAssets(userId,assets)
+	if err2 != nil{
+		util.HandleResponse(ctx,err,resp)
+		return
+	}
+
+	//便利dto然后求和
+	var sum decimal.Decimal
+	var patrons uint32
+
+	for i := range *dto{
+		sum = sum.Add((*dto)[i].Balance)
+	}
+
+	//从project里面寻找patrons然后求和
+	patrons,err3 := service.GetPatronsByUserId(userId)
+	if err3 != nil{
+		util.HandleResponse(ctx,err3,resp)
+		return
+	}
+
+	resp["total"] = sum
+	resp["patrons"] = patrons
+
+	util.HandleResponse(ctx,nil,resp)
+}
 
 
 

@@ -64,3 +64,17 @@ func GetTransferByUserIdAndAssetId(userId uint32,assetId string)(transfers *[]mo
 	}
 	return
 }
+
+func GetPatronsByUserId(userId uint32) (patrons uint32,err *util.Err) {
+	projects,err1 := dao.ListProjectsByUserId(userId)
+	if err1 != nil{
+		err = util.NewErr(err,util.ErrDataBase,"数据库获取所有project信息出错")
+		return
+	}
+
+	//遍历projects,把patrons相加
+	for i := range *projects{
+		patrons = patrons + (*projects)[i].Patrons
+	}
+	return
+}

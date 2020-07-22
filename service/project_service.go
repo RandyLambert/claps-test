@@ -52,7 +52,7 @@ func ListProjectsAll() (projects *[]model.Project,err *util.Err){
 
 
 //查询某用户的所有项目,获取数据库中所有project
-func ListProjectsByUserId(userId int64) (projects *[]model.Project,err *util.Err){
+func ListProjectsByUserId(userId uint32) (projects *[]model.Project,err *util.Err){
 	projects,err1 := dao.ListProjectsByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err1,util.ErrDataBase,"获取项目机器人失败")
