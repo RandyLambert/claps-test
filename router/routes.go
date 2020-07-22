@@ -42,7 +42,7 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 		// /api/mixin
 		mixinGroup := apiGroup.Group("/mixin")
 		{
-			mixinGroup.GET("/assets", controller.Assets)
+			mixinGroup.GET("/assets", controller.MixinAssets)
 		}
 
 
