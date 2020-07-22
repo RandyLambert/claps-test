@@ -16,3 +16,10 @@ func UpdateWallet(wallet *model.Wallet)(err error){
 	return
 }
 
+//通过项目Id获取项目的Total?
+func GetWalletTotalByProjectId(projectId uint32)(total *[]model.WalletTotal,err error){
+	total = &[]model.WalletTotal{}
+	err = util.DB.Debug().Table("wallet").Select("project_id,asset_id,total").Where("project_id=?",projectId).Scan(total).Error
+	return
+}
+

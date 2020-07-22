@@ -181,7 +181,7 @@ func SyncSnapshots() {
 			//筛选自己的转入
 			if snapshots[i].UserID != "" && snapshots[i].Amount.Cmp(decimal.Zero) > 0 {
 				//根据机器人从数据库里找到项目
-				project,err := dao.GetProjectByBotId(snapshots[i].OpponentID)
+				projectTotal,err := dao.GetProjectTotalByBotId(snapshots[i].OpponentID)
 				//错误处理有问题
 				if err != nil {
 					log.Error(err.Error())
@@ -189,7 +189,7 @@ func SyncSnapshots() {
 
 				transaction := &model.Transaction{
 					Id:        snapshots[i].SnapshotID,
-					ProjectId: project.Id,
+					ProjectId: projectTotal.Id,
 					AssetId:   snapshots[i].AssetID,
 					Amount:    snapshots[i].Amount,
 					CreatedAt: snapshots[i].CreatedAt,
@@ -209,13 +209,13 @@ func SyncSnapshots() {
 				}
 
 				//更新Total字段
-				project.Total = project.Total.Add(asset.PriceUsd.Mul(snapshots[i].Amount))
-				count,err := dao.CountPatronByProjectIdAndSender(project.Id,snapshots[i].UserID)
+				projectTotal.Total = projectTotal.Total.Add(asset.PriceUsd.Mul(snapshots[i].Amount))
+				count,err := dao.CountPatronByProjectIdAndSender(projectTotal.Id,snapshots[i].UserID)
 				if count == 0 {
-					project.Patrons += 1
+					projectTotal.Patrons += 1
 				}
 
-				err = dao.UpdateProject(project)
+				err = dao.UpdateProjectTotal(projectTotal)
 				if err != nil {
 					log.Error(err.Error())
 				}

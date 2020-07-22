@@ -47,14 +47,6 @@ func ListProjectsAll() (projects *[]model.Project,err *util.Err){
 		return
 	}
 
-	//for i :=range *projects {
-	//	var projectInfo *map[string]interface{}
-		//projectInfo,err = GetProjectInfo(&(*projects)[i])
-	//	if err != nil {
-	//		return
-	//	}
-	//	projectInfos = append(projectInfos,projectInfo)
-	//}
 	return
 }
 
@@ -67,44 +59,8 @@ func ListProjectsByUserId(userId int64) (projects *[]model.Project,err *util.Err
 		return
 	}
 
-	//以后定期获取金额的时候可能使用
-	//for i :=range *projects {
-	//	var projectInfo *map[string]interface{}
-	//	projectInfo,err = GetProjectInfo(&(*projects)[i])
-	//	if err != nil {
-	//		return
-	//	}
-	//	projectInfos = append(projectInfos,projectInfo)
-	//}
 	return
 }
-
-//以后定时获取金额时使用
-//func GetProjectInfo(project *model.Project)(projectInfo *map[string]interface{},err error){
-//
-//	projectTotal,err := dao.GetProjectTotal(project.Id)
-//	if err != nil {
-//		return
-//	}
-//	total := decimal.Zero
-//	for i := range *projectTotal {
-//		var assert *mixin.Asset
-//		assert,err = GetAsset((*projectTotal)[i].AssetId)
-//		if err != nil {
-//			return
-//		}
-//		assertTotal := decimal.NewFromFloat((*projectTotal)[i].Total)
-//		total.Add(assert.PriceUSD.Mul(assertTotal))
-//	}
-//
-//	patrons,err := dao.GetProjectPatrons(project.Id)
-//	projectInfo = &map[string]interface{}{
-//		"patrons":patrons,
-//		"total":total,
-//		"project":project,
-//	}
-//	return
-//}
 
 func ListTransactionsByProjectNameAndAssetId(name string,assetId string)(transactions *[]model.Transaction,err *util.Err){
 	transactions,err1 := dao.ListTransactionsByProjectNameAndAssetId(name,assetId)

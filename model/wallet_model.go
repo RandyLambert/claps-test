@@ -16,7 +16,8 @@ type Wallet struct {
 
 }
 
-type ProjectTotal struct {
+type WalletTotal struct {
+	ProjectId uint32 `gorm:"type:int unsigned;not null"`
 	Total decimal.Decimal `gorm:"type:varchar(128);not null;default:null"`
 	AssetId string `gorm:"type:double unsigned;not null;default:0"`
 }

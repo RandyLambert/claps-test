@@ -18,7 +18,7 @@ type Project struct {
 
 }
 
-type ProjectTotals struct{
+type ProjectTotal struct{
 	Id uint32 `json:"id" gorm:"type:int unsigned;primary_key;not null;unique_index:id_UNIQUE"`
 	Patrons uint32 `json:"patrons" gorm:"type:int unsigned;default:0"`
 	Total decimal.Decimal `json:"total" gorm:"type:varchar(128);default:null"`

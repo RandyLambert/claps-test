@@ -5,13 +5,6 @@ import (
 	"claps-test/model"
 )
 
-//通过项目Id获取项目的Total?
-func GetProjectTotalById(projectId uint32)(total *[]model.ProjectTotal,err error){
-	total = &[]model.ProjectTotal{}
-	err = util.DB.Debug().Table("wallet").Select("asset_id,total").Where("project_id=?",projectId).Scan(total).Error
-	return
-}
-
 //获取所有项目
 func ListProjectsAll() (projects *[]model.Project,err error){
 
@@ -36,14 +29,14 @@ func ListProjectsByUserId(userId int64)(projects *[]model.Project,err error){
 	return
 }
 
-func GetProjectByBotId(BotId string)(projectTotal *model.ProjectTotals,err error){
-	projectTotal = &model.ProjectTotals{}
-	err = util.DB.Debug().Table("project").Where("project_id=?",
-		util.DB.Debug().Table("bot").Select("project_id").Where("id=?",BotId).SubQuery()).Find(projectTotal).Error
+func GetProjectTotalByBotId(BotId string)(projectTotal *model.ProjectTotal,err error){
+	projectTotal = &model.ProjectTotal{}
+	err = util.DB.Debug().Table("project").Select("id,asset_id,total").Where("project_id=?",
+		util.DB.Debug().Table("bot").Select("project_id").Where("id=?",BotId).SubQuery()).Scan(projectTotal).Error
 	return
 }
 
-func UpdateProject(projectTotal *model.ProjectTotals)(err error){
+func UpdateProjectTotal(projectTotal *model.ProjectTotal)(err error){
 	err = util.DB.Debug().Table("project").Save(projectTotal).Error
 	return
 }
