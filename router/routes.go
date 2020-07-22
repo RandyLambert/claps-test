@@ -52,7 +52,8 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 		{
 			userGroup.GET("/profile", controller.UserProfile)
 			userGroup.GET("/assets", controller.UserAssets)
-			userGroup.GET("/transactions", controller.UserTransactions)
+			//userGroup.GET("/transactions", controller.UserTransactions)
+			userGroup.GET("/transfer", controller.UserTransfer)
 			userGroup.GET("/donation", controller.UserTransactions)
 		}
 

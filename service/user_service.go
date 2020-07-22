@@ -48,10 +48,10 @@ func GetUserBalanceByAllAssets(userId uint32,assets *[]model.Asset)(err *util.Er
 		if memberWalletDtos != nil{
 			log.Debug(*memberWalletDtos)
 			for j := range *memberWalletDtos{
-				tmp.Balance = (*memberWalletDtos)[j].Balance.Add(tmp.Balance)
+				tmp.Balance = ((*memberWalletDtos)[j].Balance.Mul((*assets)[i].PriceUsd) ).Add(tmp.Balance)
 			}
 		}
-		(*dto) = append((*dto), tmp)
+		*dto = append(*dto, tmp)
 	}
 	return
 }

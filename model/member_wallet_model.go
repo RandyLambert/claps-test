@@ -18,6 +18,6 @@ type MemberWallet struct {
 }
 
 type MemberWalletDto struct {
-	AssetId string `gorm:"type:varchar(50);primary_key;not null"`
-	Balance decimal.Decimal `gorm:"type:varchar(128);default:null"`
+	AssetId string `json:"asset_id" gorm:"type:varchar(50);primary_key;not null"`
+	Balance decimal.Decimal `json:"balance"  gorm:"type:varchar(128);default:null"`
 }
