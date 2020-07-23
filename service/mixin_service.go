@@ -129,7 +129,7 @@ func SyncTransfer() {
 				continue
 			}
 
-			(*transfers)[i].Status = '1'
+			(*transfers)[i].Status = "1"
 			(*transfers)[i].TraceId = snapshot.TraceID
 			(*transfers)[i].SnapshotId = snapshot.SnapshotID
 			(*transfers)[i].CreatedAt = snapshot.CreatedAt

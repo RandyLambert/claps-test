@@ -26,6 +26,7 @@ const (
 	//200客户端错误
 	ErrUnauthorized = 20001 //未登录认证
 	ErrBadRequest = 20002 // 客户端没有参数
+	ErrForbidden = 20003 //禁止访问
 )
 
 func NewErr(err error,code int,message string)*Err{
@@ -92,6 +93,8 @@ func HandleResponse(c *gin.Context, err *Err, data interface{} ) {
 		sendFailResp(c,http.StatusBadRequest,err)
 	case ErrUnauthorized:
 		sendFailResp(c,http.StatusUnauthorized,err)
+	case ErrForbidden:
+		sendFailResp(c,http.StatusForbidden,err)
 
 	}
 

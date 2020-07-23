@@ -30,3 +30,14 @@ func ListTransfersByStatus(status rune)(transfer *[]model.Transfer,err error){
 	err = util.DB.Where("status=?",status).Find(transfer).Error
 	return
 }
+
+func UpdateTransferSatusByUserIdAndAssetId(userId uint32, assetId string,status string)(err error)  {
+	err = util.DB.Debug().Table("transfer").Where("user_id = ? AND asset_id= ?",userId,assetId).Update("status",status).Error
+	return
+}
+
+func CountUnfinishedTransfer(userId uint32, assetId string) (count int,err error) {
+	err = util.DB.Debug().Table("transfer").Where("user_id = ? AND asset_id = ? AND status = ?",userId,assetId,model.UNFINISHED).Count(&count).Error
+	log.Debug(count)
+	return
+}

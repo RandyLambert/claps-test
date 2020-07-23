@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"claps-test/model"
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
@@ -100,7 +101,7 @@ func UserAssets(ctx *gin.Context){
 }
 
 
-
+//从transaction中读取关于自己项目的所有捐赠
 func UserTransactions(ctx *gin.Context){
 	resp := make(map[string]interface{})
 
@@ -113,7 +114,6 @@ func UserTransactions(ctx *gin.Context){
 	log.Debug("assetId = ",assetId)
 
 	//从transfer表中获取该用户的所有捐赠记录
-
 }
 
 //读取某种货币的交易记录,读取transfer里面的记录/
@@ -179,5 +179,37 @@ func UserDonation(ctx *gin.Context) {
 	util.HandleResponse(ctx,nil,resp)
 }
 
+//用户提现某种货币,把表中的status由0变为1
+func UserWithdraw(ctx *gin.Context) {
+
+	//获取币种
+	assetId := ctx.Query("assetId")
+	if assetId == ""{
+		err := util.NewErr(nil,util.ErrBadRequest,"请求路由无assetId参数")
+		util.HandleResponse(ctx,err,nil)
+		return
+	}
+
+	//获取userId
+	session := sessions.Default(ctx)
+	userId := uint32(*session.Get("user").(github.User).ID)
+
+	//判断是否有未完成的提现
+	 err3 := service.IfUnfinishedTransfer(userId,assetId)
+	 if err3 != nil{
+	 	util.HandleResponse(ctx,err3,nil)
+		 return
+	 }
+
+	//找到相应的币种的所有transfer然后改变status
+	err2 := service.UpdateTransferStatusByAssetIdAndUserId(userId,assetId,model.UNFINISHED)
+	if err2 != nil{
+		util.HandleResponse(ctx,err2,nil)
+		return
+	}
+	util.HandleResponse(ctx,nil,nil)
+
+	//等协程完成转账
+}
 
 
