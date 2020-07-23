@@ -37,7 +37,8 @@ func AuthInfo(ctx *gin.Context){
 
 	foxoneToken := session.Get("foxoneToken")
 	user := session.Get("user")
-	mixinToken := session.Get("mixinToken")
+	//mixin中存储的是用户mixin的user_id
+	mixinToken := session.Get("mixin")
 
 	log.Debug("从session中获取的user",user)
 	log.Debug("从session中获取的mixinToken",mixinToken)

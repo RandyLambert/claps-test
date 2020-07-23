@@ -53,3 +53,9 @@ func ListMembersByProjectId(projectId uint32)(users *[]model.User,err error){
 
 	return
 }
+
+//根据user_id更新表中的mixin_id信息
+func UpdateUserMixinId(userId uint32,mixinId string)(err error){
+	err = util.DB.Debug().Model(&model.User{}).Where("id = ?", userId).Update("mixin_id", mixinId).Error
+	return
+}
