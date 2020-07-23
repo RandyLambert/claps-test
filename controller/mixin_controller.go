@@ -5,6 +5,7 @@ import (
 	"claps-test/util"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
@@ -43,20 +44,26 @@ func MixinOauth(ctx *gin.Context)  {
 		util.HandleResponse(ctx,err2,nil)
 		return
 	}
-	session.Set("mixin",client)
 
+	//将user信息存如session中
+	session.Set("mixin",user.UserID)
+	err3 := session.Save()
+	if err3 != nil{
+		util.HandleResponse(ctx,util.NewErr(err3,util.ErrInternalServer,"设置mixin User session错误"),nil)
+		return
+	}
 
-
-	log.Println("user", user.UserID)
+	log.Debug("user", user.UserID)
 
 	//github一定是登录,绑定mixin和github
-
+	userId := uint32(*session.Get("user").(github.User).ID)
+	//更新数据库中的mixin_id字段
+	err4 := service.UpdateUserMixinId(userId,user.UserID)
+	if err4 != nil{
+		util.HandleResponse(ctx,err4,nil)
+	}
 
 	//重定位
-	//ctx.Redirect(http.StatusOK,"www.baidu.com")
-
-	ctx.JSON(http.StatusOK,gin.H{
-		"data":user,
-	})
+	ctx.Redirect(http.StatusMovedPermanently, "http://localhost:3000/assets")
 
 }

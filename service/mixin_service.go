@@ -6,7 +6,6 @@ import (
 	"claps-test/util"
 	"context"
 	"github.com/fox-one/mixin-sdk-go"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"
@@ -295,6 +294,7 @@ func GetMixinAuthorizedClient(ctx *gin.Context,code string)(client *mixin.Client
 		return
 	}
 
+	/*
 	//将client存入session
 	session := sessions.Default(ctx)
 	session.Set("mixinClient",client)
@@ -303,6 +303,7 @@ func GetMixinAuthorizedClient(ctx *gin.Context,code string)(client *mixin.Client
 		err = util.NewErr(err3,util.ErrInternalServer,"设置mixin client session 出错")
 		return
 	}
+	 */
 
 	return
 }
@@ -316,6 +317,8 @@ func GetMixinUserInfo(ctx *gin.Context,client *mixin.Client) (user *mixin.User, 
 	}
 	return
 }
+
+
 /*
 func DoTransfer(botId, assetID ,opponentID, memo string, amount decimal.Decimal, userId uint32) (err *util.Err) {
 

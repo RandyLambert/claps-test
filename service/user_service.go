@@ -78,3 +78,12 @@ func GetPatronsByUserId(userId uint32) (patrons uint32,err *util.Err) {
 	}
 	return
 }
+
+//更新user表中的mixin_id字段
+func UpdateUserMixinId(user_id uint32,mixinId string) (err *util.Err) {
+	err1 := dao.UpdateUserMixinId(user_id,mixinId)
+	if err1 != nil{
+		err = util.NewErr(err1,util.ErrDataBase,"更新数据库mixin_id错误")
+	}
+	return
+}
