@@ -12,12 +12,12 @@ type Bot struct{
 
 type BotDto struct{
 	Id string `json:"id" gorm:"type:varchar(50);primary_key;unique_index:id_UNIQUE;not null"`
-	Distribution rune `json:"distribution" gorm:"type:enum('0','1','2','3');primary_key;not null"`
+	Distribution string`json:"distribution" gorm:"type:enum('0','1','2','3');primary_key;not null"`
 }
 
 const (
-	PersperAlgorithm = '0'
-	Commits = '1'
-	ChangedLines = '2'
-	IdenticalAmount = '3'
+	PersperAlgorithm = "0" //persper算法
+	Commits = "1" //commit数量
+	ChangedLines = "2" //代码行数
+	IdenticalAmount = "3"
 )
