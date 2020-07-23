@@ -5,8 +5,8 @@ import (
 	"claps-test/util"
 )
 
-func UpdateMemberWallet(memberWallet *model.MemberWallet)(err error){
-	err = util.DB.Save(memberWallet).Error
+func UpdateMemberWallet(memberWalletDto *model.MemberWalletDto)(err error){
+	err = util.DB.Save(memberWalletDto).Error
 	return
 }
 
@@ -21,8 +21,8 @@ func GetMemeberWalletByUserIdAndAssetId(userId uint32,assetId string)(memberWall
 	return
 }
 
-func GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(projectId uint32,userId uint32,botId string,assetId string)(member *model.MemberWallet,err error){
-	member = &model.MemberWallet{}
+func GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(projectId uint32,userId uint32,botId string,assetId string)(member *model.MemberWalletDto,err error){
+	member = &model.MemberWalletDto{}
 	err = util.DB.Where("project_id=? AND user_id=? AND bot_id=? AND asset_id=?",projectId,userId,botId,assetId).Find(member).Error
 	return
 }

@@ -9,3 +9,8 @@ type User struct{
 	//UserId string `json:"user_id" gorm:"type:varchar(50);default:null"`
 	MixinId string `json:"user_id" gorm:"type:varchar(50);default:null"`
 }
+
+type UserMixinId struct {
+	Id uint32`json:"id" gorm:"type:int unsigned;primary_key;not null;"`
+	MixinId string `json:"user_id" gorm:"type:varchar(50);default:null"`
+}

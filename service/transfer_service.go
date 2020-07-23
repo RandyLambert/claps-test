@@ -9,16 +9,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func InsertTransfer(botId, assetID ,TransactionID, memo string, amount decimal.Decimal,userId uint32)(err error){
+func InsertTransfer(botId, assetID , memo string, amount decimal.Decimal,userId uint32)(err error){
 	transfer := &model.Transfer{
 		BotId:         botId,
 		UserId:        userId,
-		TraceId:       string(userId)+TransactionID+assetID,
-		TransactionId: TransactionID,
+		TraceId:       string(userId)+assetID,
+		//TransactionId: TransactionID,
 		AssetId:       assetID,
 		Amount:        amount,
 		Memo:          memo,
-		Status:        model.INITIAL,
+		Status:        model.UNFINISHED,
 	}
 
 	err1 := dao.InsertTransfer(transfer)
@@ -54,19 +54,32 @@ func IfUnfinishedTransfer(userId uint32,assetId string) (err *util.Err) {
 	return
 }
 
-func DoTransfer(projectId,userId uint32,botId,assetId string,amount decimal.Decimal) (err *util.Err) {
-	//这里的memberwallet,是通过外部获取的,业务逻辑不是这样,暂时这么写
-	memberWallet,err1 := dao.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(projectId,userId,botId,assetId)
+func DoTransfer(userId uint32,assetId string) (err *util.Err) {
+
+	memberWallets,err1 := dao.GetMemeberWalletByUserIdAndAssetId(userId,assetId)
 	if err1 != nil {
 		err = util.NewErr(err,util.ErrDataBase,"获取用户钱包失败导致提现失败")
 		return
 	}
 
-	memberWallet.Balance = memberWallet.Balance.Sub(amount)
-
-	err1 = dao.UpdateMemberWallet(memberWallet)
-	if err1 != nil {
-		err = util.NewErr(err,util.ErrDataBase,"更新用户钱包可提现值导致提现失败")
+	for i := range *memberWallets {
+		mixinId,err1 := dao.GetMixinIdByUserId(userId)
+		if err1 != nil {
+			err = util.NewErr(err1,util.ErrDataBase,"获取用户MixinId失败导致提现失败")
+			return
+		}
+		err1 = InsertTransfer(mixinId.MixinId,assetId,"test",(*memberWallets)[i].Balance,userId)
+		if err1 != nil {
+			err = util.NewErr(err1,util.ErrDataBase,"插入捐赠记录失败")
+			return
+		}
+		(*memberWallets)[i].Balance = decimal.Zero
+		err1 = dao.UpdateMemberWallet(&(*memberWallets)[i])
+		if err1 != nil {
+			err = util.NewErr(err1,util.ErrDataBase,"更新用户钱包可提现值导致提现失败")
+			return
+		}
 	}
+
 	return
 }

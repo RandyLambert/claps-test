@@ -102,7 +102,7 @@ func GetUserInfo(token *oauth2.Token)(user *github.User,err *util.Err){
 }
 
 //获取仓库的star数目,如果出错err信息不为空
-func GetRepositoryStars(c *gin.Context,slug string)(starCount int,err *util.Err) {
+func GetRepositoryInfo(c *gin.Context,slug string)(repoInfo *github.Repository,err *util.Err) {
 	session := sessions.Default(c)
 	githubToken := session.Get("githubToken")
 
@@ -125,12 +125,11 @@ func GetRepositoryStars(c *gin.Context,slug string)(starCount int,err *util.Err)
 
 	client := github.NewClient(tc)
 
-	repo,_,err1 := client.Repositories.Get(ctx,str[0],str[1])
+	repoInfo,_,err1 := client.Repositories.Get(ctx,str[0],str[1])
 	if err1 != nil{
 		err =  util.NewErr(err1,util.ErrThirdParty,"获取repo信息出错")
-		return
 	}
-	starCount =  *repo.StargazersCount
+
 	return
 }
 

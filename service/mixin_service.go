@@ -15,11 +15,19 @@ import (
 )
 
 //获取所有币的信息
-func ListAssetsAllByMixinClient(client *mixin.Client)(assets []*mixin.Asset,err *util.Err){
-
-	assets,err1 := client.ReadAssets(context.Background())
+func GetAssetByMixinClient(botId string,assetId string)(asset *mixin.Asset,err *util.Err){
+	bot,err1 := dao.GetBotById(botId)
 	if err1 != nil {
-		err = util.NewErr(err1,util.ErrThirdParty,"通过相应bot获取mixin全部asset信息错误")
+		err = util.NewErr(err1,util.ErrDataBase,"通过相应botid获取bot信息信息错误")
+		return
+	}
+	mixinClient,err := CreateMixinClient(bot)
+	if err != nil {
+		return
+	}
+	asset,err1 = mixinClient.ReadAsset(context.Background(),assetId)
+	if err1 != nil {
+		err = util.NewErr(err1,util.ErrThirdParty,"通过mixin获取asset信息错误")
 	}
 	return
 
@@ -316,43 +324,3 @@ func GetMixinUserInfo(ctx *gin.Context,client *mixin.Client) (user *mixin.User, 
 	}
 	return
 }
-
-
-/*
-func DoTransfer(botId, assetID ,opponentID, memo string, amount decimal.Decimal, userId uint32) (err *util.Err) {
-
-	transfer := &model.Transfer{
-		BotId:      botId,
-		UserId:     userId,
-		TraceId:    string(userId)+assetID+botId,
-		//OpponentId: opponentID,
-		AssetId:    assetID,
-		Amount:     amount,
-		Memo:       memo,
-		Status:    '0',
-	}
-
-	err1 := dao.InsertTransfer(transfer)
-
-	if err1 != nil {
-		err = util.NewErr(err,util.ErrDataBase,"提现记录首次写入数据库失败导致提现失败,确认当时是否有一笔提现记录未被确认?")
-		return
-	}
-
-	//这里的memberwallet,是通过外部获取的,业务逻辑不是这样,暂时这么写
-	memberWallet,err1 := dao.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(1,1,botId,assetID)
-	if err1 != nil {
-		err = util.NewErr(err,util.ErrDataBase,"获取用户钱包失败导致提现失败")
-		return
-	}
-
-	memberWallet.Balance = memberWallet.Balance.Sub(amount)
-
-	err1 = dao.UpdateMemberWallet(memberWallet)
-	if err1 != nil {
-		err = util.NewErr(err,util.ErrDataBase,"更新用户钱包可提现值导致提现失败")
-	}
-
-	return
-}
- */

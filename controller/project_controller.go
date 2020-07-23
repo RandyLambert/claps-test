@@ -37,3 +37,16 @@ func ProjectTransactions(ctx *gin.Context){
 	transactions,err := service.ListTransactionsByProjectNameAndAssetId(ctx.Param("name"),assetId)
 	util.HandleResponse(ctx,err,transactions)
 }
+
+func ProjectDonation(ctx *gin.Context){
+	assetId := ctx.Query("assetId")
+	botId := ctx.Query("botId")
+	if assetId == "" || botId == "" {
+		err := util.NewErr(nil,util.ErrUnauthorized,"没有QUERY值无法请求成功")
+		util.HandleResponse(ctx,err,nil)
+		return
+	}
+
+	asset,err := service.GetAssetByMixinClient(botId,assetId)
+	util.HandleResponse(ctx,err,asset)
+}

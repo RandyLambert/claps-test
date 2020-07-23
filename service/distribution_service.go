@@ -27,7 +27,13 @@ func distributionByIdenticalAmount(transaction *model.Transaction){
 	}
 	amount := transaction.Amount.Div(decimal.NewFromInt(int64(len(*members))))
 	for i := range *members {
-		err = InsertTransfer(transaction.Receiver,transaction.AssetId,transaction.Id,"test",amount,(*members)[i].Id)
+		walletTotal,err := dao.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(transaction.ProjectId,(*members)[i].Id,transaction.Receiver,transaction.AssetId)
+		if err != nil {
+			log.Error(err.Error())
+			return
+		}
+		walletTotal.Total = walletTotal.Total.Add(amount)
+		err = dao.UpdateMemberWallet(walletTotal)
 		if err != nil {
 			log.Error(err.Error())
 			return

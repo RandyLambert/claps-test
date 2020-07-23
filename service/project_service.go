@@ -4,10 +4,11 @@ import (
 	"claps-test/dao"
 	"claps-test/model"
 	"claps-test/util"
+	"github.com/gin-gonic/gin"
 )
 
 //通过projectName查询,查询某个项目的详情
-func GetProjectByName(name string) (projectDetailInfo *map[string]interface{},err *util.Err){
+func GetProjectByName(ctx *gin.Context,name string) (projectDetailInfo *map[string]interface{},err *util.Err){
 
 	project,err1 := dao.GetProjectByName(name)
 	if err1 != nil {
@@ -15,10 +16,21 @@ func GetProjectByName(name string) (projectDetailInfo *map[string]interface{},er
 		return
 	}
 
-	repositories,err1 := dao.ListRepositoriesByProjectId(project.Id)
+	repositoryDtos,err1 := dao.ListRepositoriesByProjectId(project.Id)
 	if err1 != nil {
 		err = util.NewErr(err1,util.ErrDataBase,"获取项目仓库失败")
 		return
+	}
+	for i := range *repositoryDtos {
+		repoInfo,err1 := GetRepositoryInfo(ctx,(*repositoryDtos)[i].Slug)
+		if err1 != nil {
+			err = util.NewErr(err1,util.ErrThirdParty,"获取项目仓库详细信息失败")
+			return
+		}
+		(*repositoryDtos)[i].Forks = *repoInfo.ForksCount
+		(*repositoryDtos)[i].Stars = *repoInfo.StargazersCount
+		(*repositoryDtos)[i].Watchs = *repoInfo.WatchersCount
+		(*repositoryDtos)[i].RepositoryUrl = *repoInfo.ArchiveURL
 	}
 
 
@@ -39,7 +51,7 @@ func GetProjectByName(name string) (projectDetailInfo *map[string]interface{},er
 
 	projectDetailInfo = &map[string]interface{}{
 		"project":project,
-		"repositories":repositories,
+		"repositories":repositoryDtos,
 		"members":members,
 		"botIds":botDtos,
 	}
@@ -54,7 +66,6 @@ func ListProjectsAll() (projects *[]model.Project,err *util.Err){
 	}
 	return
 }
-
 
 //查询某用户的所有项目,获取数据库中所有project
 func ListProjectsByUserId(userId uint32) (projects *[]model.Project,err *util.Err){

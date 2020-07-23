@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"claps-test/model"
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
@@ -201,8 +200,8 @@ func UserWithdraw(ctx *gin.Context) {
 		 return
 	 }
 
-	//找到相应的币种的所有transfer然后改变status
-	err2 := service.UpdateTransferStatusByAssetIdAndUserId(userId,assetId,model.UNFINISHED)
+	//找到相应的币种的doTransfer
+	err2 := service.DoTransfer(userId,assetId)
 	if err2 != nil{
 		util.HandleResponse(ctx,err2,nil)
 		return

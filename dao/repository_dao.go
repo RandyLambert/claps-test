@@ -6,8 +6,8 @@ import (
 )
 
 //根据project获取所有的仓库信息
-func ListRepositoriesByProjectId(projectId uint32)(repositories *[]model.Repository,err error){
-	repositories = &[]model.Repository{}
-	err = util.DB.Debug().Where("project_id=?",projectId).Find(repositories).Error
+func ListRepositoriesByProjectId(projectId uint32)(repositoriesDto *[]model.RepositoryDto,err error){
+	repositoriesDto = &[]model.RepositoryDto{}
+	err = util.DB.Debug().Table("repository").Where("project_id=?",projectId).Scan(repositoriesDto).Error
 	return
 }
