@@ -4,6 +4,7 @@ import (
 	"claps-test/dao"
 	"claps-test/model"
 	"claps-test/util"
+	"errors"
 )
 
 //通过projectName查询,查询某个项目的详情
@@ -67,6 +68,11 @@ func ListProjectsByUserId(userId uint32) (projects *[]model.Project,err *util.Er
 }
 
 func ListTransactionsByProjectNameAndAssetId(name string,assetId string)(transactions *[]model.Transaction,err *util.Err){
+	if assetId == ""{
+		err = util.NewErr(errors.New("没有QUERY值"),util.ErrUnauthorized,"没有QUERY值无法请求成功")
+		return
+	}
+
 	transactions,err1 := dao.ListTransactionsByProjectNameAndAssetId(name,assetId)
 	if err1 != nil {
 		err = util.NewErr(err1,util.ErrDataBase,"获取项目获取捐赠记录失败")
