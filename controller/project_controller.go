@@ -27,6 +27,13 @@ func ProjectMembers(ctx *gin.Context){
 
 func ProjectTransactions(ctx *gin.Context){
 
-	transactions,err := service.ListTransactionsByProjectNameAndAssetId(ctx.Param("name"),ctx.Query("assetId"))
+	assetId := ctx.Query("assetId")
+	if assetId == ""{
+		err := util.NewErr(nil,util.ErrUnauthorized,"没有QUERY值无法请求成功")
+		util.HandleResponse(ctx,err,nil)
+		return
+	}
+
+	transactions,err := service.ListTransactionsByProjectNameAndAssetId(ctx.Param("name"),assetId)
 	util.HandleResponse(ctx,err,transactions)
 }

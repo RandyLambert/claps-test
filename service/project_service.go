@@ -67,6 +67,7 @@ func ListProjectsByUserId(userId uint32) (projects *[]model.Project,err *util.Er
 }
 
 func ListTransactionsByProjectNameAndAssetId(name string,assetId string)(transactions *[]model.Transaction,err *util.Err){
+
 	transactions,err1 := dao.ListTransactionsByProjectNameAndAssetId(name,assetId)
 	if err1 != nil {
 		err = util.NewErr(err1,util.ErrDataBase,"获取项目获取捐赠记录失败")
