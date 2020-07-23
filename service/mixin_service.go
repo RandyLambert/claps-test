@@ -6,9 +6,12 @@ import (
 	"claps-test/util"
 	"context"
 	"github.com/fox-one/mixin-sdk-go"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"time"
 )
 
@@ -269,6 +272,50 @@ func SyncSnapshots() {
 	}
 }
 
+//获取认证之后的客户端
+func GetMixinAuthorizedClient(ctx *gin.Context,code string)(client *mixin.Client,err *util.Err) {
+	//从配置文件中读取Id和密码
+	clientId := viper.GetString("MIXIN_CLIENT_ID")
+	clientSecret := viper.GetString("MIXIN_CLIENT_SECRET")
+
+	//生成Key
+	key := mixin.GenerateEd25519Key()
+
+	//code换Token
+	store,err1 := mixin.AuthorizeEd25519(ctx,clientId,clientSecret,code,"",key)
+	if err1 != nil {
+		err = util.NewErr(err1,util.ErrThirdParty,"mixin Ed25519出错")
+		return
+	}
+
+	//换取
+	client, err2 := mixin.NewFromOauthKeystore(store)
+	if err2 != nil {
+		err = util.NewErr(err2,util.ErrThirdParty,"mixin store to client error")
+		return
+	}
+
+	//将client存入session
+	session := sessions.Default(ctx)
+	session.Set("mixinClient",client)
+	err3 := session.Save()
+	if err3 != nil{
+		err = util.NewErr(err3,util.ErrInternalServer,"设置mixin client session 出错")
+		return
+	}
+
+	return
+}
+
+func GetMixinUserInfo(ctx *gin.Context,client *mixin.Client) (user *mixin.User, err *util.Err) {
+
+	user, err1 := client.UserMe(ctx)
+	if err1 != nil {
+		err = util.NewErr(err,util.ErrDataBase,"获取mixin用户的信息出错")
+		return
+	}
+	return
+}
 /*
 func DoTransfer(botId, assetID ,opponentID, memo string, amount decimal.Decimal, userId uint32) (err *util.Err) {
 
