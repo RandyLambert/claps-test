@@ -74,12 +74,6 @@ func HandleResponse(c *gin.Context, err *Err, data interface{} ) {
 		return
 	}
 
-	if err == nil{
-		sendSuccessResp(c, data)
-		return
-
-	}
-
 	//根据错误的不同
 	switch err.Code {
 	case ErrDataBase:
