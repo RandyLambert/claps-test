@@ -24,6 +24,6 @@ func ListAssetsAllByDB()(assets *[]model.Asset,err error){
 
 func GetPriceUsdByAssetId(assetId string)(priceUsd *model.AssetIdToPriceUsd,err error){
 	priceUsd = &model.AssetIdToPriceUsd{}
-	err = util.DB.Table("asset").Where("asset_id=?",assetId).Scan(priceUsd).Error
+	err = util.DB.Debug().Table("asset").Select("asset_id,price_usd").Where("asset_id=?",assetId).Scan(priceUsd).Error
 	return
 }

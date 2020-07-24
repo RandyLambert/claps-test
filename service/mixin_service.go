@@ -198,7 +198,12 @@ func SyncSnapshots() {
 			//筛选自己的转入
 			if snapshots[i].UserID != "" && snapshots[i].Amount.Cmp(decimal.Zero) > 0 {
 				//根据机器人从数据库里找到项目
-				projectTotal,err := dao.GetProjectTotalByBotId(snapshots[i].OpponentID)
+				log.Debug("SnapshotID: ",snapshots[i].SnapshotID)
+				log.Debug("AssetId: ",snapshots[i].AssetID)
+				log.Debug("Amount: ",snapshots[i].Amount)
+				log.Debug("UserID: ",snapshots[i].UserID)
+				log.Debug("OpponentID: ",snapshots[i].OpponentID)
+				projectTotal,err := dao.GetProjectTotalByBotId(snapshots[i].UserID)
 				//错误处理有问题
 				if err != nil {
 					log.Error(err.Error())
@@ -211,8 +216,8 @@ func SyncSnapshots() {
 					AssetId:   snapshots[i].AssetID,
 					Amount:    snapshots[i].Amount,
 					CreatedAt: snapshots[i].CreatedAt,
-					Sender:    snapshots[i].UserID,
-					Receiver:  snapshots[i].OpponentID,
+					Sender:    snapshots[i].OpponentID,
+					Receiver:  snapshots[i].UserID,
 				}
 				//插入捐赠记录
 				err = dao.InsertTransaction(transaction)
