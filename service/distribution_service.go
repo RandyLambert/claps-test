@@ -41,8 +41,10 @@ func distributionByIdenticalAmount(transaction *model.Transaction){
 		if i == 0 {
 			//因为可能会除不尽,所以这里考虑如果出现这种情况,就把除不尽的值转给第一个人
 			walletTotal.Total = walletTotal.Total.Add(transaction.Amount.Sub(amount.Mul(memberNumbers.Sub(decimal.NewFromInt(1)))))
+			walletTotal.Balance = walletTotal.Balance.Add(transaction.Amount.Sub(amount.Mul(memberNumbers.Sub(decimal.NewFromInt(1)))))
 		}else {
 			walletTotal.Total = walletTotal.Total.Add(amount)
+			walletTotal.Balance = walletTotal.Balance.Add(amount)
 		}
 		//更新钱包
 		err = dao.UpdateMemberWallet(walletTotal)
