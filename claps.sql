@@ -11,7 +11,7 @@ INSERT INTO `claps`.`project` (`id`, `name`, `display_name`, `description`, `ava
 # repository
 SELECT * FROM claps.repository;
 INSERT INTO `claps`.`repository` (`id`, `project_id`, `type`, `name`, `slug`, `description`, `created_at`, `updated_at`) VALUES ('1', '1', 'GITHUB', 'Claps.dev', 'lyricat/claps.dev', 'Help you funding the creators and projects you appreciate with crypto currencies.', now(), now());
-
+ SELECT * FROM `transaction`  WHERE (asset_id='815b0b1a-2764-3736-8faa-42d694fa620a' AND project.id=(SELECT project.id FROM `project`  WHERE (project.name='claps.dev')));
 # member
 SELECT * FROM claps.member;
 INSERT INTO `claps`.`member` (`project_id`, `user_id`) VALUES ('1', '46085959');
@@ -98,3 +98,8 @@ INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_i
 INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', '1ccd828e-7639-3c60-90f8-c133414bf210', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
 INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', 'dd10b157-9d0f-31e5-bfa3-39c442f3a9b8', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
 INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', 'aac43e6e-0a28-35b8-b3de-c9ff84256451', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
+
+# transaction
+SELECT * FROM claps.transaction;
+SELECT id,donations,total FROM `project`  WHERE (id=(SELECT project_id FROM `bot`  WHERE (id='1ccd828e-7639-3c60-90f8-c133414bf210'))); 
+SELECT project_id FROM `bot`  WHERE (id='1ccd828e-7639-3c60-90f8-c133414bf210');

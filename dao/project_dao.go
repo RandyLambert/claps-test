@@ -31,7 +31,7 @@ func ListProjectsByUserId(userId uint32)(projects *[]model.Project,err error){
 
 func GetProjectTotalByBotId(BotId string)(projectTotal *model.ProjectTotal,err error){
 	projectTotal = &model.ProjectTotal{}
-	err = util.DB.Debug().Table("project").Select("id,asset_id,total").Where("project_id=?",
+	err = util.DB.Debug().Table("project").Select("id,donations,total").Where("id=?",
 		util.DB.Debug().Table("bot").Select("project_id").Where("id=?",BotId).SubQuery()).Scan(projectTotal).Error
 	return
 }
