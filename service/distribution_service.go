@@ -28,8 +28,9 @@ func distributionByIdenticalAmount(transaction *model.Transaction){
 		return
 	}
 
-	//做除法
-	amount := transaction.Amount.Div(decimal.NewFromInt(int64(len(*members))))
+	//做除法,如果members等于0上面就返回?
+	memberNumbers := decimal.NewFromInt(int64(len(*members)))
+	amount := transaction.Amount.Div(memberNumbers)
 	for i := range *members {
 		//获得相应的用户钱包
 		walletTotal,err := dao.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(transaction.ProjectId,(*members)[i].Id,transaction.Receiver,transaction.AssetId)
@@ -37,7 +38,12 @@ func distributionByIdenticalAmount(transaction *model.Transaction){
 			log.Error(err.Error())
 			return
 		}
-		walletTotal.Total = walletTotal.Total.Add(amount)
+		if i == 0 {
+			//因为可能会除不尽,所以这里考虑如果出现这种情况,就把除不尽的值转给第一个人
+			walletTotal.Total = walletTotal.Total.Add(transaction.Amount.Sub(amount.Mul(memberNumbers.Sub(decimal.NewFromInt(1)))))
+		}else {
+			walletTotal.Total = walletTotal.Total.Add(amount)
+		}
 		//更新钱包
 		err = dao.UpdateMemberWallet(walletTotal)
 		if err != nil {
