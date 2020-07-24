@@ -20,6 +20,6 @@ func ListBotDtosByProjectId(projectId uint32)(botDto *[]model.BotDto,err error){
 
 func GetBotDtoById(botId string)(botDto *model.BotDto,err error){
 	botDto = &model.BotDto{}
-	err = util.DB.Table("bot").Where("bot_id=?",botId).Scan(botDto).Error
+	err = util.DB.Table("bot").Where("id=?",botId).Scan(botDto).Error
 	return
 }

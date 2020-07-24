@@ -68,7 +68,8 @@ func SyncAssets() {
 				assetsInfo[i].AssetID == util.EOS ||
 				assetsInfo[i].AssetID == util.XRP ||
 				assetsInfo[i].AssetID == util.XEM ||
-				assetsInfo[i].AssetID == util.USDT {
+				assetsInfo[i].AssetID == util.USDT||
+				assetsInfo[i].AssetID == util.DOGE{
 
 				asset := &model.Asset{
 					AssetId:  assetsInfo[i].AssetID,
@@ -198,11 +199,6 @@ func SyncSnapshots() {
 			//筛选自己的转入
 			if snapshots[i].UserID != "" && snapshots[i].Amount.Cmp(decimal.Zero) > 0 {
 				//根据机器人从数据库里找到项目
-				log.Debug("SnapshotID: ",snapshots[i].SnapshotID)
-				log.Debug("AssetId: ",snapshots[i].AssetID)
-				log.Debug("Amount: ",snapshots[i].Amount)
-				log.Debug("UserID: ",snapshots[i].UserID)
-				log.Debug("OpponentID: ",snapshots[i].OpponentID)
 				projectTotal,err := dao.GetProjectTotalByBotId(snapshots[i].UserID)
 				//错误处理有问题
 				if err != nil {
@@ -213,7 +209,7 @@ func SyncSnapshots() {
 				transaction := &model.Transaction{
 					Id:        snapshots[i].SnapshotID,
 					ProjectId: projectTotal.Id,
-					AssetId:   snapshots[i].AssetID,
+					AssetId:   snapshots[i].Asset.AssetID,
 					Amount:    snapshots[i].Amount,
 					CreatedAt: snapshots[i].CreatedAt,
 					Sender:    snapshots[i].OpponentID,
@@ -227,7 +223,7 @@ func SyncSnapshots() {
 				}
 
 				//查找汇率等详细信息
-				asset,err := dao.GetPriceUsdByAssetId(snapshots[i].AssetID)
+				asset,err := dao.GetPriceUsdByAssetId(snapshots[i].Asset.AssetID)
 				if err != nil {
 					log.Error(err.Error())
 					continue
@@ -245,7 +241,7 @@ func SyncSnapshots() {
 				}
 
 				//更新项目钱包
-				walletTotal,err := dao.GetWalletTotalByBotIdAndAssetId(snapshots[i].OpponentID,snapshots[i].AssetID)
+				walletTotal,err := dao.GetWalletTotalByBotIdAndAssetId(snapshots[i].UserID,snapshots[i].Asset.AssetID)
 				if err != nil {
 					log.Error(err.Error())
 					continue
@@ -257,7 +253,7 @@ func SyncSnapshots() {
 					continue
 				}
 				//根据不同的分配算法进行配置
-				bot,err := dao.GetBotDtoById(snapshots[i].OpponentID)
+				bot,err := dao.GetBotDtoById(snapshots[i].UserID)
 
 				switch bot.Distribution {
 				case model.PersperAlgorithm:

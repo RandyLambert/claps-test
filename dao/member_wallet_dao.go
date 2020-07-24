@@ -6,7 +6,7 @@ import (
 )
 
 func UpdateMemberWallet(memberWalletDto *model.MemberWalletDto)(err error){
-	err = util.DB.Save(memberWalletDto).Error
+	err = util.DB.Debug().Table("member_wallet").Save(memberWalletDto).Error
 	return
 }
 
@@ -23,7 +23,7 @@ func GetMemeberWalletByUserIdAndAssetId(userId uint32,assetId string)(memberWall
 
 func GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(projectId uint32,userId uint32,botId string,assetId string)(member *model.MemberWalletDto,err error){
 	member = &model.MemberWalletDto{}
-	err = util.DB.Where("project_id=? AND user_id=? AND bot_id=? AND asset_id=?",projectId,userId,botId,assetId).Find(member).Error
+	err = util.DB.Debug().Table("member_wallet").Where("project_id=? AND user_id=? AND bot_id=? AND asset_id=?",projectId,userId,botId,assetId).Find(member).Error
 	return
 }
 

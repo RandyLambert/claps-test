@@ -91,6 +91,10 @@ INSERT INTO `claps`.`wallet` (`bot_id`, `asset_id`, `project_id`, `total`, `crea
 INSERT INTO `claps`.`wallet` (`bot_id`, `asset_id`, `project_id`, `total`, `created_at`, `updated_at`, `synced_at`) VALUES ('dd10b157-9d0f-31e5-bfa3-39c442f3a9b8', '815b0b1a-2764-3736-8faa-42d694fa620a', '1', '0', now(), now(), now());
 INSERT INTO `claps`.`wallet` (`bot_id`, `asset_id`, `project_id`, `total`, `created_at`, `updated_at`, `synced_at`) VALUES ('aac43e6e-0a28-35b8-b3de-c9ff84256451', '815b0b1a-2764-3736-8faa-42d694fa620a', '1', '0', now(), now(),now());
 INSERT INTO `claps`.`wallet` (`bot_id`, `asset_id`, `project_id`, `total`, `created_at`, `updated_at`, `synced_at`) VALUES ('f1d0ee2d-af22-3022-aa08-de3657455ce0', '815b0b1a-2764-3736-8faa-42d694fa620a', '1', '0', now(), now(), now());
+INSERT INTO `claps`.`wallet` (`bot_id`, `asset_id`, `project_id`, `total`, `created_at`, `updated_at`, `synced_at`) VALUES ('1ccd828e-7639-3c60-90f8-c133414bf210', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '1', '0', '2020-07-24 17:07:59', '2020-07-24 17:07:59', '2020-07-24 17:07:59');
+INSERT INTO `claps`.`wallet` (`bot_id`, `asset_id`, `project_id`, `total`, `created_at`, `updated_at`, `synced_at`) VALUES ('aac43e6e-0a28-35b8-b3de-c9ff84256451', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '1', '0', '2020-07-24 17:07:59', '2020-07-24 17:07:59', '2020-07-24 17:07:59');
+INSERT INTO `claps`.`wallet` (`bot_id`, `asset_id`, `project_id`, `total`, `created_at`, `updated_at`, `synced_at`) VALUES ('dd10b157-9d0f-31e5-bfa3-39c442f3a9b8', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '1', '0', '2020-07-24 17:07:59', '2020-07-24 17:07:59', '2020-07-24 17:07:59');
+INSERT INTO `claps`.`wallet` (`bot_id`, `asset_id`, `project_id`, `total`, `created_at`, `updated_at`, `synced_at`) VALUES ('f1d0ee2d-af22-3022-aa08-de3657455ce0', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '1', '0', '2020-07-24 17:07:59', '2020-07-24 17:07:59', '2020-07-24 17:07:59');
 
 # member_wallet
 SELECT * FROM claps.member_wallet;
@@ -98,8 +102,24 @@ INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_i
 INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', '1ccd828e-7639-3c60-90f8-c133414bf210', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
 INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', 'dd10b157-9d0f-31e5-bfa3-39c442f3a9b8', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
 INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', 'aac43e6e-0a28-35b8-b3de-c9ff84256451', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', '1ccd828e-7639-3c60-90f8-c133414bf210', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '2020-07-24 17:20:10', '2020-07-24 17:20:10', '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', 'aac43e6e-0a28-35b8-b3de-c9ff84256451', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '2020-07-24 17:20:10', '2020-07-24 17:20:10', '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', 'dd10b157-9d0f-31e5-bfa3-39c442f3a9b8', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '2020-07-24 17:20:10', '2020-07-24 17:20:10', '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085959', 'f1d0ee2d-af22-3022-aa08-de3657455ce0', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '2020-07-24 17:20:10', '2020-07-24 17:20:10', '0', '0');
+
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085963', 'f1d0ee2d-af22-3022-aa08-de3657455ce0', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085963', '1ccd828e-7639-3c60-90f8-c133414bf210', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085963', 'dd10b157-9d0f-31e5-bfa3-39c442f3a9b8', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085963', 'aac43e6e-0a28-35b8-b3de-c9ff84256451', '815b0b1a-2764-3736-8faa-42d694fa620a', now(), now(), '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085963', '1ccd828e-7639-3c60-90f8-c133414bf210', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '2020-07-24 17:20:10', '2020-07-24 17:20:10', '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085963', 'aac43e6e-0a28-35b8-b3de-c9ff84256451', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '2020-07-24 17:20:10', '2020-07-24 17:20:10', '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085963', 'dd10b157-9d0f-31e5-bfa3-39c442f3a9b8', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '2020-07-24 17:20:10', '2020-07-24 17:20:10', '0', '0');
+INSERT INTO `claps`.`member_wallet` (`project_id`, `user_id`, `bot_id`, `asset_id`, `created_at`, `updated_at`, `total`, `balance`) VALUES ('1', '46085963', 'f1d0ee2d-af22-3022-aa08-de3657455ce0', '6770a1e5-6086-44d5-b60f-545f9d9e8ffd', '2020-07-24 17:20:10', '2020-07-24 17:20:10', '0', '0');
+
 
 # transaction
 SELECT * FROM claps.transaction;
 SELECT id,donations,total FROM `project`  WHERE (id=(SELECT project_id FROM `bot`  WHERE (id='1ccd828e-7639-3c60-90f8-c133414bf210'))); 
 SELECT project_id FROM `bot`  WHERE (id='1ccd828e-7639-3c60-90f8-c133414bf210');
+
+ SELECT * FROM `user`  WHERE (user.id IN ((SELECT user_id FROM `member`  WHERE (project_id=1)))) ;

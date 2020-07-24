@@ -7,12 +7,12 @@ import (
 
 func GetWalletTotalByBotIdAndAssetId(botId string,assetId string)(total *model.WalletTotal,err error){
 	total = &model.WalletTotal{}
-	err = util.DB.Where("bot_id=? AND asset_id=?",botId,assetId).Find(total).Error
+	err = util.DB.Debug().Table("wallet").Where("bot_id=? AND asset_id=?",botId,assetId).Find(total).Error
 	return
 }
 
 func UpdateWalletTotal(walletTotal *model.WalletTotal)(err error){
-	err = util.DB.Save(walletTotal).Error
+	err = util.DB.Table("wallet").Save(walletTotal).Error
 	return
 }
 
