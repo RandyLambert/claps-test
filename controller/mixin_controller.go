@@ -3,6 +3,7 @@ package controller
 import (
 	"claps-test/service"
 	"claps-test/util"
+	"errors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
@@ -22,13 +23,26 @@ func MixinOauth(ctx *gin.Context)  {
 	state := ctx.Query("state")
 	session := sessions.Default(ctx)
 
+	//判断参数是否存在
 	if code == "" || state == ""{
-		err := util.NewErr(nil,util.ErrBadRequest,"mixin oauth认证没有参数")
+		err := util.NewErr(nil,util.ErrBadRequest,"mixin oauth认证参数出错")
 		util.HandleResponse(ctx,err,nil)
 		return
 	}
 
 	//判断state和randomUid是否一致
+	uid := session.Get("uid")
+	if uid == nil{
+		err := util.NewErr(nil,util.ErrInternalServer,"session中没有uid")
+		util.HandleResponse(ctx,err,nil)
+		return
+	}
+	if uid.(string) != state{
+		err := util.NewErr(errors.New("invalid oauth redirect"),util.ErrBadRequest,"")
+		util.HandleResponse(ctx,err,nil)
+		return
+	}
+
 	log.Debug(state)
 
 	//用state换取令牌
@@ -63,7 +77,7 @@ func MixinOauth(ctx *gin.Context)  {
 		util.HandleResponse(ctx,err4,nil)
 	}
 
-	//重定位
+	//重定向
 	ctx.Redirect(http.StatusMovedPermanently, "http://localhost:3000/assets")
 
 }
