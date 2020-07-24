@@ -9,11 +9,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func InsertTransfer(botId, assetID , memo string, amount decimal.Decimal,userId uint32)(err error){
+func InsertTransfer(botId, assetID , memo string, amount decimal.Decimal,mixinId string)(err error){
 	transfer := &model.Transfer{
 		BotId:         botId,
-		UserId:        userId,
-		TraceId:       string(userId)+assetID,
+		MixinId:       mixinId,
+		TraceId:       mixinId+assetID,
 		//TransactionId: TransactionID,
 		AssetId:       assetID,
 		Amount:        amount,
@@ -24,7 +24,7 @@ func InsertTransfer(botId, assetID , memo string, amount decimal.Decimal,userId 
 	err1 := dao.InsertTransfer(transfer)
 
 	if err1 != nil {
-		err = util.NewErr(err,util.ErrDataBase,"根据分配算法分配之后算出应为没为member分配多少钱,提现记录首次写入数据库失败导致提现失败")
+		err = util.NewErr(err,util.ErrDataBase,"根据分配算法分配之后算出应为每位member分配多少钱,提现记录首次写入数据库失败导致提现失败")
 	}
 	return
 }
@@ -54,7 +54,8 @@ func IfUnfinishedTransfer(userId uint32,assetId string) (err *util.Err) {
 	return
 }
 
-func DoTransfer(userId uint32,assetId string) (err *util.Err) {
+//生成trasfer记录
+func DoTransfer(userId uint32,mixinId ,assetId string) (err *util.Err) {
 
 	memberWallets,err1 := dao.GetMemeberWalletByUserIdAndAssetId(userId,assetId)
 	if err1 != nil {
@@ -63,17 +64,22 @@ func DoTransfer(userId uint32,assetId string) (err *util.Err) {
 	}
 
 	for i := range *memberWallets {
+		/*
 		mixinId,err1 := dao.GetMixinIdByUserId(userId)
 		if err1 != nil {
 			err = util.NewErr(err1,util.ErrDataBase,"获取用户MixinId失败导致提现失败")
 			return
 		}
-		err1 = InsertTransfer(mixinId.MixinId,assetId,"test",(*memberWallets)[i].Balance,userId)
+		 */
+		err1 = InsertTransfer((*memberWallets)[i].BotId,assetId,"恭喜您获得一笔捐赠",(*memberWallets)[i].Balance,mixinId)
 		if err1 != nil {
-			err = util.NewErr(err1,util.ErrDataBase,"插入捐赠记录失败")
+			err = util.NewErr(err1,util.ErrDataBase,"插入提现记录失败")
 			return
 		}
+
+		//清零
 		(*memberWallets)[i].Balance = decimal.Zero
+		//更新member_wallet
 		err1 = dao.UpdateMemberWallet(&(*memberWallets)[i])
 		if err1 != nil {
 			err = util.NewErr(err1,util.ErrDataBase,"更新用户钱包可提现值导致提现失败")

@@ -42,7 +42,7 @@ func AuthInfo(ctx *gin.Context){
 
 	log.Debug("从session中获取的user",user)
 	log.Debug("从session中获取的mixinToken",mixinToken)
-	log.Debug("从session中获取的foxoneToken",foxoneToken)
+	//log.Debug("从session中获取的foxoneToken",foxoneToken)
 
 	if user == nil || mixinToken == nil {
 		//没有登录的话随机生成uid
@@ -61,7 +61,7 @@ func AuthInfo(ctx *gin.Context){
 	resp["user"] = user
 	resp["randomUid"] = randomUid
 	resp["mixinAuth"] = If(mixinToken != nil,true,false).(bool)
-	resp["foxoneAuth"] = If(foxoneToken!= nil,true,false).(bool)
+	//resp["foxoneAuth"] = If(foxoneToken!= nil,true,false).(bool)
 	resp["envs"] = gin.H{
 		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
 		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),

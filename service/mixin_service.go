@@ -95,7 +95,8 @@ func SyncTransfer() {
 
 	ctx := context.TODO()
 	for {
-		transfers,err := dao.ListTransfersByStatus('1')
+		//找到状态为UNFINISHED的trasfer
+		transfers,err := dao.ListTransfersByStatus(model.UNFINISHED)
 		if err != nil {
 			log.Error(err.Error())
 			continue
@@ -112,6 +113,8 @@ func SyncTransfer() {
 			// Transfer transfer to account
 			//	asset_id, opponent_id, amount, traceID, memo
 			// 把该user的钱转账到该账户返回快照
+
+			//sender
 			bot,err := dao.GetBotById((*transfers)[i].BotId)
 			if err != nil {
 				log.Error(err.Error())
@@ -137,15 +140,17 @@ func SyncTransfer() {
 				continue
 			}
 
-			(*transfers)[i].Status = "1"
+			(*transfers)[i].Status = model.FINISHED
 			(*transfers)[i].TraceId = snapshot.TraceID
 			(*transfers)[i].SnapshotId = snapshot.SnapshotID
 			(*transfers)[i].CreatedAt = snapshot.CreatedAt
 
+			//更新trace_id为随机数
 			err = dao.UpdateTransfer(&(*transfers)[i])
 			if err != nil {
 				log.Error(err.Error())
 			}
+
 		}
 
 		time.Sleep(300*time.Millisecond)

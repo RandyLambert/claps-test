@@ -178,8 +178,15 @@ func UserDonation(ctx *gin.Context) {
 	util.HandleResponse(ctx,nil,resp)
 }
 
+//加中间件
 //用户提现某种货币,把表中的status由0变为1
 func UserWithdraw(ctx *gin.Context) {
+
+	//gihub和mixin已经绑定了
+
+	//获取mixinId
+	session := sessions.Default(ctx)
+	mixinId := session.Get("mixin").(string)
 
 	//获取币种
 	assetId := ctx.Query("assetId")
@@ -190,7 +197,6 @@ func UserWithdraw(ctx *gin.Context) {
 	}
 
 	//获取userId
-	session := sessions.Default(ctx)
 	userId := uint32(*session.Get("user").(github.User).ID)
 
 	//判断是否有未完成的提现
@@ -200,8 +206,9 @@ func UserWithdraw(ctx *gin.Context) {
 		 return
 	 }
 
-	//找到相应的币种的doTransfer
-	err2 := service.DoTransfer(userId,assetId)
+	//找到相应的币种的doTransfer mixin_id和assetId
+	//生成trasfer记录
+	err2 := service.DoTransfer(userId,mixinId,assetId)
 	if err2 != nil{
 		util.HandleResponse(ctx,err2,nil)
 		return

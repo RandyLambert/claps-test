@@ -44,22 +44,23 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 		mixinGroup := apiGroup.Group("/mixin")
 		{
 			mixinGroup.GET("/assets", controller.MixinAssets)
-			mixinGroup.GET("/oauth",middleware.AuthMiddleware(),controller.MixinOauth)
+			mixinGroup.GET("/oauth",middleware.GithubAuthMiddleware(),controller.MixinOauth)
 		}
 
 
 		// /api/user
 		userGroup := apiGroup.Group("/user")
-		userGroup.Use(middleware.AuthMiddleware())
+		userGroup.Use(middleware.GithubAuthMiddleware())
 		{
 			userGroup.GET("/profile", controller.UserProfile)
 			userGroup.GET("/assets", controller.UserAssets)
-			userGroup.GET("/transactions", controller.UserTransactions)
+			//userGroup.GET("/transactions", controller.UserTransactions)
+			//查询所有完成和未完成的记录
 			userGroup.GET("/transfers", controller.UserTransfer)
 			//请求获得某个用户的捐赠信息的汇总,包括总金额和捐赠人数
 			userGroup.GET("/donation", controller.UserDonation)
 			//提现
-			userGroup.GET("/withdraw",controller.UserWithdraw)
+			userGroup.GET("/withdraw",middleware.MixinAuthMiddleware(),controller.UserWithdraw)
 		}
 
 	}
