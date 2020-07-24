@@ -9,7 +9,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"math/rand"
-	"net/http"
 )
 var longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_")
 
@@ -37,7 +36,7 @@ func AuthInfo(ctx *gin.Context){
 	var randomUid string = ""
 
 
-	foxoneToken := session.Get("foxoneToken")
+	//foxoneToken := session.Get("foxoneToken")
 	user := session.Get("user")
 	//mixin中存储的是用户mixin的user_id
 	mixinToken := session.Get("mixin")
@@ -79,7 +78,6 @@ func AuthInfo(ctx *gin.Context){
 		}
 	}
 
-	/*
 	resp["user"] = user
 	resp["randomUid"] = randomUid
 	resp["mixinAuth"] = If(mixinToken != nil,true,false).(bool)
@@ -91,8 +89,8 @@ func AuthInfo(ctx *gin.Context){
 	}
 
 	util.HandleResponse(ctx,nil,resp)
-	 */
 
+	/*
 	ctx.JSON(http.StatusOK,gin.H{
 		"user":user,
 		"randomUid":randomUid,
@@ -103,6 +101,7 @@ func AuthInfo(ctx *gin.Context){
 			"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
 			"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
 		}})
+	 */
 }
 
 //模拟三目运算符号
