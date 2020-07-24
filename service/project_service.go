@@ -21,6 +21,8 @@ func GetProjectByName(ctx *gin.Context,name string) (projectDetailInfo *map[stri
 		err = util.NewErr(err1,util.ErrDataBase,"获取项目仓库失败")
 		return
 	}
+
+	/*
 	for i := range *repositoryDtos {
 		repoInfo,err1 := GetRepositoryInfo(ctx,(*repositoryDtos)[i].Slug)
 		if err1 != nil {
@@ -32,6 +34,7 @@ func GetProjectByName(ctx *gin.Context,name string) (projectDetailInfo *map[stri
 		(*repositoryDtos)[i].Watchs = *repoInfo.WatchersCount
 		(*repositoryDtos)[i].RepositoryUrl = *repoInfo.ArchiveURL
 	}
+	 */
 
 
 	//mambers格式不同,删除project_id和userid字段
