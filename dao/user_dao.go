@@ -6,9 +6,9 @@ import (
 )
 
 //从数据库中通过ID获取user信息,存储在user中,引用传值
-func GetMixinIdByUserId(id uint32)(user *model.UserMixinId,err error) {
+func GetUserByUserId(id uint32)(user *model.UserMixinId,err error) {
 	user = &model.UserMixinId{}
-	err = util.DB.Debug().Table("user").Where("id+?",id).Scan(user).Error
+	err = util.DB.Debug().Table("user").Where("id = ?",id).Scan(user).Error
 	return
 }
 

@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"claps-test/service"
 	"claps-test/util"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"math/rand"
@@ -39,6 +41,26 @@ func AuthInfo(ctx *gin.Context){
 	user := session.Get("user")
 	//mixin中存储的是用户mixin的user_id
 	mixinToken := session.Get("mixin")
+
+	//如果session中没有mixin的user_id尝试从数据库读取,如果绑定了就不需要用户在绑定mixin了
+	if user != nil && mixinToken == nil{
+		userId := uint32(*user.(github.User).ID)
+		mixinId,err := service.GetMixinIdByUserId(userId)
+		if err != nil{
+			util.HandleResponse(ctx,err,nil)
+			return
+		}
+		if mixinId != ""{
+			session.Set("mixin",mixinId)
+			err := session.Save()
+			if err != nil{
+				util.HandleResponse(ctx,util.NewErr(err,util.ErrInternalServer,"保存session出错"),nil)
+				return
+			}
+			mixinToken = true
+		}
+	}
+
 
 	log.Debug("从session中获取的user",user)
 	log.Debug("从session中获取的mixinToken",mixinToken)

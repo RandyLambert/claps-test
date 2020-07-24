@@ -87,3 +87,13 @@ func UpdateUserMixinId(user_id uint32,mixinId string) (err *util.Err) {
 	}
 	return
 }
+
+func GetMixinIdByUserId(userId uint32)(mixinId string,err *util.Err)  {
+	user,err1 := dao.GetUserByUserId(userId)
+	if err1 != nil{
+		err = util.NewErr(err1,util.ErrDataBase,"从数据库查询user信息错误")
+		return
+	}
+	mixinId = user.MixinId
+	return
+}
