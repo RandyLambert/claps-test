@@ -74,7 +74,7 @@ func GetPatronsByUserId(userId uint32) (patrons uint32,err *util.Err) {
 
 	//遍历projects,把patrons相加
 	for i := range *projects{
-		patrons = patrons + (*projects)[i].Patrons
+		patrons = patrons + (*projects)[i].Donations
 	}
 	return
 }

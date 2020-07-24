@@ -15,7 +15,7 @@ func Projects(ctx *gin.Context){
 
 func Project(ctx *gin.Context){
 
-	projectInfo,err := service.GetProjectByName(ctx.Param("name"))
+	projectInfo,err := service.GetProjectByName(ctx,ctx.Param("name"))
 	util.HandleResponse(ctx,err,projectInfo)
 }
 

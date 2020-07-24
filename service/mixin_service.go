@@ -225,10 +225,8 @@ func SyncSnapshots() {
 
 				//更新Total字段
 				projectTotal.Total = projectTotal.Total.Add(asset.PriceUsd.Mul(snapshots[i].Amount))
-				count,err := dao.CountPatronByProjectIdAndSender(projectTotal.Id,snapshots[i].UserID)
-				if count == 0 {
-					projectTotal.Patrons += 1
-				}
+				projectTotal.Donations += 1
+
 
 				err = dao.UpdateProjectTotal(projectTotal)
 				if err != nil {
