@@ -122,16 +122,17 @@ func SyncTransfer() {
 				continue
 			}
 
-			user,err := CreateMixinClient(bot)
-			if err != nil {
-				log.Error(err.Error())
+			user,err1 := CreateMixinClient(bot)
+			if err1 != nil {
+				log.Error(err1.Errord.Error())
 				continue
 			}
 			//traceid暂时不应该这样
 			snapshot, err := user.Transfer(ctx, &mixin.TransferInput{
 				TraceID:    uuid.Must(uuid.NewV4()).String(),
 				AssetID:    (*transfers)[i].AssetId,
-				OpponentID: (*transfers)[i].BotId,
+				//接收方的mixin_id
+				OpponentID: (*transfers)[i].MixinId,
 				Amount:     (*transfers)[i].Amount,
 				Memo:       (*transfers)[i].Memo,
 			}, bot.Pin)
@@ -146,7 +147,7 @@ func SyncTransfer() {
 			(*transfers)[i].SnapshotId = snapshot.SnapshotID
 			(*transfers)[i].CreatedAt = snapshot.CreatedAt
 
-			//更新trace_id为随机数
+			//更新trace_id为随机数,主键改变了，不能save
 			err = dao.UpdateTransfer(&(*transfers)[i])
 			if err != nil {
 				log.Error(err.Error())

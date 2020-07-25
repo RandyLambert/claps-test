@@ -17,9 +17,9 @@ func UpdateTransfer(transfer *model.Transfer)(err error){
 
 }
 
-func GetTransferByUserIdAndAssetId(userid uint32, assetId string)(transfers *[]model.Transfer,err error) {
+func GetTransferByUserIdAndAssetId(mixinId string, assetId string)(transfers *[]model.Transfer,err error) {
 	transfers = &[]model.Transfer{}
-	err = util.DB.Debug().Where("user_id = ? AND asset_id = ?",userid,assetId).Find(transfers).Error
+	err = util.DB.Debug().Where("mixin_id = ? AND asset_id = ?",mixinId,assetId).Find(transfers).Error
 	log.Debug("dao transfers = ",transfers)
 	return
 }
@@ -31,13 +31,13 @@ func ListTransfersByStatus(status string)(transfer *[]model.Transfer,err error){
 	return
 }
 
-func UpdateTransferSatusByUserIdAndAssetId(userId uint32, assetId string,status string)(err error)  {
-	err = util.DB.Debug().Table("transfer").Where("user_id = ? AND asset_id= ?",userId,assetId).Update("status",status).Error
+func UpdateTransferSatusByUserIdAndAssetId(mixinId string, assetId string,status string)(err error)  {
+	err = util.DB.Debug().Table("transfer").Where("mixin_id = ? AND asset_id= ?",mixinId,assetId).Update("status",status).Error
 	return
 }
 
-func CountUnfinishedTransfer(userId uint32, assetId string) (count int,err error) {
-	err = util.DB.Debug().Table("transfer").Where("user_id = ? AND asset_id = ? AND status = ?",userId,assetId,model.UNFINISHED).Count(&count).Error
+func CountUnfinishedTransfer(mixinId string, assetId string) (count int,err error) {
+	err = util.DB.Debug().Table("transfer").Where("mixin_id = ? AND asset_id = ? AND status = ?",mixinId,assetId,model.UNFINISHED).Count(&count).Error
 	log.Debug(count)
 	return
 }

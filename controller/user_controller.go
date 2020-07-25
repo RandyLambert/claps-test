@@ -119,7 +119,19 @@ func UserTransactions(ctx *gin.Context){
 func UserTransfer(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 	session := sessions.Default(ctx)
+
+	//用户如果提现过一定是绑定了mixin,没有mixin则是没有提现记录
 	userId := uint32(*(session.Get("user").(github.User).ID))
+	mixinId,err := service.GetMixinIdByUserId(userId)
+	if  err != nil{
+		util.HandleResponse(ctx,err,nil)
+		return
+	}
+
+	if mixinId == ""{
+		util.HandleResponse(ctx,util.NewErr(nil,util.ErrUnauthorized,"没有绑定mixin没有提现记录"),nil)
+		return
+	}
 
 	assetId := ctx.Query("assetId")
 	if assetId == ""{
@@ -130,7 +142,7 @@ func UserTransfer(ctx *gin.Context) {
 	log.Debug("assetId = ",assetId)
 
 	//从transfer表中获取该用户的所有捐赠记录
-	transfers,err := service.GetTransferByUserIdAndAssetId(userId,assetId)
+	transfers,err := service.GetTransferByMininIdAndAssetId(mixinId,assetId)
 	resp["transfers"] = transfers
 	util.HandleResponse(ctx,err,resp)
 }
@@ -200,7 +212,7 @@ func UserWithdraw(ctx *gin.Context) {
 	userId := uint32(*session.Get("user").(github.User).ID)
 
 	//判断是否有未完成的提现
-	 err3 := service.IfUnfinishedTransfer(userId,assetId)
+	 err3 := service.IfUnfinishedTransfer(mixinId,assetId)
 	 if err3 != nil{
 	 	util.HandleResponse(ctx,err3,nil)
 		 return

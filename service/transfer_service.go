@@ -30,8 +30,8 @@ func InsertTransfer(botId, assetID , memo string, amount decimal.Decimal,mixinId
 }
 
 //跟新数据库中的transger表中的status为1
-func UpdateTransferStatusByAssetIdAndUserId(userId uint32,assetId string,status string)(err *util.Err){
-	err1 := dao.UpdateTransferSatusByUserIdAndAssetId(userId,assetId,status)
+func UpdateTransferStatusByAssetIdAndUserId(mixinId string,assetId string,status string)(err *util.Err){
+	err1 := dao.UpdateTransferSatusByUserIdAndAssetId(mixinId,assetId,status)
 	if err1 != nil{
 		err = util.NewErr(err1,util.ErrDataBase,"更新数据库transfer状态出错")
 	}
@@ -39,8 +39,8 @@ func UpdateTransferStatusByAssetIdAndUserId(userId uint32,assetId string,status 
 }
 
 //判断某种币是否有未完成的提现操作,err非nil标有有未完成,err=nil表示没有未完成
-func IfUnfinishedTransfer(userId uint32,assetId string) (err *util.Err) {
-	count,err1 := dao.CountUnfinishedTransfer(userId,assetId)
+func IfUnfinishedTransfer(mixinId string,assetId string) (err *util.Err) {
+	count,err1 := dao.CountUnfinishedTransfer(mixinId,assetId)
 	if err1 != nil{
 		err = util.NewErr(err1,util.ErrDataBase,"数据库查询Unfinished出错")
 		return

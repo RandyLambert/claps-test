@@ -56,8 +56,8 @@ func GetUserBalanceByAllAssets(userId uint32,assets *[]model.Asset)(err *util.Er
 	return
 }
 
-func GetTransferByUserIdAndAssetId(userId uint32,assetId string)(transfers *[]model.Transfer,err *util.Err) {
-	transfers,err1 := dao.GetTransferByUserIdAndAssetId(userId,assetId)
+func GetTransferByMininIdAndAssetId(mixinId string,assetId string)(transfers *[]model.Transfer,err *util.Err) {
+	transfers,err1 := dao.GetTransferByUserIdAndAssetId(mixinId,assetId)
 	log.Debug("service transfers = ",transfers)
 	if err1 != nil{
 		err = util.NewErr(err1,util.ErrDataBase,"数据库查询transfer出错")
