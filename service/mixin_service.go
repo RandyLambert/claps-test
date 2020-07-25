@@ -62,14 +62,7 @@ func SyncAssets() {
 
 		for i := range assetsInfo {
 			//log.Debug(assetsInfo[i].Name)
-			if assetsInfo[i].AssetID == util.BTC ||
-				assetsInfo[i].AssetID == util.BCH ||
-				assetsInfo[i].AssetID == util.ETC ||
-				assetsInfo[i].AssetID == util.EOS ||
-				assetsInfo[i].AssetID == util.XRP ||
-				assetsInfo[i].AssetID == util.XEM ||
-				assetsInfo[i].AssetID == util.USDT ||
-				assetsInfo[i].AssetID == util.DOGE {
+			if util.CheckAsset(&assetsInfo[i].AssetID) {
 
 				asset := &model.Asset{
 					AssetId:  assetsInfo[i].AssetID,
@@ -189,7 +182,7 @@ func SyncSnapshots() {
 		}
 
 		//遍历100记录
-		for i, _ := range snapshots {
+		for i := range snapshots {
 			/*
 				log.Debug(*snapshots[i])
 				log.Debug("\n")

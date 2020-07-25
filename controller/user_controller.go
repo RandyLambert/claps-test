@@ -169,21 +169,20 @@ func UserDonation(ctx *gin.Context) {
 
 	//便利dto然后求和
 	var sum decimal.Decimal
-	var patrons uint32
 
 	for i := range *dto {
 		sum = sum.Add((*dto)[i].Balance)
 	}
 
-	//从project里面寻找patrons然后求和
-	patrons, err3 := service.GetPatronsByUserId(userId)
+	//从project里面寻找Donations然后求和
+	donations, err3 := service.SumProjectDonationsByUserId(userId)
 	if err3 != nil {
 		util.HandleResponse(ctx, err3, resp)
 		return
 	}
 
 	resp["total"] = sum
-	resp["patrons"] = patrons
+	resp["donations"] = donations
 
 	util.HandleResponse(ctx, nil, resp)
 }

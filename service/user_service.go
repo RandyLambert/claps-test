@@ -65,16 +65,10 @@ func GetTransferByMininIdAndAssetId(mixinId string, assetId string) (transfers *
 	return
 }
 
-func GetPatronsByUserId(userId uint32) (patrons uint32, err *util.Err) {
-	projects, err1 := dao.ListProjectsByUserId(userId)
+func SumProjectDonationsByUserId(userId uint32) (donations *[]interface{}, err *util.Err) {
+	donations, err1 := dao.SumProjectDonationsByUserId(userId)
 	if err1 != nil {
-		err = util.NewErr(err, util.ErrDataBase, "数据库获取所有project信息出错")
-		return
-	}
-
-	//遍历projects,把patrons相加
-	for i := range *projects {
-		patrons = patrons + (*projects)[i].Donations
+		err = util.NewErr(err, util.ErrDataBase, "数据库获取用户项目信息和出错")
 	}
 	return
 }

@@ -47,3 +47,11 @@ func InitMixin() *mixin.Client {
 func GetMixin() *mixin.Client {
 	return MixinClient
 }
+
+func CheckAsset(assetId *string) bool{
+	switch *assetId{
+	case DOGE,USDT,XEM,XRP,BCH,BTC,EOS,ETC:
+		return true
+	}
+	return false
+}

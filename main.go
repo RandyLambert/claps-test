@@ -22,7 +22,9 @@ func main() {
 	util.InitMixin()
 	util.InitLog()
 	db := util.InitDB()
-	defer db.Close()
+	if db != nil {
+		defer db.Close()
+	}
 
 	//自动迁移
 	db.Debug().AutoMigrate(&model.Project{})

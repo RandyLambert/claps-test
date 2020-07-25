@@ -40,3 +40,10 @@ func UpdateProjectTotal(projectTotal *model.ProjectTotal) (err error) {
 	err = util.DB.Debug().Table("project").Save(projectTotal).Error
 	return
 }
+
+func SumProjectDonationsByUserId(userId uint32) (donations *[]interface{}, err error) {
+	donations = &[]interface{}{}
+	err = util.DB.Debug().Table("project").Select("sum(donations)").Where("id IN(?)",
+		util.DB.Debug().Table("member").Select("project_id").Where("user_id=?",userId).SubQuery()).Pluck("sum(donations)", donations).Error
+	return
+}

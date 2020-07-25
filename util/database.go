@@ -9,7 +9,7 @@ import (
 
 var DB *gorm.DB
 
-func InitDB() *gorm.DB {
+func InitDB() (db *gorm.DB) {
 	driverName := "mysql"
 	host := viper.GetString("DATABASE_HOST")
 	port := viper.GetString("DATABASE_PORT")
@@ -24,16 +24,16 @@ func InitDB() *gorm.DB {
 		port,
 		database,
 		charset)
-	db, err := gorm.Open(driverName, args)
+	DB, err := gorm.Open(driverName, args)
 
 	if err != nil {
 		log.Panic("failed to connect database,err :" + err.Error())
+		return
 	}
 
-	db.SingularTable(true)
+	DB.SingularTable(true)
 
-	DB = db
-	return db
+	return DB
 }
 
 /*
