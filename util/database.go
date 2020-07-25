@@ -3,8 +3,8 @@ package util
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"github.com/spf13/viper"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 var DB *gorm.DB
@@ -38,7 +38,7 @@ func InitDB() *gorm.DB {
 
 /*
 获取数据库句柄
- */
+*/
 func GetDB() *gorm.DB {
 	return DB
 }

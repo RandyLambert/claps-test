@@ -6,47 +6,46 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Projects(ctx *gin.Context){
+func Projects(ctx *gin.Context) {
 
-	projects,err := service.ListProjectsAll()
-	util.HandleResponse(ctx,err,projects)
+	projects, err := service.ListProjectsAll()
+	util.HandleResponse(ctx, err, projects)
 }
 
+func Project(ctx *gin.Context) {
 
-func Project(ctx *gin.Context){
-
-	projectInfo,err := service.GetProjectByName(ctx,ctx.Param("name"))
-	util.HandleResponse(ctx,err,projectInfo)
+	projectInfo, err := service.GetProjectByName(ctx, ctx.Param("name"))
+	util.HandleResponse(ctx, err, projectInfo)
 }
 
-func ProjectMembers(ctx *gin.Context){
+func ProjectMembers(ctx *gin.Context) {
 
-	members,err := service.ListMembersByProjectName(ctx.Param("name"))
-	util.HandleResponse(ctx,err,members)
+	members, err := service.ListMembersByProjectName(ctx.Param("name"))
+	util.HandleResponse(ctx, err, members)
 }
 
-func ProjectTransactions(ctx *gin.Context){
+func ProjectTransactions(ctx *gin.Context) {
 
 	assetId := ctx.Query("assetId")
-	if assetId == ""{
-		err := util.NewErr(nil,util.ErrUnauthorized,"没有QUERY值无法请求成功")
-		util.HandleResponse(ctx,err,nil)
+	if assetId == "" {
+		err := util.NewErr(nil, util.ErrUnauthorized, "没有QUERY值无法请求成功")
+		util.HandleResponse(ctx, err, nil)
 		return
 	}
 
-	transactions,err := service.ListTransactionsByProjectNameAndAssetId(ctx.Param("name"),assetId)
-	util.HandleResponse(ctx,err,transactions)
+	transactions, err := service.ListTransactionsByProjectNameAndAssetId(ctx.Param("name"), assetId)
+	util.HandleResponse(ctx, err, transactions)
 }
 
-func ProjectDonation(ctx *gin.Context){
+func ProjectDonation(ctx *gin.Context) {
 	assetId := ctx.Query("assetId")
 	botId := ctx.Query("botId")
 	if assetId == "" || botId == "" {
-		err := util.NewErr(nil,util.ErrUnauthorized,"没有QUERY值无法请求成功")
-		util.HandleResponse(ctx,err,nil)
+		err := util.NewErr(nil, util.ErrUnauthorized, "没有QUERY值无法请求成功")
+		util.HandleResponse(ctx, err, nil)
 		return
 	}
 
-	asset,err := service.GetAssetByMixinClient(botId,assetId)
-	util.HandleResponse(ctx,err,asset)
+	asset, err := service.GetAssetByMixinClient(botId, assetId)
+	util.HandleResponse(ctx, err, asset)
 }

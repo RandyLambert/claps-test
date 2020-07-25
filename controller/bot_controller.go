@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Bot(ctx *gin.Context){
+func Bot(ctx *gin.Context) {
 
-	asset,err := service.GetAssetByBotIdAndAssetId(ctx.Param("botId"),ctx.Param("assetId"))
-	util.HandleResponse(ctx,err,asset)
+	asset, err := service.GetAssetByBotIdAndAssetId(ctx.Param("botId"), ctx.Param("assetId"))
+	util.HandleResponse(ctx, err, asset)
 
 }

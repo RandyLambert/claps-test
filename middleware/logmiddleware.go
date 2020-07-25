@@ -6,9 +6,6 @@ import (
 	"time"
 )
 
-
-
-
 func LoggerToFile() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
@@ -47,4 +44,3 @@ func LoggerToFile() gin.HandlerFunc {
 
 	}
 }
-

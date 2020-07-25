@@ -13,33 +13,40 @@ import (
 /*
 初始化日志,logrus日志库
 */
-func setLogLevel(level string){
+func setLogLevel(level string) {
 	switch level {
-	case "InfoLevel": logrus.SetLevel(logrus.InfoLevel)
-	case "DebugLevel": logrus.SetLevel(logrus.DebugLevel)
-	case "ErrorLevel": logrus.SetLevel(logrus.ErrorLevel)
-	case "FatalLevel": logrus.SetLevel(logrus.FatalLevel)
-	case "PanicLevel": logrus.SetLevel(logrus.PanicLevel)
-	case "TraceLevel": logrus.SetLevel(logrus.TraceLevel)
-	case "WarnLevel": logrus.SetLevel(logrus.WarnLevel)
+	case "InfoLevel":
+		logrus.SetLevel(logrus.InfoLevel)
+	case "DebugLevel":
+		logrus.SetLevel(logrus.DebugLevel)
+	case "ErrorLevel":
+		logrus.SetLevel(logrus.ErrorLevel)
+	case "FatalLevel":
+		logrus.SetLevel(logrus.FatalLevel)
+	case "PanicLevel":
+		logrus.SetLevel(logrus.PanicLevel)
+	case "TraceLevel":
+		logrus.SetLevel(logrus.TraceLevel)
+	case "WarnLevel":
+		logrus.SetLevel(logrus.WarnLevel)
 	default:
 		logrus.SetLevel(logrus.InfoLevel)
 	}
 }
 
-func setLogFormatter(formatter string){
-	if formatter == "json"{
+func setLogFormatter(formatter string) {
+	if formatter == "json" {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	} else {
 		logrus.SetFormatter(&logrus.TextFormatter{})
 	}
 }
 
-func setLogOutput(){
+func setLogOutput() {
 	now := time.Now()
 	//获取日志文件路径
 	logFilePath := viper.GetString("log.filePath")
-	if logFilePath == ""{
+	if logFilePath == "" {
 		if dir, err := os.Getwd(); err == nil {
 			logFilePath = dir + "/logs/"
 		}
@@ -51,7 +58,7 @@ func setLogOutput(){
 	//设置日志文件名字
 	logFileName := viper.GetString("log.fileName")
 	//当前日期时间命名
-	if logFileName == ""{
+	if logFileName == "" {
 		logFileName = now.Format("2006-01-02") + ".log"
 	}
 	//日志文件,拼接两部分
@@ -62,7 +69,7 @@ func setLogOutput(){
 	//获取配置文件中的日志文件类型
 	logFileType := viper.GetString("log.fileType")
 	//未设置和Stdout设置为标准输出
-	if logFileType =="File" {
+	if logFileType == "File" {
 		var err error
 		writer, err = os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0755)
 		if err != nil {
@@ -72,12 +79,11 @@ func setLogOutput(){
 		writer = os.Stdout
 	}
 
-
 	logrus.SetOutput(io.MultiWriter(writer))
 
 }
 
-func InitLog(){
+func InitLog() {
 	//设置输出
 	setLogOutput()
 	//设置日志级别

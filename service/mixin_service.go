@@ -15,36 +15,36 @@ import (
 )
 
 //获取所有币的信息
-func GetAssetByMixinClient(botId string,assetId string)(asset *mixin.Asset,err *util.Err){
-	bot,err1 := dao.GetBotById(botId)
+func GetAssetByMixinClient(botId string, assetId string) (asset *mixin.Asset, err *util.Err) {
+	bot, err1 := dao.GetBotById(botId)
 	if err1 != nil {
-		err = util.NewErr(err1,util.ErrDataBase,"通过相应botid获取bot信息信息错误")
+		err = util.NewErr(err1, util.ErrDataBase, "通过相应botid获取bot信息信息错误")
 		return
 	}
-	mixinClient,err := CreateMixinClient(bot)
+	mixinClient, err := CreateMixinClient(bot)
 	if err != nil {
 		return
 	}
-	asset,err1 = mixinClient.ReadAsset(context.Background(),assetId)
+	asset, err1 = mixinClient.ReadAsset(context.Background(), assetId)
 	if err1 != nil {
-		err = util.NewErr(err1,util.ErrThirdParty,"通过mixin获取asset信息错误")
+		err = util.NewErr(err1, util.ErrThirdParty, "通过mixin获取asset信息错误")
 	}
 	return
 
 }
 
-func CreateMixinClient(bot *model.Bot)(client *mixin.Client,err *util.Err){
+func CreateMixinClient(bot *model.Bot) (client *mixin.Client, err *util.Err) {
 
 	s := &mixin.Keystore{
 		ClientID:   bot.Id,
 		SessionID:  bot.SessionId,
 		PrivateKey: bot.PrivateKey,
-		PinToken: bot.PinToken,
+		PinToken:   bot.PinToken,
 	}
 
 	client, err1 := mixin.NewFromKeystore(s)
 	if err1 != nil {
-		err = util.NewErr(err1,util.ErrThirdParty,"创建mixinclient失败")
+		err = util.NewErr(err1, util.ErrThirdParty, "创建mixinclient失败")
 	}
 	return
 }
@@ -53,7 +53,7 @@ func SyncAssets() {
 
 	ctx := context.TODO()
 	for {
-		assetsInfo,err := util.MixinClient.ReadAssets(ctx)
+		assetsInfo, err := util.MixinClient.ReadAssets(ctx)
 		//错误处理
 		if err != nil {
 			log.Error(err.Error())
@@ -68,8 +68,8 @@ func SyncAssets() {
 				assetsInfo[i].AssetID == util.EOS ||
 				assetsInfo[i].AssetID == util.XRP ||
 				assetsInfo[i].AssetID == util.XEM ||
-				assetsInfo[i].AssetID == util.USDT||
-				assetsInfo[i].AssetID == util.DOGE{
+				assetsInfo[i].AssetID == util.USDT ||
+				assetsInfo[i].AssetID == util.DOGE {
 
 				asset := &model.Asset{
 					AssetId:  assetsInfo[i].AssetID,
@@ -88,7 +88,7 @@ func SyncAssets() {
 				}
 			}
 		}
-		time.Sleep(time.Minute*5)
+		time.Sleep(time.Minute * 5)
 	}
 }
 
@@ -97,7 +97,7 @@ func SyncTransfer() {
 	ctx := context.TODO()
 	for {
 		//找到状态为UNFINISHED的trasfer
-		transfers,err := dao.ListTransfersByStatus(model.UNFINISHED)
+		transfers, err := dao.ListTransfersByStatus(model.UNFINISHED)
 		if err != nil {
 			log.Error(err.Error())
 			continue
@@ -105,7 +105,7 @@ func SyncTransfer() {
 
 		//说明当前时间没有提现记录
 		if len(*transfers) == 0 {
-			time.Sleep(1*time.Second)
+			time.Sleep(1 * time.Second)
 			continue
 		}
 
@@ -116,21 +116,21 @@ func SyncTransfer() {
 			// 把该user的钱转账到该账户返回快照
 
 			//sender
-			bot,err := dao.GetBotById((*transfers)[i].BotId)
+			bot, err := dao.GetBotById((*transfers)[i].BotId)
 			if err != nil {
 				log.Error(err.Error())
 				continue
 			}
 
-			user,err1 := CreateMixinClient(bot)
+			user, err1 := CreateMixinClient(bot)
 			if err1 != nil {
 				log.Error(err1.Errord.Error())
 				continue
 			}
 			//traceid暂时不应该这样
 			snapshot, err := user.Transfer(ctx, &mixin.TransferInput{
-				TraceID:    uuid.Must(uuid.NewV4()).String(),
-				AssetID:    (*transfers)[i].AssetId,
+				TraceID: uuid.Must(uuid.NewV4()).String(),
+				AssetID: (*transfers)[i].AssetId,
 				//接收方的mixin_id
 				OpponentID: (*transfers)[i].MixinId,
 				Amount:     (*transfers)[i].Amount,
@@ -142,20 +142,21 @@ func SyncTransfer() {
 				continue
 			}
 
-			(*transfers)[i].Status = model.FINISHED
-			(*transfers)[i].TraceId = snapshot.TraceID
-			(*transfers)[i].SnapshotId = snapshot.SnapshotID
-			(*transfers)[i].CreatedAt = snapshot.CreatedAt
-
+			transfer := &map[string]interface{}{
+				"status":      model.FINISHED,
+				"trace_id":    snapshot.TraceID,
+				"snapshot_id": snapshot.SnapshotID,
+				"created_at":  snapshot.CreatedAt,
+			}
+			//log.Error(transfer["status"])
 			//更新trace_id为随机数,主键改变了，不能save
-			err = dao.UpdateTransfer(&(*transfers)[i])
+			err = dao.UpdateTransferTraceId(transfer, (*transfers)[i].TraceId)
+
 			if err != nil {
 				log.Error(err.Error())
 			}
-
 		}
-
-		time.Sleep(300*time.Millisecond)
+		time.Sleep(300 * time.Millisecond)
 	}
 }
 
@@ -169,7 +170,7 @@ func SyncSnapshots() {
 	//死循环,读到上次最后一条就break
 	for {
 		//获取最后一次跟新记录
-		property,_ := dao.GetPropertyByKey("last_snapshot_id")
+		property, _ := dao.GetPropertyByKey("last_snapshot_id")
 		lastSnapshotID := property.Value
 
 		//从mixin获取当前时间之后的snapshots
@@ -188,11 +189,11 @@ func SyncSnapshots() {
 		}
 
 		//遍历100记录
-		for i,_ := range snapshots {
+		for i, _ := range snapshots {
 			/*
-			log.Debug(*snapshots[i])
-			log.Debug("\n")
-			 */
+				log.Debug(*snapshots[i])
+				log.Debug("\n")
+			*/
 			if lastSnapshotID == snapshots[i].SnapshotID {
 				continue
 			}
@@ -200,7 +201,7 @@ func SyncSnapshots() {
 			//筛选自己的转入
 			if snapshots[i].UserID != "" && snapshots[i].Amount.Cmp(decimal.Zero) > 0 {
 				//根据机器人从数据库里找到项目
-				projectTotal,err := dao.GetProjectTotalByBotId(snapshots[i].UserID)
+				projectTotal, err := dao.GetProjectTotalByBotId(snapshots[i].UserID)
 				//错误处理有问题
 				if err != nil {
 					log.Error(err.Error())
@@ -224,7 +225,7 @@ func SyncSnapshots() {
 				}
 
 				//查找汇率等详细信息
-				asset,err := dao.GetPriceUsdByAssetId(snapshots[i].Asset.AssetID)
+				asset, err := dao.GetPriceUsdByAssetId(snapshots[i].Asset.AssetID)
 				if err != nil {
 					log.Error(err.Error())
 					continue
@@ -234,7 +235,6 @@ func SyncSnapshots() {
 				projectTotal.Total = projectTotal.Total.Add(asset.PriceUsd.Mul(snapshots[i].Amount))
 				projectTotal.Donations += 1
 
-
 				err = dao.UpdateProjectTotal(projectTotal)
 				if err != nil {
 					log.Error(err.Error())
@@ -242,7 +242,7 @@ func SyncSnapshots() {
 				}
 
 				//更新项目钱包
-				walletTotal,err := dao.GetWalletTotalByBotIdAndAssetId(snapshots[i].UserID,snapshots[i].Asset.AssetID)
+				walletTotal, err := dao.GetWalletTotalByBotIdAndAssetId(snapshots[i].UserID, snapshots[i].Asset.AssetID)
 				if err != nil {
 					log.Error(err.Error())
 					continue
@@ -254,7 +254,7 @@ func SyncSnapshots() {
 					continue
 				}
 				//根据不同的分配算法进行配置
-				bot,err := dao.GetBotDtoById(snapshots[i].UserID)
+				bot, err := dao.GetBotDtoById(snapshots[i].UserID)
 
 				switch bot.Distribution {
 				case model.PersperAlgorithm:
@@ -284,7 +284,7 @@ func SyncSnapshots() {
 }
 
 //获取认证之后的客户端
-func GetMixinAuthorizedClient(ctx *gin.Context,code string)(client *mixin.Client,err *util.Err) {
+func GetMixinAuthorizedClient(ctx *gin.Context, code string) (client *mixin.Client, err *util.Err) {
 	//从配置文件中读取Id和密码
 	clientId := viper.GetString("MIXIN_CLIENT_ID")
 	clientSecret := viper.GetString("MIXIN_CLIENT_SECRET")
@@ -293,38 +293,38 @@ func GetMixinAuthorizedClient(ctx *gin.Context,code string)(client *mixin.Client
 	key := mixin.GenerateEd25519Key()
 
 	//code换Token
-	store,err1 := mixin.AuthorizeEd25519(ctx,clientId,clientSecret,code,"",key)
+	store, err1 := mixin.AuthorizeEd25519(ctx, clientId, clientSecret, code, "", key)
 	if err1 != nil {
-		err = util.NewErr(err1,util.ErrThirdParty,"mixin Ed25519出错")
+		err = util.NewErr(err1, util.ErrThirdParty, "mixin Ed25519出错")
 		return
 	}
 
 	//换取
 	client, err2 := mixin.NewFromOauthKeystore(store)
 	if err2 != nil {
-		err = util.NewErr(err2,util.ErrThirdParty,"mixin store to client error")
+		err = util.NewErr(err2, util.ErrThirdParty, "mixin store to client error")
 		return
 	}
 
 	/*
-	//将client存入session
-	session := sessions.Default(ctx)
-	session.Set("mixinClient",client)
-	err3 := session.Save()
-	if err3 != nil{
-		err = util.NewErr(err3,util.ErrInternalServer,"设置mixin client session 出错")
-		return
-	}
-	 */
+		//将client存入session
+		session := sessions.Default(ctx)
+		session.Set("mixinClient",client)
+		err3 := session.Save()
+		if err3 != nil{
+			err = util.NewErr(err3,util.ErrInternalServer,"设置mixin client session 出错")
+			return
+		}
+	*/
 
 	return
 }
 
-func GetMixinUserInfo(ctx *gin.Context,client *mixin.Client) (user *mixin.User, err *util.Err) {
+func GetMixinUserInfo(ctx *gin.Context, client *mixin.Client) (user *mixin.User, err *util.Err) {
 
 	user, err1 := client.UserMe(ctx)
 	if err1 != nil {
-		err = util.NewErr(err,util.ErrDataBase,"获取mixin用户的信息出错")
+		err = util.NewErr(err, util.ErrDataBase, "获取mixin用户的信息出错")
 		return
 	}
 	return
