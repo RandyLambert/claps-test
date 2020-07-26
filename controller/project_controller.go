@@ -40,7 +40,7 @@ func ProjectTransactions(ctx *gin.Context) {
 func ProjectDonation(ctx *gin.Context) {
 	assetId := ctx.Query("assetId")
 	botId := ctx.Query("botId")
-	if assetId == "" || botId == "" {
+	if assetId == "" || botId == "" || !util.CheckAsset(&assetId) {
 		err := util.NewErr(nil, util.ErrUnauthorized, "没有QUERY值无法请求成功")
 		util.HandleResponse(ctx, err, nil)
 		return
