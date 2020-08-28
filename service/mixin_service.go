@@ -120,7 +120,7 @@ func SyncTransfer() {
 				log.Error(err1.Errord.Error())
 				continue
 			}
-			//traceid暂时不应该这样
+			//traceid暂时不应该这ls
 			snapshot, err := user.Transfer(ctx, &mixin.TransferInput{
 				TraceID: uuid.Must(uuid.NewV4()).String(),
 				AssetID: (*transfers)[i].AssetId,
