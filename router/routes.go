@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CollectRoute(r *gin.Engine) * gin.Engine{
+func CollectRoute(r *gin.Engine) *gin.Engine {
 	//添加日志中间件
 	r.Use(middleware.LoggerToFile())
 	//设置创建基于cookie的存储引擎,secret是加密的秘钥
@@ -39,14 +39,12 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 
 		}
 
-
 		// /api/mixin
 		mixinGroup := apiGroup.Group("/mixin")
 		{
 			mixinGroup.GET("/assets", controller.MixinAssets)
-			mixinGroup.GET("/oauth",middleware.GithubAuthMiddleware(),controller.MixinOauth)
+			mixinGroup.GET("/oauth", middleware.GithubAuthMiddleware(), controller.MixinOauth)
 		}
-
 
 		// /api/user
 		userGroup := apiGroup.Group("/user")
@@ -60,7 +58,7 @@ func CollectRoute(r *gin.Engine) * gin.Engine{
 			//请求获得某个用户的捐赠信息的汇总,包括总金额和捐赠人数
 			userGroup.GET("/donation", controller.UserDonation)
 			//提现
-			userGroup.GET("/withdraw",middleware.MixinAuthMiddleware(),controller.UserWithdraw)
+			userGroup.GET("/withdraw", middleware.MixinAuthMiddleware(), controller.UserWithdraw)
 		}
 
 	}

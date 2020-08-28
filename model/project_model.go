@@ -6,23 +6,19 @@ import (
 )
 
 type Project struct {
-	Id uint32 `json:"id" gorm:"type:int unsigned;primary_key;not null"`
-	Name string `json:"name" gorm:"type:varchar(50);not null;unique_index:name_UNIQUE"`
-    DisplayName string `json:"display_name" gorm:"type:varchar(50);default:null"`
-	Description string `json:"description" gorm:"type:varchar(120);default:null"`
-	AvatarUrl string `json:"avatar_url" gorm:"type:varchar(100);default:null"`
-	Donations uint32 `json:"donations" gorm:"type:int unsigned;default:0"`
-	Total decimal.Decimal `json:"total" gorm:"type:varchar(128);default:null"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-
+	Id          uint32          `json:"id" gorm:"type:int unsigned;primary_key;not null"`
+	Name        string          `json:"name" gorm:"type:varchar(50);not null;unique_index:name_UNIQUE"`
+	DisplayName string          `json:"display_name" gorm:"type:varchar(50);default:null"`
+	Description string          `json:"description" gorm:"type:varchar(120);default:null"`
+	AvatarUrl   string          `json:"avatar_url" gorm:"type:varchar(100);default:null"`
+	Donations   uint32          `json:"donations" gorm:"type:int unsigned;default:0"`
+	Total       decimal.Decimal `json:"total" gorm:"type:varchar(128);default:null"`
+	CreatedAt   time.Time       `json:"createdAt"`
+	UpdatedAt   time.Time       `json:"updatedAt"`
 }
 
-type ProjectTotal struct{
-	Id uint32 `json:"id" gorm:"type:int unsigned;primary_key;not null"`
-	Donations uint32 `json:"donations" gorm:"type:int unsigned;default:0"`
-	Total decimal.Decimal `json:"total" gorm:"type:varchar(128);default:null"`
+type ProjectTotal struct {
+	Id        uint32          `json:"id" gorm:"type:int unsigned;primary_key;not null"`
+	Donations uint32          `json:"donations" gorm:"type:int unsigned;default:0"`
+	Total     decimal.Decimal `json:"total" gorm:"type:varchar(128);default:null"`
 }
-
-
-

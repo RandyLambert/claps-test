@@ -11,59 +11,59 @@ import (
 	"net/http"
 )
 
-func MixinAssets(ctx *gin.Context){
+func MixinAssets(ctx *gin.Context) {
 
-	assets,err := service.ListAssetsAllByDB()
-	util.HandleResponse(ctx,err,assets)
+	assets, err := service.ListAssetsAllByDB()
+	util.HandleResponse(ctx, err, assets)
 }
 
 //mixin oauth授权认证
-func MixinOauth(ctx *gin.Context)  {
+func MixinOauth(ctx *gin.Context) {
 	code := ctx.Query("code")
 	state := ctx.Query("state")
 	session := sessions.Default(ctx)
 
 	//判断参数是否存在
-	if code == "" || state == ""{
-		err := util.NewErr(nil,util.ErrBadRequest,"mixin oauth认证参数出错")
-		util.HandleResponse(ctx,err,nil)
+	if code == "" || state == "" {
+		err := util.NewErr(nil, util.ErrBadRequest, "mixin oauth认证参数出错")
+		util.HandleResponse(ctx, err, nil)
 		return
 	}
 
 	//判断state和randomUid是否一致
 	uid := session.Get("uid")
-	if uid == nil{
-		err := util.NewErr(nil,util.ErrInternalServer,"session中没有uid")
-		util.HandleResponse(ctx,err,nil)
+	if uid == nil {
+		err := util.NewErr(nil, util.ErrInternalServer, "session中没有uid")
+		util.HandleResponse(ctx, err, nil)
 		return
 	}
-	if uid.(string) != state{
-		err := util.NewErr(errors.New("invalid oauth redirect"),util.ErrBadRequest,"")
-		util.HandleResponse(ctx,err,nil)
+	if uid.(string) != state {
+		err := util.NewErr(errors.New("invalid oauth redirect"), util.ErrBadRequest, "")
+		util.HandleResponse(ctx, err, nil)
 		return
 	}
 
 	log.Debug(state)
 
 	//用state换取令牌
-	client,err := service.GetMixinAuthorizedClient(ctx,code)
-	if err != nil{
-		util.HandleResponse(ctx,err,nil)
+	client, err := service.GetMixinAuthorizedClient(ctx, code)
+	if err != nil {
+		util.HandleResponse(ctx, err, nil)
 		return
 	}
 
 	//获取mixin用户信息,存入session
-	user,err2 := service.GetMixinUserInfo(ctx,client)
-	if err2 != nil{
-		util.HandleResponse(ctx,err2,nil)
+	user, err2 := service.GetMixinUserInfo(ctx, client)
+	if err2 != nil {
+		util.HandleResponse(ctx, err2, nil)
 		return
 	}
 
 	//将user信息存如session中
-	session.Set("mixin",user.UserID)
+	session.Set("mixin", user.UserID)
 	err3 := session.Save()
-	if err3 != nil{
-		util.HandleResponse(ctx,util.NewErr(err3,util.ErrInternalServer,"设置mixin User session错误"),nil)
+	if err3 != nil {
+		util.HandleResponse(ctx, util.NewErr(err3, util.ErrInternalServer, "设置mixin User session错误"), nil)
 		return
 	}
 
@@ -72,9 +72,9 @@ func MixinOauth(ctx *gin.Context)  {
 	//github一定是登录,绑定mixin和github
 	userId := uint32(*session.Get("user").(github.User).ID)
 	//更新数据库中的mixin_id字段
-	err4 := service.UpdateUserMixinId(userId,user.UserID)
-	if err4 != nil{
-		util.HandleResponse(ctx,err4,nil)
+	err4 := service.UpdateUserMixinId(userId, user.UserID)
+	if err4 != nil {
+		util.HandleResponse(ctx, err4, nil)
 	}
 
 	//重定向

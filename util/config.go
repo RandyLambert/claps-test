@@ -11,7 +11,7 @@ func InitConfig() {
 	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
-	if err!=nil {
+	if err != nil {
 		log.Println(err.Error())
 	}
 

@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"math/rand"
 )
+
 var longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_")
 
 func RandUp(n int) []byte {
@@ -29,12 +30,11 @@ func RandUp(n int) []byte {
 }
 
 //认证身份信息
-func AuthInfo(ctx *gin.Context){
+func AuthInfo(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 	//从session中尝试获取用户信息
 	session := sessions.Default(ctx)
 	var randomUid string = ""
-
 
 	//foxoneToken := session.Get("foxoneToken")
 	user := session.Get("user")
@@ -42,45 +42,44 @@ func AuthInfo(ctx *gin.Context){
 	mixinToken := session.Get("mixin")
 
 	//如果session中没有mixin的user_id尝试从数据库读取,如果绑定了就不需要用户在绑定mixin了
-	if user != nil && mixinToken == nil{
+	if user != nil && mixinToken == nil {
 		userId := uint32(*user.(github.User).ID)
-		mixinId,err := service.GetMixinIdByUserId(userId)
-		if err != nil{
-			util.HandleResponse(ctx,err,nil)
+		mixinId, err := service.GetMixinIdByUserId(userId)
+		if err != nil {
+			util.HandleResponse(ctx, err, nil)
 			return
 		}
-		if mixinId != ""{
-			session.Set("mixin",mixinId)
+		if mixinId != "" {
+			session.Set("mixin", mixinId)
 			err := session.Save()
-			if err != nil{
-				util.HandleResponse(ctx,util.NewErr(err,util.ErrInternalServer,"保存session出错"),nil)
+			if err != nil {
+				util.HandleResponse(ctx, util.NewErr(err, util.ErrInternalServer, "保存session出错"), nil)
 				return
 			}
 			mixinToken = true
 		}
 	}
 
-
-	log.Debug("从session中获取的user",user)
-	log.Debug("从session中获取的mixinToken",mixinToken)
+	log.Debug("从session中获取的user", user)
+	log.Debug("从session中获取的mixinToken", mixinToken)
 	//log.Debug("从session中获取的foxoneToken",foxoneToken)
 
 	if user == nil || mixinToken == nil {
 		//没有登录的话随机生成uid
 		randomUid = string(RandUp(32))
 		//存入session
-		session.Set("uid",randomUid)
+		session.Set("uid", randomUid)
 		err1 := session.Save()
-		if err1 != nil{
-			err := util.NewErr(err1,util.ErrInternalServer,"session保存出错")
-			util.HandleResponse(ctx,err,resp)
+		if err1 != nil {
+			err := util.NewErr(err1, util.ErrInternalServer, "session保存出错")
+			util.HandleResponse(ctx, err, resp)
 			return
 		}
 	}
 
 	resp["user"] = user
 	resp["randomUid"] = randomUid
-	resp["mixinAuth"] = If(mixinToken != nil,true,false).(bool)
+	resp["mixinAuth"] = If(mixinToken != nil, true, false).(bool)
 	//resp["foxoneAuth"] = If(foxoneToken!= nil,true,false).(bool)
 	resp["envs"] = gin.H{
 		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
@@ -88,20 +87,20 @@ func AuthInfo(ctx *gin.Context){
 		"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
 	}
 
-	util.HandleResponse(ctx,nil,resp)
+	util.HandleResponse(ctx, nil, resp)
 
 	/*
-	ctx.JSON(http.StatusOK,gin.H{
-		"user":user,
-		"randomUid":randomUid,
-		"mixinAuth": If(mixinToken != nil,true,false).(bool),
-		"foxoneAuth": If(foxoneToken!= nil,true,false).(bool),
-		"envs":gin.H{
-			"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
-			"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
-			"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
-		}})
-	 */
+		ctx.JSON(http.StatusOK,gin.H{
+			"user":user,
+			"randomUid":randomUid,
+			"mixinAuth": If(mixinToken != nil,true,false).(bool),
+			"foxoneAuth": If(foxoneToken!= nil,true,false).(bool),
+			"envs":gin.H{
+				"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
+				"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
+				"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
+			}})
+	*/
 }
 
 //模拟三目运算符号

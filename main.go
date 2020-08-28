@@ -16,13 +16,15 @@ import (
 func main() {
 
 	/*
-	初始化配置文件,Mixin,log和DB
-	 */
+		初始化配置文件,Mixin,log和DB
+	*/
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
 	db := util.InitDB()
-	defer db.Close()
+	if db != nil {
+		defer db.Close()
+	}
 
 	//自动迁移
 	db.Debug().AutoMigrate(&model.Project{})
@@ -50,21 +52,17 @@ func main() {
 	log.Warning("Warning")
 	log.Error("Error")
 
-
-
 	r := gin.Default()
 
 	//设置session middleware
 	store := cookie.NewStore([]byte("claps-test"))
-	r.Use(sessions.Sessions("mysession",store))
+	r.Use(sessions.Sessions("mysession", store))
 
 	r = router.CollectRoute(r)
 	serverport := viper.GetString("server.port")
-	if serverport != ""{
-		panic(r.Run(":"+serverport))
+	if serverport != "" {
+		panic(r.Run(":" + serverport))
 	} else {
 		panic(r.Run(":3001"))
 	}
 }
-
-
