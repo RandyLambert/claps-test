@@ -10,7 +10,7 @@ import (
 var DB *gorm.DB
 
 func InitDB() (db *gorm.DB) {
-	driverName := "mysql"
+	driverName := viper.GetString("DATABASE_ENGINE")
 	host := viper.GetString("DATABASE_HOST")
 	port := viper.GetString("DATABASE_PORT")
 	database := viper.GetString("DATABASE_DATABASE")

@@ -251,13 +251,13 @@ func SyncSnapshots() {
 
 				switch bot.Distribution {
 				case model.PersperAlgorithm:
-					go distributionByPersperAlgorithm(transaction)
+					distributionByPersperAlgorithm(transaction)
 				case model.Commits:
-					go distributionByCommits(transaction)
+					distributionByCommits(transaction)
 				case model.ChangedLines:
-					go distributionByChangedLines(transaction)
+					distributionByChangedLines(transaction)
 				case model.IdenticalAmount:
-					go distributionByIdenticalAmount(transaction)
+					distributionByIdenticalAmount(transaction)
 				}
 			}
 		}

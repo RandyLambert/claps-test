@@ -6,22 +6,22 @@ import (
 )
 
 type MemberWallet struct {
-	ProjectId uint32 `gorm:"type:int unsigned;primary_key;not null"`
+	ProjectId uint32 `json:"project_id,omitempty" gorm:"type:int unsigned;primary_key;not null"`
 	//user表的Id
-	UserId    uint32 `gorm:"type:int unsigned;primary_key;not null"`
-	BotId     string `gorm:"type:varchar(50);primary_key;not null"`
-	AssetId   string `gorm:"type:varchar(50);primary_key;not null"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Total     decimal.Decimal `gorm:"type:varchar(128);default:null"`
-	Balance   decimal.Decimal `gorm:"type:varchar(128);default:null"`
+	UserId    uint32 `json:"user_id,omitempty" gorm:"type:int unsigned;primary_key;not null"`
+	BotId     string `json:"bot_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
+	AssetId   string `json:"asset_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	Total     decimal.Decimal `json:"total,omitempty" gorm:"type:varchar(128);default:null"`
+	Balance   decimal.Decimal `json:"balance,omitempty" gorm:"type:varchar(128);default:null"`
 }
 
 type MemberWalletDto struct {
-	ProjectId uint32          `gorm:"type:int unsigned;primary_key;not null"`
-	UserId    uint32          `gorm:"type:int unsigned;primary_key;not null"`
-	BotId     string          `gorm:"type:varchar(50);primary_key;not null"`
-	AssetId   string          `json:"asset_id" gorm:"type:varchar(50);primary_key;not null"`
-	Total     decimal.Decimal `json:"-" gorm:"type:varchar(128);default:null"`
-	Balance   decimal.Decimal `json:"balance"  gorm:"type:varchar(128);default:null"`
+	ProjectId uint32          `json:"project_id,omitempty" gorm:"type:int unsigned;primary_key;not null"`
+	UserId    uint32          `json:"user_id,omitempty" gorm:"type:int unsigned;primary_key;not null"`
+	BotId     string          `json:"bot_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
+	AssetId   string          `json:"asset_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
+	Total     decimal.Decimal `json:",omitempty" gorm:"type:varchar(128);default:null"`
+	Balance   decimal.Decimal `json:"balance,omitempty" gorm:"type:varchar(128);default:null"`
 }
