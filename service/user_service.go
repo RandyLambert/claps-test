@@ -31,7 +31,7 @@ func ListEmailsByToken(githubToken string) (emails []*github.UserEmail, err *uti
 }
 
 //获取用户的所有币种的余额
-func GetUserBalanceByAllAssets(userId uint32, assets *[]model.Asset) (err *util.Err, dto *[]model.MemberWalletDto) {
+func GetUserBalanceByAllAssets(userId int64, assets *[]model.Asset) (err *util.Err, dto *[]model.MemberWalletDto) {
 
 	dto = &[]model.MemberWalletDto{}
 	//遍历assets数组获取所有的币种
@@ -65,7 +65,7 @@ func GetTransferByMininIdAndAssetId(mixinId string, assetId string) (transfers *
 	return
 }
 
-func SumProjectDonationsByUserId(userId uint32) (donations *[]interface{}, err *util.Err) {
+func SumProjectDonationsByUserId(userId int64) (donations *[]interface{}, err *util.Err) {
 	donations, err1 := dao.SumProjectDonationsByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err, util.ErrDataBase, "数据库获取用户项目信息和出错")
@@ -74,8 +74,8 @@ func SumProjectDonationsByUserId(userId uint32) (donations *[]interface{}, err *
 }
 
 //更新user表中的mixin_id字段
-func UpdateUserMixinId(user_id uint32, mixinId string) (err *util.Err) {
-	err1 := dao.UpdateUserMixinId(user_id, mixinId)
+func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
+	err1 := dao.UpdateUserMixinId(userId, mixinId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "更新数据库mixin_id错误")
 	}

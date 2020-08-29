@@ -31,7 +31,7 @@ func InsertTransfer(botId, assetID, memo string, amount decimal.Decimal, mixinId
 
 //跟新数据库中的transger表中的status为1
 func UpdateTransferStatusByAssetIdAndUserId(mixinId string, assetId string, status string) (err *util.Err) {
-	err1 := dao.UpdateTransferSatusByUserIdAndAssetId(mixinId, assetId, status)
+	err1 := dao.UpdateTransferStatusByUserIdAndAssetId(mixinId, assetId, status)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "更新数据库transfer状态出错")
 	}
@@ -55,7 +55,7 @@ func IfUnfinishedTransfer(mixinId string, assetId string) (err *util.Err) {
 }
 
 //生成trasfer记录
-func DoTransfer(userId uint32, mixinId, assetId string) (err *util.Err) {
+func DoTransfer(userId int64, mixinId, assetId string) (err *util.Err) {
 
 	memberWallets, err1 := dao.GetMemeberWalletByUserIdAndAssetId(userId, assetId)
 	if err1 != nil {

@@ -30,7 +30,7 @@ func ListTransfersByStatus(status string) (transfer *[]model.Transfer, err error
 	return
 }
 
-func UpdateTransferSatusByUserIdAndAssetId(mixinId string, assetId string, status string) (err error) {
+func UpdateTransferStatusByUserIdAndAssetId(mixinId string, assetId string, status string) (err error) {
 	err = util.DB.Debug().Table("transfer").Where("mixin_id = ? AND asset_id= ?", mixinId, assetId).Update("status", status).Error
 	return
 }

@@ -17,9 +17,9 @@ require (
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/google/go-github/v32 v32.0.0
 	github.com/gorilla/sessions v1.2.0
-	github.com/jinzhu/gorm v1.9.13
+	github.com/jinzhu/gorm v1.9.16
 	github.com/json-iterator/go v1.1.10 // indirect
-	github.com/lib/pq v1.3.0 // indirect
+	github.com/lib/pq v1.8.0 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect

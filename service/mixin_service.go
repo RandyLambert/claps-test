@@ -164,7 +164,10 @@ func SyncSnapshots() {
 	for {
 		//获取最后一次跟新记录
 		property, _ := dao.GetPropertyByKey("last_snapshot_id")
-		lastSnapshotID := property.Value
+		var lastSnapshotID string
+		if property != nil{
+			lastSnapshotID = property.Value
+		}
 
 		//从mixin获取当前时间之后的snapshots
 		snapshots, err := util.MixinClient.ReadNetworkSnapshots(ctx, "", since, "ASC", 100)

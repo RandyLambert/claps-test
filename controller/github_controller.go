@@ -68,7 +68,7 @@ func Oauth(ctx *gin.Context) {
 
 	//尝试获取数据库中该user信息
 	u := model.User{}
-	u.Id = uint32(*user.ID)
+	u.Id = *user.ID
 	u.Name = *user.Login
 	if user.AvatarURL != nil {
 		u.AvatarUrl = *user.AvatarURL
