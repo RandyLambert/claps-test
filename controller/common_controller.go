@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"claps-test/middleware"
 	"claps-test/service"
 	"claps-test/util"
 	"github.com/gin-contrib/sessions"
@@ -29,9 +30,11 @@ func RandUp(n int) []byte {
 	return b
 }
 
-//认证身份信息
+//之前有JWTAuthmiddleWare,认证身份信息
 func AuthInfo(ctx *gin.Context) {
 	resp := make(map[string]interface{})
+
+	/*
 	//从session中尝试获取用户信息
 	session := sessions.Default(ctx)
 	var randomUid string = ""
@@ -40,6 +43,14 @@ func AuthInfo(ctx *gin.Context) {
 	user := session.Get("user")
 	//mixin中存储的是用户mixin的user_id
 	mixinToken := session.Get("mixin")
+	 */
+	var randomUid = ""
+
+	session := sessions.Default(ctx)
+	mixin_id := session.Get(middleware.MIXINID).(string)
+	github_id := session.Get(middleware.GITHUBID).(string)
+	log.Debug("github_id = ",github_id)
+	log.Debug("mixin_id = ",mixin_id)
 
 	//如果session中没有mixin的user_id尝试从数据库读取,如果绑定了就不需要用户在绑定mixin了
 	if user != nil && mixinToken == nil {
@@ -60,27 +71,25 @@ func AuthInfo(ctx *gin.Context) {
 		}
 	}
 
-	log.Debug("从session中获取的user", user)
-	log.Debug("从session中获取的mixinToken", mixinToken)
-	//log.Debug("从session中获取的foxoneToken",foxoneToken)
-
-	if user == nil || mixinToken == nil {
-		//没有登录的话随机生成uid
-		randomUid = string(RandUp(32))
-		//存入session
-		session.Set("uid", randomUid)
-		err1 := session.Save()
-		if err1 != nil {
-			err := util.NewErr(err1, util.ErrInternalServer, "session保存出错")
-			util.HandleResponse(ctx, err, resp)
-			return
+	//if user == nil || mixinToken == nil {
+	//未登录github或者未绑定mixin
+	if mixin_id == ""|| github_id== ""{
+			//没有登录的话随机生成uid
+			randomUid = string(RandUp(32))
+			//存入session
+			session.Set("uid", randomUid)
+			err1 := session.Save()
+			if err1 != nil {
+				err := util.NewErr(err1, util.ErrInternalServer, "session保存出错")
+				util.HandleResponse(ctx, err, resp)
+				return
+			}
 		}
 	}
 
 	resp["user"] = user
 	resp["randomUid"] = randomUid
 	resp["mixinAuth"] = If(mixinToken != nil, true, false).(bool)
-	//resp["foxoneAuth"] = If(foxoneToken!= nil,true,false).(bool)
 	resp["envs"] = gin.H{
 		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
 		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),

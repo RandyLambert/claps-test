@@ -6,11 +6,23 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
+	"github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
-var (
-	identityKey = "userinfo"
+type MyClaims struct {
+	MixinId string `json:"mixin_id"`
+	GithubId string `json:"github_id"`
+	jwt.StandardClaims
+}
+//jwt的过期时间
+const TokenExpireDuration = time.Hour * 2
+var MySecret = []byte("claps-dev")
+
+const (
+	MIXINID = "mixin_id"
+	GITHUBID = "gtihub_id"
 )
 
 type userInfo struct {
