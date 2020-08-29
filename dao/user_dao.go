@@ -43,7 +43,7 @@ func ListMembersByProjectName(projectName string) (users *[]model.User, err erro
 	return
 }
 
-func ListMembersByProjectId(projectId uint32) (users *[]model.User, err error) {
+func ListMembersByProjectId(projectId int64) (users *[]model.User, err error) {
 
 	//db.Where("amount > ?", db.Table("orders").Select("AVG(amount)").Where("state = ?", "paid").SubQuery()).Find(&orders)
 	// SELECT * FROM "orders"  WHERE "orders"."deleted_at" IS NULL AND (amount > (SELECT AVG(amount) FROM "orders"  WHERE (state = 'paid')));
@@ -58,7 +58,7 @@ func ListMembersByProjectId(projectId uint32) (users *[]model.User, err error) {
 }
 
 //根据user_id更新表中的mixin_id信息
-func UpdateUserMixinId(userId uint32, mixinId string) (err error) {
+func UpdateUserMixinId(userId int64, mixinId string) (err error) {
 	err = util.DB.Debug().Model(&model.User{}).Where("id = ?", userId).Update("mixin_id", mixinId).Error
 	return
 }

@@ -87,7 +87,7 @@ func UserAssets(ctx *gin.Context) {
 	log.Debug(*assets)
 
 	//查询用户钱包,获得相应的余额,添加到币信息的后面
-	err2, dto := service.GetUserBalanceByAllAssets(uint32(*userId), assets)
+	err2, dto := service.GetUserBalanceByAllAssets(*userId, assets)
 	if err2 != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
@@ -149,7 +149,7 @@ func UserTransfer(ctx *gin.Context) {
 func UserDonation(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 	session := sessions.Default(ctx)
-	userId := uint32(*(session.Get("user").(github.User)).ID)
+	userId := *(session.Get("user").(github.User)).ID
 
 	//读取所有的member_wallet表然后汇总
 	//获得所有币的信息
@@ -206,7 +206,7 @@ func UserWithdraw(ctx *gin.Context) {
 	}
 
 	//获取userId
-	userId := uint32(*session.Get("user").(github.User).ID)
+	userId := *session.Get("user").(github.User).ID
 
 	//判断是否有未完成的提现
 	err3 := service.IfUnfinishedTransfer(mixinId, assetId)

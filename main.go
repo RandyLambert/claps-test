@@ -8,7 +8,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/spf13/viper"
 )
 
@@ -25,6 +25,10 @@ func main() {
 		defer db.Close()
 	}
 
+	db.Save(&model.Property{
+		Key:   "last_snapshot_id",
+		Value: "1",
+	})
 	//自动迁移
 	db.Debug().AutoMigrate(&model.Project{})
 	db.Debug().AutoMigrate(&model.MemberWallet{})

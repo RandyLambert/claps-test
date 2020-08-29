@@ -70,7 +70,7 @@ func MixinOauth(ctx *gin.Context) {
 	log.Debug("user", user.UserID)
 
 	//github一定是登录,绑定mixin和github
-	userId := uint32(*session.Get("user").(github.User).ID)
+	userId := *session.Get("user").(github.User).ID
 	//更新数据库中的mixin_id字段
 	err4 := service.UpdateUserMixinId(userId, user.UserID)
 	if err4 != nil {
