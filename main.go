@@ -21,7 +21,7 @@ func main() {
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
-	if rediserr := util.InitClient();err != nil{
+	if rediserr := util.InitClient();rediserr != nil{
 		log.Error(rediserr)
 	}
 
