@@ -1,18 +1,24 @@
 package util
 
 import (
-	"github.com/go-redis/redis"
-	config "github.com/spf13/viper"
+	"github.com/gin-contrib/cache/persistence"
+	"time"
 )
 
 // 声明一个全局的rdb变量
-var Rdb *redis.Client
+var Rdb *persistence.InMemoryStore
+
+//jwt的过期时间
+const TokenExpireDuration = time.Minute* 2
 
 // 初始化连接
 func InitClient() (err error) {
+	Rdb = persistence.NewInMemoryStore(TokenExpireDuration)
+
+	/*
 	Rdb = redis.NewClient(&redis.Options{
 		Addr:     config.GetString("REDIS_ADDR"),
-		Password: config.GetString("REDIS_PASSWORD"), // no password set
+		Password: config.GetString("REDIS_PASSWORD"),
 		DB:       config.GetInt("REDIS_DB"),  // use default DB
 	})
 
@@ -20,5 +26,6 @@ func InitClient() (err error) {
 	if err != nil {
 		return err
 	}
+	 */
 	return nil
 }

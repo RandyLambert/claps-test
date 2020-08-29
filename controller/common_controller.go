@@ -2,16 +2,17 @@ package controller
 
 import (
 	"claps-test/middleware"
-	"claps-test/service"
 	"claps-test/util"
-	"github.com/gin-contrib/sessions"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"math/rand"
 )
 
+const (
+	RANDOMUID = "randomUid"
+)
 var longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_")
 
 func RandUp(n int) []byte {
@@ -31,8 +32,39 @@ func RandUp(n int) []byte {
 }
 
 /*
+功能:返回前端randomUid
+说明:调用此函数时候用户没有登录github,生成randomUid,并存储redis
+ */
+func LoginGithub(ctx *gin.Context)  {
+	resp := make(map[string]interface{})
+	token,_ := ctx.Get(middleware.TOKEN)
+	jwt_token := token.(string)
+
+	//没有登录的话随机生成uid
+	randomUid := string(RandUp(32))
+	//存入redis
+	util.Rdb.Set(jwt_token,randomUid,util.TokenExpireDuration)
+
+	//测试
+	randomUid = ""
+	log.Debug("randomUid = ",randomUid)
+	util.Rdb.Get(jwt_token,&randomUid)
+	log.Debug("randomUid = ",randomUid)
+
+	resp["user"] = nil
+	resp["randomUid"] = randomUid
+	resp["mixinAuth"] = false
+	resp["envs"] = gin.H{
+		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
+		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
+		"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
+	}
+	util.HandleResponse(ctx, nil, resp)
+	return
+}
+/*
 功能:认证用户信息,判断github和mixin是否登录绑定
-说明:之前有JWTAuthmiddleWare,ctx里设置mixin_id,github_id和
+说明:之前有JWTAuthmiddleWare,ctx里设置mixin_id,github_id和token,经过了JWT的说明至少绑定了github。
  */
 func AuthInfo(ctx *gin.Context) {
 	resp := make(map[string]interface{})
@@ -47,14 +79,61 @@ func AuthInfo(ctx *gin.Context) {
 	//mixin中存储的是用户mixin的user_id
 	mixinToken := session.Get("mixin")
 	 */
-	var randomUid = ""
+	/*
+	var (
+		randomUid = ""
+		user  *github.User = nil
+	)
 
-	session := sessions.Default(ctx)
-	mixin_id := session.Get(middleware.MIXINID).(string)
-	github_id := session.Get(middleware.GITHUBID).(string)
-	log.Debug("github_id = ",github_id)
-	log.Debug("mixin_id = ",mixin_id)
+	 */
 
+	//获取claim
+	token,_ := ctx.Get(middleware.TOKEN)
+	jwt_token,ok := token.(string)
+	if ok != true{
+		fmt.Println(ok)
+		return
+	}
+
+	claim,_ := middleware.ParseToken(jwt_token)
+
+	log.Debug("github_id = ",claim.GithubId)
+	log.Debug("mixin_id = ",claim.MixinId)
+
+	//未登录github
+	if claim.GithubId == ""{
+		LoginGithub(ctx)
+		return
+	}
+
+	return
+
+	//从redis中取user信息
+
+	/*
+	//用户已经登录github
+	if github_id != ""{
+		userId := *user.(github.User).ID
+		//通过github_id获取mixin_id
+		mixinId, err := service.GetMixinIdByUserId(userId)
+		if err != nil {
+			util.HandleResponse(ctx, err, nil)
+			return
+		}
+
+		if mixinId != "" {
+			session.Set("mixin", mixinId)
+			err := session.Save()
+			if err != nil {
+				util.HandleResponse(ctx, util.NewErr(err, util.ErrInternalServer, "保存session出错"), nil)
+				return
+			}
+			mixinToken = true
+		}
+	}
+	 */
+
+	/*
 	//如果session中没有mixin的user_id尝试从数据库读取,如果绑定了就不需要用户在绑定mixin了
 	if user != nil && mixinToken == nil {
 		userId := *user.(github.User).ID
@@ -73,31 +152,25 @@ func AuthInfo(ctx *gin.Context) {
 			mixinToken = true
 		}
 	}
+	 */
 
 	//if user == nil || mixinToken == nil {
 	//未登录github或者未绑定mixin
-	if mixin_id == ""|| github_id== ""{
-			//没有登录的话随机生成uid
-			randomUid = string(RandUp(32))
-			//存入session
-			session.Set("uid", randomUid)
-			err1 := session.Save()
-			if err1 != nil {
-				err := util.NewErr(err1, util.ErrInternalServer, "session保存出错")
-				util.HandleResponse(ctx, err, resp)
-				return
-			}
-		}
-	}
-
-	resp["user"] = user
-	resp["randomUid"] = randomUid
-	resp["mixinAuth"] = If(mixinToken != nil, true, false).(bool)
-	resp["envs"] = gin.H{
-		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
-		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
-		"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
-	}
+	//if mixin_id == ""|| github_id== ""{
+	//		//没有登录的话随机生成uid
+	//		randomUid = string(RandUp(32))
+	//		//存入redis
+	//		util.Rdb.Set(RANDOMUID,randomUid,middleware.TokenExpireDuration)
+	//	}
+	//
+	//resp["user"] = user
+	//resp["randomUid"] = randomUid
+	////resp["mixinAuth"] = If(mixinToken != nil, true, false).(bool)
+	//resp["envs"] = gin.H{
+	//	"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
+	//	"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
+	//	"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
+	//}
 
 	util.HandleResponse(ctx, nil, resp)
 
