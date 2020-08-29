@@ -27,10 +27,9 @@ func UpdateTransferTraceId(transferMap *map[string]interface{}, traceId string) 
 	return
 }
 
-func GetTransferByUserIdAndAssetId(mixinId string, assetId string) (transfers *[]model.Transfer, err error) {
+func GetTransferByMixinId(mixinId string) (transfers *[]model.Transfer, err error) {
 	transfers = &[]model.Transfer{}
-	err = db.Debug().Where("mixin_id = ? AND asset_id = ?", mixinId, assetId).Find(transfers).Error
-	log.Debug("dao transfers = ", transfers)
+	err = db.Debug().Where("mixin_id = ?", mixinId).Find(transfers).Error
 	return
 }
 

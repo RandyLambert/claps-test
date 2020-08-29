@@ -41,7 +41,7 @@ func UserProfile(ctx *gin.Context) {
 	}
 
 	//根据userId获取所有project信息,Total和Patrons字段添加
-	projects, err := service.ListProjectsByUserId(uint32(*user.(github.User).ID))
+	projects, err := service.ListProjectsByUserId(*user.(github.User).ID)
 	if err != nil {
 		util.HandleResponse(ctx, err, resp)
 	}
@@ -51,21 +51,6 @@ func UserProfile(ctx *gin.Context) {
 	resp["projects"] = projects
 	util.HandleResponse(ctx, err, resp)
 
-}
-
-//获取捐赠记录,就是个人的提现记录
-func Transfer(ctx *gin.Context) {
-	resp := make(map[string]interface{})
-
-	assetId := ctx.Query("assetId")
-	if assetId == "" {
-		err := util.NewErr(nil, util.ErrBadRequest, "没有币种参数")
-		util.HandleResponse(ctx, err, resp)
-		return
-	}
-	log.Debug("assetId = ", assetId)
-
-	//从transaction表中获取该用户的所有捐赠记录
 }
 
 //获取用户钱包中所有币种的余额
@@ -113,13 +98,13 @@ func UserTransactions(ctx *gin.Context) {
 	//从transfer表中获取该用户的所有捐赠记录
 }
 
-//读取某种货币的交易记录,读取transfer里面的记录/
+//读取某种货币的交易记录,读取transfer里面的记录
 func UserTransfer(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 	session := sessions.Default(ctx)
 
 	//用户如果提现过一定是绑定了mixin,没有mixin则是没有提现记录
-	userId := uint32(*(session.Get("user").(github.User).ID))
+	userId := *(session.Get("user").(github.User).ID)
 	mixinId, err := service.GetMixinIdByUserId(userId)
 	if err != nil {
 		util.HandleResponse(ctx, err, nil)
@@ -131,16 +116,16 @@ func UserTransfer(ctx *gin.Context) {
 		return
 	}
 
-	assetId := ctx.Query("assetId")
-	if assetId == "" {
-		err := util.NewErr(nil, util.ErrBadRequest, "没有币种参数")
-		util.HandleResponse(ctx, err, resp)
-		return
-	}
-	log.Debug("assetId = ", assetId)
+	//assetId := ctx.Query("assetId")
+	//if assetId == "" {
+	//	err := util.NewErr(nil, util.ErrBadRequest, "没有币种参数")
+	//	util.HandleResponse(ctx, err, resp)
+	//	return
+	//}
+	//log.Debug("assetId = ", assetId)
 
 	//从transfer表中获取该用户的所有捐赠记录
-	transfers, err := service.GetTransferByMininIdAndAssetId(mixinId, assetId)
+	transfers, err := service.GetTransferByMininId(mixinId)
 	resp["transfers"] = transfers
 	util.HandleResponse(ctx, err, resp)
 }
