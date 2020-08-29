@@ -2,14 +2,25 @@ package dao
 
 import (
 	"claps-test/model"
-	"claps-test/util"
+	"github.com/jinzhu/gorm"
 )
+
+func init() {
+	RegisterMigrateHandler(func(db *gorm.DB) error {
+
+		if err := db.AutoMigrate(&model.Project{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 
 //获取所有项目
 func ListProjectsAll() (projects *[]model.Project, err error) {
 
 	projects = &[]model.Project{}
-	err = util.DB.Debug().Find(projects).Error
+	err = db.Debug().Find(projects).Error
 	return
 }
 
@@ -17,33 +28,33 @@ func ListProjectsAll() (projects *[]model.Project, err error) {
 func GetProjectByName(name string) (project *model.Project, err error) {
 
 	project = &model.Project{}
-	err = util.DB.Debug().Where("name=?", name).Find(&project).Error
+	err = db.Debug().Where("name=?", name).Find(&project).Error
 	return
 }
 
 //根据userid获取所有项目
 func ListProjectsByUserId(userId uint32) (projects *[]model.Project, err error) {
 	projects = &[]model.Project{}
-	err = util.DB.Debug().Where("id IN(?)",
-		util.DB.Debug().Table("member").Select("project_id").Where("user_id=?", userId).SubQuery()).Find(projects).Error
+	err = db.Debug().Where("id IN(?)",
+		db.Debug().Table("member").Select("project_id").Where("user_id=?", userId).SubQuery()).Find(projects).Error
 	return
 }
 
 func GetProjectTotalByBotId(BotId string) (projectTotal *model.ProjectTotal, err error) {
 	projectTotal = &model.ProjectTotal{}
-	err = util.DB.Debug().Table("project").Select("id,donations,total").Where("id=?",
-		util.DB.Debug().Table("bot").Select("project_id").Where("id=?", BotId).SubQuery()).Scan(projectTotal).Error
+	err = db.Debug().Table("project").Select("id,donations,total").Where("id=?",
+		db.Debug().Table("bot").Select("project_id").Where("id=?", BotId).SubQuery()).Scan(projectTotal).Error
 	return
 }
 
 func UpdateProjectTotal(projectTotal *model.ProjectTotal) (err error) {
-	err = util.DB.Debug().Table("project").Save(projectTotal).Error
+	err = db.Debug().Table("project").Save(projectTotal).Error
 	return
 }
 
 func SumProjectDonationsByUserId(userId int64) (donations *[]interface{}, err error) {
 	donations = &[]interface{}{}
-	err = util.DB.Debug().Table("project").Select("sum(donations)").Where("id IN(?)",
-		util.DB.Debug().Table("member").Select("project_id").Where("user_id=?",userId).SubQuery()).Pluck("sum(donations)", donations).Error
+	err = db.Debug().Table("project").Select("sum(donations)").Where("id IN(?)",
+		db.Debug().Table("member").Select("project_id").Where("user_id=?",userId).SubQuery()).Pluck("sum(donations)", donations).Error
 	return
 }

@@ -2,23 +2,34 @@ package dao
 
 import (
 	"claps-test/model"
-	"claps-test/util"
+	"github.com/jinzhu/gorm"
 )
+
+func init() {
+	RegisterMigrateHandler(func(db *gorm.DB) error {
+
+		if err := db.AutoMigrate(&model.Property{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 
 func GetPropertyByKey(Key string) (property *model.Property, err error) {
 	property = &model.Property{
 		Key: Key,
 	}
-	err = util.DB.First(property).Error
+	err = db.First(property).Error
 	return
 }
 
 func UpdateProperty(property *model.Property) (err error) {
-	err = util.DB.Save(property).Error
+	err = db.Save(property).Error
 	return
 }
 
 func InsertProperty(property *model.Property) (err error) {
-	err = util.DB.Create(property).Error
+	err = db.Create(property).Error
 	return
 }
