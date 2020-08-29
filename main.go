@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -20,6 +21,10 @@ func main() {
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
+	if rediserr := util.InitClient();err != nil{
+		log.Error(rediserr)
+	}
+
 	db,_ := dao.InitDB()
 	if db != nil {
 		defer db.Close()
