@@ -9,6 +9,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var (
+	identityKey = "userinfo"
+)
+
+type userInfo struct {
+	mixin_id string
+	github_id string
+}
+
 //判断用户是否登录的中间件
 func GithubAuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -42,3 +51,5 @@ func MixinAuthMiddleware() gin.HandlerFunc {
 		}
 	}
 }
+
+
