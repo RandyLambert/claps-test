@@ -15,7 +15,6 @@ func init() {
 	})
 }
 
-
 func UpdateAsset(asset *model.Asset) (err error) {
 	err = db.Save(asset).Error
 	return

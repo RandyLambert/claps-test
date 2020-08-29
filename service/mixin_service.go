@@ -61,7 +61,7 @@ func SyncAssets() {
 		}
 
 		for i := range assetsInfo {
-			//log.Debug(assetsInfo[i].Name)
+
 			if util.CheckAsset(&assetsInfo[i].AssetID) {
 
 				asset := &model.Asset{

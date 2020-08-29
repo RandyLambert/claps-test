@@ -56,9 +56,8 @@ func GetUserBalanceByAllAssets(userId int64, assets *[]model.Asset) (err *util.E
 	return
 }
 
-func GetTransferByMininIdAndAssetId(mixinId string, assetId string) (transfers *[]model.Transfer, err *util.Err) {
-	transfers, err1 := dao.GetTransferByUserIdAndAssetId(mixinId, assetId)
-	log.Debug("service transfers = ", transfers)
+func GetTransferByMininId(mixinId string) (transfers *[]model.Transfer, err *util.Err) {
+	transfers, err1 := dao.GetTransferByMixinId(mixinId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "数据库查询transfer出错")
 	}
@@ -82,7 +81,7 @@ func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
 	return
 }
 
-func GetMixinIdByUserId(userId uint32) (mixinId string, err *util.Err) {
+func GetMixinIdByUserId(userId int64) (mixinId string, err *util.Err) {
 	user, err1 := dao.GetUserByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "从数据库查询user信息错误")

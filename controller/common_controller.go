@@ -54,7 +54,7 @@ func AuthInfo(ctx *gin.Context) {
 
 	//如果session中没有mixin的user_id尝试从数据库读取,如果绑定了就不需要用户在绑定mixin了
 	if user != nil && mixinToken == nil {
-		userId := uint32(*user.(github.User).ID)
+		userId := *user.(github.User).ID
 		mixinId, err := service.GetMixinIdByUserId(userId)
 		if err != nil {
 			util.HandleResponse(ctx, err, nil)

@@ -33,7 +33,7 @@ func GetProjectByName(name string) (project *model.Project, err error) {
 }
 
 //根据userid获取所有项目
-func ListProjectsByUserId(userId uint32) (projects *[]model.Project, err error) {
+func ListProjectsByUserId(userId int64) (projects *[]model.Project, err error) {
 	projects = &[]model.Project{}
 	err = db.Debug().Where("id IN(?)",
 		db.Debug().Table("member").Select("project_id").Where("user_id=?", userId).SubQuery()).Find(projects).Error
