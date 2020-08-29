@@ -1,7 +1,7 @@
 package main
 
 import (
-	"claps-test/model"
+	"claps-test/dao"
 	"claps-test/router"
 	"claps-test/service"
 	"claps-test/util"
@@ -21,27 +21,15 @@ func main() {
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
-	db := util.InitDB()
+	db,_ := dao.InitDB()
 	if db != nil {
 		defer db.Close()
 	}
 
-	db.Save(&model.Property{
-		Key:   "last_snapshot_id",
-		Value: "1",
-	})
 	//自动迁移
-	db.Debug().AutoMigrate(&model.Project{})
-	db.Debug().AutoMigrate(&model.MemberWallet{})
-	db.Debug().AutoMigrate(&model.Repository{})
-	db.Debug().AutoMigrate(&model.Transaction{})
-	db.Debug().AutoMigrate(&model.Transfer{})
-	db.Debug().AutoMigrate(&model.Wallet{})
-	db.Debug().AutoMigrate(&model.User{})
-	db.Debug().AutoMigrate(&model.Member{})
-	db.Debug().AutoMigrate(&model.Property{})
-	db.Debug().AutoMigrate(&model.Bot{})
-	db.Debug().AutoMigrate(&model.Asset{})
+	if multierror := dao.Migrate(); multierror != nil{
+		log.Error(multierror)
+	}
 
 	util.RegisterType()
 	util.Cors()

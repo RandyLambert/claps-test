@@ -2,11 +2,22 @@ package dao
 
 import (
 	"claps-test/model"
-	"claps-test/util"
+	"github.com/jinzhu/gorm"
 )
 
+func init() {
+	RegisterMigrateHandler(func(db *gorm.DB) error {
+
+		if err := db.AutoMigrate(&model.Transaction{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+
 func InsertTransaction(transaction *model.Transaction) (err error) {
-	err = util.DB.Create(transaction).Error
+	err = db.Create(transaction).Error
 	return
 }
 
@@ -14,8 +25,8 @@ func InsertTransaction(transaction *model.Transaction) (err error) {
 func ListTransactionsByProjectNameAndAssetId(name string, assetId string) (transactions *[]model.Transaction, err error) {
 
 	transactions = &[]model.Transaction{}
-	err = util.DB.Debug().Where("asset_id=? AND project_id=?", assetId,
-		util.DB.Debug().Table("project").Select("project.id").Where("project.name=?", name).SubQuery()).Find(transactions).Error
+	err = db.Debug().Where("asset_id=? AND project_id=?", assetId,
+		db.Debug().Table("project").Select("project.id").Where("project.name=?", name).SubQuery()).Find(transactions).Error
 	//err = util.DB.Debug().Joins("INNER JOIN project ON project.name=?",name).Where("asset_id=?",assetId).Find(transactions).Error
 	return
 }
@@ -24,6 +35,6 @@ func ListTransactionsByProjectNameAndAssetId(name string, assetId string) (trans
 func CountPatronByProjectIdAndSender(projectId uint32, sender string) (count uint32, err error) {
 	//todo 可能需要更改
 	//db.Table("deleted_users").Select("count(distinct(name))").Count(&count)
-	err = util.DB.Debug().Table("transaction").Where("project_id=? AND sender=?", projectId, sender).Count(&count).Error
+	err = db.Debug().Table("transaction").Where("project_id=? AND sender=?", projectId, sender).Count(&count).Error
 	return
 }
