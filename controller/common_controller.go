@@ -30,7 +30,10 @@ func RandUp(n int) []byte {
 	return b
 }
 
-//之前有JWTAuthmiddleWare,认证身份信息
+/*
+功能:认证用户信息,判断github和mixin是否登录绑定
+说明:之前有JWTAuthmiddleWare,ctx里设置mixin_id,github_id和
+ */
 func AuthInfo(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 

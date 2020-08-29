@@ -23,6 +23,7 @@ var MySecret = []byte("claps-dev")
 const (
 	MIXINID = "mixin_id"
 	GITHUBID = "gtihub_id"
+	TOKEN = "token"
 )
 
 type userInfo struct {
