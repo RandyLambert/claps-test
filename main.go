@@ -9,7 +9,6 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -33,16 +32,12 @@ func main() {
 
 	util.RegisterType()
 	util.Cors()
-	//开一个协程,定期更新数据库snapshot信息
+	//定期更新数据库snapshot信息
 	go service.SyncSnapshots()
-	//开一个协程,定期更新数据库asset信息
+	//定期更新数据库asset信息
 	go service.SyncAssets()
-	//开一个协程,定期进行提现操作,并更改数据库
+	//定期进行提现操作,并更改数据库
 	go service.SyncTransfer()
-
-	log.Debug("debug")
-	log.Warning("Warning")
-	log.Error("Error")
 
 	r := gin.Default()
 
