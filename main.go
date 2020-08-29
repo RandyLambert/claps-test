@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -21,6 +22,10 @@ func main() {
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
+	if rediserr := util.InitClient();rediserr != nil{
+		log.Error(rediserr)
+	}
+
 	db,_ := dao.InitDB()
 	if db != nil {
 		defer db.Close()
