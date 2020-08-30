@@ -3,19 +3,22 @@ package middleware
 import (
 	"claps-test/util"
 	"errors"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
-	"github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"net/http"
 	"strings"
 	"time"
 )
 
 type MyClaims struct {
-	MixinId string `json:"mixin_id"`
-	GithubId string `json:"github_id"`
+	//MixinId string `json:"mixin_id"`
+	//GithubId string `json:"github_id"`
+	Uid string `json:"uid"`
 	jwt.StandardClaims
 }
 
@@ -71,11 +74,10 @@ func MixinAuthMiddleware() gin.HandlerFunc {
 功能:生成Tokenm
 参数:mixin的userID和github的Id
  */
-func GenToken(mixin_id ,github_id string) (string, error) {
+func GenToken(uid string) (string, error) {
 
 	c := MyClaims{
-		mixin_id,
-		github_id,
+		uid,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(util.TokenExpireDuration).Unix(), // 过期时间
 			Issuer:    "sky",                               // 签发人
@@ -109,6 +111,44 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 }
 
 /*
+功能:再无Token的情况下,返回Uid和Token,并且redis缓存uid-mcache
+ */
+func NoToken(c *gin.Context)(randomUid string)  {
+	resp := make(map[string]interface{})
+	randomUid = util.RandUp(32)
+
+
+	token,err := GenToken(randomUid)
+	if err != nil{
+		c.AbortWithStatusJSON(http.StatusOK,gin.H{
+			"message":"generate token error.",
+		})
+	}
+	resp["user"] = nil
+	resp["randomUid"] = randomUid
+	resp["mixinAuth"] = false
+	resp["envs"] = gin.H{
+		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
+		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
+		"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
+	}
+	resp["token"] = token
+
+	mcache := util.MCache{}
+
+	//mcache.GithubAuth = true
+
+	err1 := util.Rdb.Set(randomUid,mcache,-1)
+	if err1 != nil{
+		util.HandleResponse(c,util.NewErr(err1,util.ErrDataBase,"cache set error"),nil)
+		return
+	}
+
+	util.HandleResponse(c,nil,resp)
+	return
+}
+
+/*
 功能:判断请求的Token情况
  */
 func JWTAuthMiddleware() func(c *gin.Context) {
@@ -116,19 +156,12 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		authHeader := c.Request.Header.Get("Authorization")
 		log.Debug("authHeader = ",authHeader)
 
-		//无Token,生成Token返回
+		var randomUid string
+		//无Token,生成Token返回,生成Uid
 		if authHeader == "" {
-			log.Debug("无Token")
-			token,err := GenToken("","")
-			if err != nil{
-				c.AbortWithStatusJSON(http.StatusOK,gin.H{
-					"message":"generate token error.",
-				})
-			}
-
-			c.JSON(http.StatusOK,gin.H{
-				TOKEN:token,
-			})
+			log.Debug("No Token")
+			randomUid = NoToken(c)
+			fmt.Println("randomUid = ",randomUid)
 			c.Abort()
 			return
 		}
@@ -145,7 +178,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		}
 
 		// parts[1]是获取到的tokenString，我们使用之前定义好的解析JWT的函数来解析它
-		_, err := ParseToken(parts[1])
+		claim, err := ParseToken(parts[1])
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"code": 2005,
@@ -156,8 +189,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		}
 
 		//取出mixin_id和gihub_id
-		c.Set(TOKEN,parts[1])
-
+		c.Set(util.UID,claim.Uid)
 		c.Next()
 	}
 }

@@ -1,35 +1,16 @@
 package controller
 
 import (
-	"claps-test/middleware"
 	"claps-test/util"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"math/rand"
 )
 
 const (
 	RANDOMUID = "randomUid"
 )
-var longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_")
 
-func RandUp(n int) []byte {
-	if n <= 0 {
-		return []byte{}
-	}
-	b := make([]byte, n)
-	arc := uint8(0)
-	if _, err := rand.Read(b[:]); err != nil {
-		return []byte{}
-	}
-	for i, x := range b {
-		arc = x & 63
-		b[i] = longLetters[arc]
-	}
-	return b
-}
 
 /*
 功能:返回前端randomUid
@@ -37,19 +18,8 @@ func RandUp(n int) []byte {
  */
 func LoginGithub(ctx *gin.Context)  {
 	resp := make(map[string]interface{})
-	token,_ := ctx.Get(middleware.TOKEN)
-	jwt_token := token.(string)
-
-	//没有登录的话随机生成uid
-	randomUid := string(RandUp(32))
-	//存入redis
-	util.Rdb.Set(jwt_token,randomUid,util.TokenExpireDuration)
-
-	//测试
-	randomUid = ""
-	log.Debug("randomUid = ",randomUid)
-	util.Rdb.Get(jwt_token,&randomUid)
-	log.Debug("randomUid = ",randomUid)
+	uid,_ := ctx.Get(util.UID)
+	randomUid,_ := uid.(string)
 
 	resp["user"] = nil
 	resp["randomUid"] = randomUid
@@ -64,7 +34,7 @@ func LoginGithub(ctx *gin.Context)  {
 }
 /*
 功能:认证用户信息,判断github和mixin是否登录绑定
-说明:之前有JWTAuthmiddleWare,ctx里设置mixin_id,github_id和token,经过了JWT的说明至少绑定了github。
+说明:之前有JWTAuthmiddleWare,ctx里设置uid
  */
 func AuthInfo(ctx *gin.Context) {
 	resp := make(map[string]interface{})
@@ -88,27 +58,41 @@ func AuthInfo(ctx *gin.Context) {
 	 */
 
 	//获取claim
-	token,_ := ctx.Get(middleware.TOKEN)
-	jwt_token,ok := token.(string)
-	if ok != true{
-		fmt.Println(ok)
+	uid,_ := ctx.Get(util.UID)
+	randomUid,_ := uid.(string)
+
+	log.Debug("RandomUid = ",randomUid)
+
+	//从redis取出mcache
+	mcache := &util.MCache{}
+	err1 := util.Rdb.Get(randomUid,mcache)
+	if err1 != nil{
+		log.Error("Get cache error:",err1)
 		return
 	}
 
-	claim,_ := middleware.ParseToken(jwt_token)
-
-	log.Debug("github_id = ",claim.GithubId)
-	log.Debug("mixin_id = ",claim.MixinId)
-
 	//未登录github
-	if claim.GithubId == ""{
+	if mcache.GithubAuth == false{
+		log.Debug("github未登录")
 		LoginGithub(ctx)
 		return
 	}
 
+
+	log.Debug("github已登录")
+	//从redis中取出github信息返回
+	resp["user"] = mcache.Github
+	resp["randomUid"] = randomUid
+	resp["mixinAuth"] = mcache.MixinAuth
+	resp["envs"] = gin.H{
+		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
+		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
+		"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
+	}
+
+	util.HandleResponse(ctx, nil, resp)
 	return
 
-	//从redis中取user信息
 
 	/*
 	//用户已经登录github

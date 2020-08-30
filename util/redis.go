@@ -2,18 +2,21 @@ package util
 
 import (
 	"github.com/gin-contrib/cache/persistence"
+	"github.com/spf13/viper"
 	"time"
 )
 
 // 声明一个全局的rdb变量
-var Rdb *persistence.InMemoryStore
+var Rdb *persistence.RedisStore
 
 //jwt的过期时间
-const TokenExpireDuration = time.Minute* 2
+const TokenExpireDuration = time.Hour* 2
 
 // 初始化连接
 func InitClient() (err error) {
-	Rdb = persistence.NewInMemoryStore(TokenExpireDuration)
+	//Rdb = persistence.NewInMemoryStore(TokenExpireDuration)
+	Rdb = persistence.NewRedisCache(viper.GetString("REDIS_ADDR"),
+		viper.GetString("REDIS_PASSWORD"),TokenExpireDuration)
 
 	/*
 	Rdb = redis.NewClient(&redis.Options{

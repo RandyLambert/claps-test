@@ -72,7 +72,7 @@ func GetToken(url string) (token *oauth2.Token, err *util.Err) {
 		err = util.NewErr(err3, util.ErrInternalServer, "解析Token结构体出错")
 		return
 	}
-	log.Debug("获得的Token是", token)
+	log.Debug("生成的Token是", token)
 	return
 }
 

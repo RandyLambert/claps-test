@@ -48,7 +48,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 
 		// /api/user
 		userGroup := apiGroup.Group("/user")
-		userGroup.Use(middleware.GithubAuthMiddleware())
+		userGroup.Use(middleware.JWTAuthMiddleware())
 		{
 			userGroup.GET("/profile", controller.UserProfile)
 			userGroup.GET("/assets", controller.UserAssets)

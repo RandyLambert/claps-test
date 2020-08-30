@@ -2,8 +2,39 @@ package util
 
 import (
 	"encoding/json"
+	"github.com/fox-one/mixin-sdk-go"
 	"github.com/google/go-github/v32/github"
+	"math/rand"
 )
+
+const (
+	UID = "UID"
+)
+
+type MCache struct {
+	Github github.User
+	Mixin mixin.User
+	GithubAuth bool
+	MixinAuth bool
+}
+
+var longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_sky")
+
+func RandUp(n int) string{
+	if n <= 0 {
+		return ""
+	}
+	b := make([]byte, n)
+	arc := uint8(0)
+	if _, err := rand.Read(b[:]); err != nil {
+		return string(b)
+	}
+	for i, x := range b {
+		arc = x & 63
+		b[i] = longLetters[arc]
+	}
+	return string(b)
+}
 
 func UserToJson(user *github.User)(userJson string,err error)  {
 	jsonBytes,err := json.Marshal(*user)
