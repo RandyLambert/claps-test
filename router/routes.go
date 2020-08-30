@@ -25,6 +25,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		// /api/oauth
 		apiGroup.GET("/oauth", controller.Oauth)
 
+		//给项目捐赠
 		//https://claps.dev/api/bots/469e9ddc-25b3-35f0-8e43-17ffa80963c2/assets/c6d0c728-2624-429b-8e0d-d9d19b6592fa
 		apiGroup.GET("bots/:botId/assets/:assetId", controller.Bot)
 
@@ -35,7 +36,6 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 			projectsGroup.GET("/:name", controller.Project)
 			projectsGroup.GET("/:name/members", controller.ProjectMembers)
 			projectsGroup.GET("/:name/transactions", controller.ProjectTransactions)
-			projectsGroup.GET("/:name/donation", controller.ProjectDonation)
 
 		}
 

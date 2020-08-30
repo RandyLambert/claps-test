@@ -44,7 +44,7 @@ func ListMembersByProjectName(projectName string) (users *[]model.User, err erro
 	//db.Where("amount > ?", db.Table("orders").Select("AVG(amount)").Where("state = ?", "paid").SubQuery()).Find(&orders)
 	// SELECT * FROM "orders"  WHERE "orders"."deleted_at" IS NULL AND (amount > (SELECT AVG(amount) FROM "orders"  WHERE (state = 'paid')));
 	users = &[]model.User{}
-	err = db.Debug().Where("user.id IN (?)",
+	err = db.Debug().Where("id IN (?)",
 		db.Debug().Table("member").Select("user_id").Where("project_id=?",
 			db.Debug().Table("project").Select("project.id").Where("project.name=?", projectName).SubQuery()).SubQuery()).Find(users).Error
 	// IN
@@ -59,7 +59,7 @@ func ListMembersByProjectId(projectId int64) (users *[]model.User, err error) {
 	//db.Where("amount > ?", db.Table("orders").Select("AVG(amount)").Where("state = ?", "paid").SubQuery()).Find(&orders)
 	// SELECT * FROM "orders"  WHERE "orders"."deleted_at" IS NULL AND (amount > (SELECT AVG(amount) FROM "orders"  WHERE (state = 'paid')));
 	users = &[]model.User{}
-	err = db.Debug().Where("user.id IN (?)",
+	err = db.Debug().Where("id IN (?)",
 		db.Debug().Table("member").Select("user_id").Where("project_id=?", projectId).SubQuery()).Find(users).Error
 	// IN
 	//db.Where("name IN (?)", []string{"jinzhu", "jinzhu 2"}).Find(&users)

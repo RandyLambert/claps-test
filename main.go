@@ -21,9 +21,9 @@ func main() {
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
-	if rediserr := util.InitClient();rediserr != nil{
-		log.Error(rediserr)
-	}
+	//if rediserr := util.InitClient();rediserr != nil{
+	//	log.Error(rediserr)
+	//}
 
 	db,_ := dao.InitDB()
 	if db != nil {
