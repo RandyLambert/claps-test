@@ -4,10 +4,7 @@ import (
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
-	"github.com/astaxie/beego/session"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-github/v32/github"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
@@ -230,7 +227,6 @@ func UserWithdraw(ctx *gin.Context) {
 		util.HandleResponse(ctx,err,nil)
 		return
 	}
-
 
 	//判断是否有未完成的提现
 	err3 := service.IfUnfinishedTransfer(mixinId)

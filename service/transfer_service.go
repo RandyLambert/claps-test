@@ -63,7 +63,7 @@ func DoTransfer(userId int64, mixinId string) (err *util.Err) {
 		return
 	}
 
-	for i := range *memberWallets {
+	for _,value := range *memberWallets {
 		/*
 			mixinId,err1 := dao.GetMixinIdByUserId(userId)
 			if err1 != nil {
@@ -71,16 +71,16 @@ func DoTransfer(userId int64, mixinId string) (err *util.Err) {
 				return
 			}
 		*/
-		err1 = InsertTransfer((*memberWallets)[i].BotId, assetId, "恭喜您获得一笔捐赠", (*memberWallets)[i].Balance, mixinId)
+		err1 = InsertTransfer(value.BotId, value.AssetId, "恭喜您获得一笔捐赠", value.Balance, mixinId)
 		if err1 != nil {
 			err = util.NewErr(err1, util.ErrDataBase, "插入提现记录失败")
 			return
 		}
 
 		//清零
-		(*memberWallets)[i].Balance = decimal.Zero
+		value.Balance = decimal.Zero
 		//更新member_wallet
-		err1 = dao.UpdateMemberWallet(&(*memberWallets)[i])
+		err1 = dao.UpdateMemberWallet(&value)
 		if err1 != nil {
 			err = util.NewErr(err1, util.ErrDataBase, "更新用户钱包可提现值导致提现失败")
 			return
