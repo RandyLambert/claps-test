@@ -16,6 +16,10 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	//注册session中间件,设置session的sssion的名字,也是cookie的key
 	r.Use(sessions.Sessions("SessionId", store))
 
+	r.GET("/_hc", func(ctx *gin.Context) {
+		ctx.JSON(200, "ok")
+	})
+
 	// /api
 	apiGroup := r.Group("/api")
 	{
