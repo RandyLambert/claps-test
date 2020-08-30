@@ -5,66 +5,82 @@ import (
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
+type oauth struct {
+	Code string `json:"code" form:"code"`
+	Path string `json:"path" form:"path"`
+	State string `json:"state" form:"state"`
+}
+
+/*
+功能:用code换取Token
+说明:此时未完成授权也就没有获得github信息,github_id为空
+ */
 func Oauth(ctx *gin.Context) {
-	var err *util.Err
+	var (
+		err *util.Err
+		oauth_ oauth
+		//randomUid = ""
+	)
+
 	resp := make(map[string]interface{})
-	log.Debug("开始处理Oauth授权")
 
-	//获取code,path和state
-	session := sessions.Default(ctx)
-	code := ctx.Query("code")
-	path := ctx.Query("path")
-	state := ctx.Query("state")
-
-	log.Debug("获得的code,path和state", code, path, state)
-
-	uid, ok := session.Get("uid").(string)
-	//不存在state
-	ok2 := If(state != "", false, true).(bool)
-	if (ok && uid != state) || ok2 {
-		session.Set("user", nil)
-		session.Set("githubToken", nil)
-		err = util.NewErr(errors.New("invalid oauth redirect"), util.ErrBadRequest, "")
-		util.HandleResponse(ctx, err, resp)
+	if err1 := ctx.ShouldBindQuery(&oauth_);err1 != nil ||
+		oauth_.Code =="" || oauth_.State == "" || oauth_.Path == ""{
+		err1 := util.NewErr(errors.New("invalid query param"), util.ErrBadRequest, "")
+		util.HandleResponse(ctx, err1, resp)
 		return
 	}
+	log.Debug("code = ",oauth_.Code)
+	log.Debug("path = ",oauth_.Path)
+	//state设计做为redis的key
+	log.Debug("state = ",oauth_.State)
+
+	mcache := &util.MCache{}
+	err1 := util.Rdb.Get(oauth_.State,mcache)
+
+	//if err1 == persistence.ErrCacheMiss{
+	//验证state
+	if err1 != nil{
+			err = util.NewErr(err1,util.ErrBadRequest, "")
+			util.HandleResponse(ctx, err, resp)
+			return
+	}
+
 
 	//获取token
-	var oauthTokenUrl = service.GetOauthToken(code)
+	var oauthTokenUrl = service.GetOauthToken(oauth_.Code)
 	//处理请求的URL,获得Token指针
-	token, err := service.GetToken(oauthTokenUrl)
+	token2,err := service.GetToken(oauthTokenUrl)
 	if err != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
 
-	// 通过token，获取用户信息,user是指针类型
-	user, err := service.GetUserInfo(token)
+	// 通过token，获取用户信息
+	user, err := service.GetUserInfo(token2)
 	if err != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
 
-	log.Debugf("\n获得的用户信息是:\n", *user)
+	log.Debug("user = ",*user)
 
-	//存储session
-	session.Set("user", *user)
-	session.Set("githubToken", token.AccessToken)
-	err1 := session.Save()
-	if err1 != nil {
-		err = util.NewErr(err1, util.ErrInternalServer, "session保存出错")
+	//redis存储user信息
+	mcache.Github = *user
+	err1 = util.Rdb.Set(oauth_.Code,mcache,-1)
+	if err1 != nil{
+		err = util.NewErr(errors.New("cache error"), util.ErrBadRequest, "")
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
 
-	tmp := session.Get("user")
-	log.Debug("刚刚存储的session是", tmp)
+	tmp := &util.MCache{}
+	util.Rdb.Get(oauth_.Code,tmp)
+	log.Debug("刚刚存储的user = ",*tmp)
 
 	//尝试获取数据库中该user信息
 	u := model.User{}
@@ -87,7 +103,8 @@ func Oauth(ctx *gin.Context) {
 	}
 
 	//重定向到http://localhost:3000/profile
-	newpath := "http://localhost:3000" + path
+	newpath := "http://localhost:3000" + oauth_.Path
 	log.Debug("重定向", newpath)
-	ctx.Redirect(http.StatusMovedPermanently, newpath)
+	//ctx.Redirect(http.StatusMovedPermanently, newpath)
+
 }

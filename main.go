@@ -3,7 +3,6 @@ package main
 import (
 	"claps-test/dao"
 	"claps-test/router"
-	"claps-test/service"
 	"claps-test/util"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -38,11 +37,11 @@ func main() {
 	util.RegisterType()
 	util.Cors()
 	//定期更新数据库snapshot信息
-	go service.SyncSnapshots()
+	//go service.SyncSnapshots()
 	//定期更新数据库asset信息
-	go service.SyncAssets()
+	//go service.SyncAssets()
 	//定期进行提现操作,并更改数据库
-	go service.SyncTransfer()
+	//go service.SyncTransfer()
 
 	r := gin.Default()
 
