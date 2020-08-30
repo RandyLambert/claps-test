@@ -3,7 +3,9 @@ package main
 import (
 	"claps-test/dao"
 	"claps-test/router"
+	"claps-test/service"
 	"claps-test/util"
+	"flag"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -11,49 +13,57 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
-
-func main() {
-
+func init() {
 	/*
-		初始化配置文件,Mixin,log和DB
+		初始化配置文件,Mixin,log,DB和cache
 	*/
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
-	//if rediserr := util.InitClient();rediserr != nil{
-	//	log.Error(rediserr)
-	//}
+	if err := util.InitClient();err != nil{
+		log.Error(err)
+	}
+}
 
-	db,_ := dao.InitDB()
+func main() {
+
+	cmd := flag.String("cmd", "", "process identity")
+	flag.Parse()
+
+	db, _ := dao.InitDB()
 	if db != nil {
 		defer db.Close()
 	}
 
-	//自动迁移
-	if multierror := dao.Migrate(); multierror != nil{
-		log.Error(multierror)
-	}
+	switch *cmd {
+	case "migrate", "setdb":
+		if multierror := dao.Migrate(); multierror != nil {
+			log.Error(multierror)
+		}
+	default:
+		//定期更新数据库snapshot信息
+		go service.SyncSnapshots()
+		//定期更新数据库asset信息
+		go service.SyncAssets()
+		//定期进行提现操作,并更改数据库
+		go service.SyncTransfer()
 
-	util.RegisterType()
-	util.Cors()
-	//定期更新数据库snapshot信息
-	//go service.SyncSnapshots()
-	//定期更新数据库asset信息
-	//go service.SyncAssets()
-	//定期进行提现操作,并更改数据库
-	//go service.SyncTransfer()
+		util.RegisterType()
+		util.Cors()
 
-	r := gin.Default()
+		r := gin.Default()
 
-	//设置session middleware
-	store := cookie.NewStore([]byte("claps-test"))
-	r.Use(sessions.Sessions("mysession", store))
+		//设置session middleware
+		store := cookie.NewStore([]byte("claps-test"))
+		r.Use(sessions.Sessions("mysession", store))
 
-	r = router.CollectRoute(r)
-	serverport := viper.GetString("server.port")
-	if serverport != "" {
-		panic(r.Run(":" + serverport))
-	} else {
-		panic(r.Run(":3001"))
+		r = router.CollectRoute(r)
+		serverport := viper.GetString("server.port")
+		if serverport != "" {
+			panic(r.Run(":" + serverport))
+		} else {
+			panic(r.Run(":3001"))
+		}
+
 	}
 }
