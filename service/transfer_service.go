@@ -39,8 +39,8 @@ func UpdateTransferStatusByAssetIdAndUserId(mixinId string, assetId string, stat
 }
 
 //判断某种币是否有未完成的提现操作,err非nil标有有未完成,err=nil表示没有未完成
-func IfUnfinishedTransfer(mixinId string, assetId string) (err *util.Err) {
-	count, err1 := dao.CountUnfinishedTransfer(mixinId, assetId)
+func IfUnfinishedTransfer(mixinId string) (err *util.Err) {
+	count, err1 := dao.CountUnfinishedTransfer(mixinId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "数据库查询Unfinished出错")
 		return
@@ -55,9 +55,9 @@ func IfUnfinishedTransfer(mixinId string, assetId string) (err *util.Err) {
 }
 
 //生成trasfer记录
-func DoTransfer(userId int64, mixinId, assetId string) (err *util.Err) {
+func DoTransfer(userId int64, mixinId string) (err *util.Err) {
 
-	memberWallets, err1 := dao.GetMemeberWalletByUserIdAndAssetId(userId, assetId)
+	memberWallets, err1 := dao.GetMemeberWalletByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err, util.ErrDataBase, "获取用户钱包失败导致提现失败")
 		return

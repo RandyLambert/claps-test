@@ -64,7 +64,7 @@ func GetTransferByMininId(mixinId string) (transfers *[]model.Transfer, err *uti
 	return
 }
 
-func SumProjectDonationsByUserId(userId int64) (donations *[]interface{}, err *util.Err) {
+func SumProjectDonationsByUserId(userId int64) (donations int64,err *util.Err) {
 	donations, err1 := dao.SumProjectDonationsByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err, util.ErrDataBase, "数据库获取用户项目信息和出错")

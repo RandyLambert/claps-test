@@ -4,6 +4,7 @@ import (
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
+	"github.com/astaxie/beego/session"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
@@ -143,12 +144,26 @@ func UserTransfer(ctx *gin.Context) {
 
 //获取某用户的所有的受捐赠记录的汇总
 /*
-功能:
+功能:请求获得某个用户的捐赠信息的汇总,包括总金额和捐赠人数
+说明:不需要绑定mixin
  */
 func UserDonation(ctx *gin.Context) {
 	resp := make(map[string]interface{})
-	session := sessions.Default(ctx)
-	userId := *(session.Get("user").(github.User)).ID
+
+	var val interface{}
+	var ok bool
+	if val,ok = ctx.Get(util.UID);!ok{
+		util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),resp)
+		return
+	}
+	uid := val.(string)
+
+	mcache := &util.MCache{}
+	err1 := util.Rdb.Get(uid,mcache)
+	if err1 != nil{
+		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"cache get error"),resp)
+		return
+	}
 
 	//读取所有的member_wallet表然后汇总
 	//获得所有币的信息
@@ -160,7 +175,7 @@ func UserDonation(ctx *gin.Context) {
 	log.Debug(*assets)
 
 	//查询用户钱包,获得相应的余额,添加到币信息的后面
-	err2, dto := service.GetUserBalanceByAllAssets(userId, assets)
+	err2, dto := service.GetUserBalanceByAllAssets(*mcache.Github.ID, assets)
 	if err2 != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
@@ -174,11 +189,13 @@ func UserDonation(ctx *gin.Context) {
 	}
 
 	//从project里面寻找Donations然后求和
-	donations, err3 := service.SumProjectDonationsByUserId(userId)
+	donations, err3 := service.SumProjectDonationsByUserId(*mcache.Github.ID)
 	if err3 != nil {
 		util.HandleResponse(ctx, err3, resp)
 		return
 	}
+
+	log.Debug("donations = ",donations)
 
 	resp["total"] = sum
 	resp["donations"] = donations
@@ -186,37 +203,44 @@ func UserDonation(ctx *gin.Context) {
 	util.HandleResponse(ctx, nil, resp)
 }
 
-//加中间件
-//用户提现某种货币,把表中的status由0变为1
+/*
+功能:用户提现某种货币,把表中的status由0变为1
+说明:已经中间件验证绑定了mixin
+ */
 func UserWithdraw(ctx *gin.Context) {
+	resp := make(map[string]interface{})
 
-	//gihub和mixin已经绑定了
+	var val interface{}
+	var ok bool
+	if val,ok = ctx.Get(util.UID);!ok{
+		util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),resp)
+		return
+	}
+	uid := val.(string)
 
-	//获取mixinId
-	session := sessions.Default(ctx)
-	mixinId := session.Get("mixin").(string)
-
-	//获取币种
-	assetId := ctx.Query("assetId")
-	if assetId == "" {
-		err := util.NewErr(nil, util.ErrBadRequest, "请求路由无assetId参数")
-		util.HandleResponse(ctx, err, nil)
+	mcache := &util.MCache{}
+	err1 := util.Rdb.Get(uid,mcache)
+	if err1 != nil{
+		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"cache get error"),resp)
 		return
 	}
 
-	//获取userId
-	userId := *session.Get("user").(github.User).ID
+	mixinId,err := service.GetMixinIdByUserId(*mcache.Github.ID)
+	if err != nil{
+		util.HandleResponse(ctx,err,nil)
+		return
+	}
+
 
 	//判断是否有未完成的提现
-	err3 := service.IfUnfinishedTransfer(mixinId, assetId)
+	err3 := service.IfUnfinishedTransfer(mixinId)
 	if err3 != nil {
 		util.HandleResponse(ctx, err3, nil)
 		return
 	}
 
-	//找到相应的币种的doTransfer mixin_id和assetId
 	//生成trasfer记录
-	err2 := service.DoTransfer(userId, mixinId, assetId)
+	err2 := service.DoTransfer(*mcache.Github.ID, mixinId)
 	if err2 != nil {
 		util.HandleResponse(ctx, err2, nil)
 		return

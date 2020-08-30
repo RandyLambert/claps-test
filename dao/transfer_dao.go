@@ -45,8 +45,8 @@ func UpdateTransferStatusByUserIdAndAssetId(mixinId string, assetId string, stat
 	return
 }
 
-func CountUnfinishedTransfer(mixinId string, assetId string) (count int, err error) {
-	err = db.Debug().Table("transfer").Where("mixin_id = ? AND asset_id = ? AND status = ?", mixinId, assetId, model.UNFINISHED).Count(&count).Error
+func CountUnfinishedTransfer(mixinId string) (count int, err error) {
+	err = db.Debug().Table("transfer").Where("mixin_id = ? AND status = ?", mixinId, model.UNFINISHED).Count(&count).Error
 	log.Debug(count)
 	return
 }

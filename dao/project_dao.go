@@ -52,9 +52,13 @@ func UpdateProjectTotal(projectTotal *model.ProjectTotal) (err error) {
 	return
 }
 
-func SumProjectDonationsByUserId(userId int64) (donations *[]interface{}, err error) {
-	donations = &[]interface{}{}
-	err = db.Debug().Table("project").Select("sum(donations)").Where("id IN(?)",
-		db.Debug().Table("member").Select("project_id").Where("user_id=?",userId).SubQuery()).Pluck("sum(donations)", donations).Error
+func SumProjectDonationsByUserId(userId int64) (donations int64, err error) {
+	type Result struct {
+		Total int64
+	}
+	var result Result
+	err = db.Debug().Table("project").Select("sum(donations) as total").Where("id IN(?)",
+		db.Debug().Table("member").Select("project_id").Where("user_id=?",userId).SubQuery()).Scan(&result).Error
+	donations = result.Total
 	return
 }
