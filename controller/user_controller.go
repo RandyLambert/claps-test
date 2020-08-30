@@ -100,31 +100,40 @@ func UserTransactions(ctx *gin.Context) {
 	//从transfer表中获取该用户的所有捐赠记录
 }
 
-//读取某种货币的交易记录,读取transfer里面的记录
+/*
+功能:获取某币种的交易记录,从transfer表里面读取数据
+说明:用户一定登录了github和mixin,中间件保证
+ */
 func UserTransfer(ctx *gin.Context) {
 	resp := make(map[string]interface{})
-	session := sessions.Default(ctx)
+
+	var val interface{}
+	var ok bool
+	if val,ok = ctx.Get(util.UID);!ok{
+		util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),resp)
+		return
+	}
+	uid := val.(string)
+
+	mcache := &util.MCache{}
+	err1 := util.Rdb.Get(uid,mcache)
+	if err1 != nil{
+		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"cache get error"),resp)
+		return
+	}
 
 	//用户如果提现过一定是绑定了mixin,没有mixin则是没有提现记录
-	userId := *(session.Get("user").(github.User).ID)
-	mixinId, err := service.GetMixinIdByUserId(userId)
+	mixinId, err := service.GetMixinIdByUserId(*mcache.Github.ID)
 	if err != nil {
 		util.HandleResponse(ctx, err, nil)
 		return
 	}
 
+	//可能封装成中间件,判断mixin是否登录
 	if mixinId == "" {
 		util.HandleResponse(ctx, util.NewErr(nil, util.ErrUnauthorized, "没有绑定mixin没有提现记录"), nil)
 		return
 	}
-
-	//assetId := ctx.Query("assetId")
-	//if assetId == "" {
-	//	err := util.NewErr(nil, util.ErrBadRequest, "没有币种参数")
-	//	util.HandleResponse(ctx, err, resp)
-	//	return
-	//}
-	//log.Debug("assetId = ", assetId)
 
 	//从transfer表中获取该用户的所有捐赠记录
 	transfers, err := service.GetTransferByMininId(mixinId)
@@ -133,6 +142,9 @@ func UserTransfer(ctx *gin.Context) {
 }
 
 //获取某用户的所有的受捐赠记录的汇总
+/*
+功能:
+ */
 func UserDonation(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 	session := sessions.Default(ctx)
