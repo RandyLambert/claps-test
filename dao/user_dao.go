@@ -27,13 +27,13 @@ func GetUserByUserId(id int64) (user *model.UserMixinId, err error) {
 func InsertOrUpdateUser(user *model.User) (err error) {
 	err = db.Debug().Save(user).Error
 	/*
-		var cnt int64
-		util.DB.Debug().Table("user").Where("id = ?",user.Id).Count(&cnt)
-		if cnt == 0{
-			err = util.DB.Debug().Create(user).Error
-			return
-		}
-	*/
+	var cnt int64
+	db.Debug().Table("user").Where("id = ?",user.Id).Count(&cnt)
+	if cnt == 0{
+		err = db.Debug().Create(user).Error
+		return
+	}
+	 */
 	//util.DB.Save(user)
 	return
 }

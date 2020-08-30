@@ -6,6 +6,7 @@ import (
 	"claps-test/util"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -45,7 +46,7 @@ func Oauth(ctx *gin.Context) {
 	//if err1 == persistence.ErrCacheMiss{
 	//验证state
 	if err1 != nil{
-			err = util.NewErr(err1,util.ErrBadRequest, "")
+			err = util.NewErr(err1,util.ErrBadRequest, "invalid oauth state")
 			util.HandleResponse(ctx, err, resp)
 			return
 	}
@@ -67,20 +68,31 @@ func Oauth(ctx *gin.Context) {
 		return
 	}
 
+	//通过token,获取Email信息
+	emails, err := service.ListEmailsByToken(token2.AccessToken)
+	//如果因为超时出错,重新请求
+	if err != nil {
+		util.HandleResponse(ctx, err, resp)
+		return
+	}
+
 	log.Debug("user = ",*user)
 
 	//redis存储user信息
+	emailForCache := []github.UserEmail{}
+	for _,val:= range emails{
+		emailForCache = append(emailForCache, *val)
+	}
 	mcache.Github = *user
-	err1 = util.Rdb.Set(oauth_.Code,mcache,-1)
+	mcache.GithubEmails = emailForCache
+	mcache.GithubAuth = true
+
+	err1 = util.Rdb.Replace(oauth_.State,mcache,-1)
 	if err1 != nil{
 		err = util.NewErr(errors.New("cache error"), util.ErrBadRequest, "")
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
-
-	tmp := &util.MCache{}
-	util.Rdb.Get(oauth_.Code,tmp)
-	log.Debug("刚刚存储的user = ",*tmp)
 
 	//尝试获取数据库中该user信息
 	u := model.User{}

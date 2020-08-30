@@ -136,8 +136,6 @@ func NoToken(c *gin.Context)(randomUid string)  {
 
 	mcache := util.MCache{}
 
-	//mcache.GithubAuth = true
-
 	err1 := util.Rdb.Set(randomUid,mcache,-1)
 	if err1 != nil{
 		util.HandleResponse(c,util.NewErr(err1,util.ErrDataBase,"cache set error"),nil)
@@ -188,7 +186,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			return
 		}
 
-		//取出mixin_id和gihub_id
+		//set Key
 		c.Set(util.UID,claim.Uid)
 		c.Next()
 	}

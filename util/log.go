@@ -83,7 +83,7 @@ func setLogOutput() {
 
 }
 
-func init() {
+func InitLog() {
 	//设置输出
 	setLogOutput()
 	//设置日志级别

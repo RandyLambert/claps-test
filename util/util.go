@@ -13,8 +13,10 @@ const (
 
 type MCache struct {
 	Github github.User
-	Mixin mixin.User
+	GithubEmails []github.UserEmail
 	GithubAuth bool
+	GithubToken string
+	Mixin mixin.User
 	MixinAuth bool
 }
 
