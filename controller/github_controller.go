@@ -1,30 +1,28 @@
 package controller
 
 import (
+	"claps-test/middleware"
 	"claps-test/model"
 	"claps-test/service"
 	"claps-test/util"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
+	"strconv"
 )
 
-type oauth struct {
-	Code string `json:"code" form:"code"`
-	Path string `json:"path" form:"path"`
-	State string `json:"state" form:"state"`
-}
 
 /*
 功能:用code换取Token
-说明:此时未完成授权也就没有获得github信息,github_id为空
+说明:此时没有发放token,没有cache,成功授权后发放token,设置cache
  */
 func Oauth(ctx *gin.Context) {
+	type oauth struct {
+		Code string `json:"code" form:"code"`
+	}
 	var (
 		err *util.Err
 		oauth_ oauth
-		//randomUid = ""
 	)
 
 	resp := make(map[string]interface{})
@@ -34,28 +32,8 @@ func Oauth(ctx *gin.Context) {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
-
-	if oauth_.Code =="" || oauth_.State == "" {
-		err := util.NewErr(errors.New("invalid query param"), util.ErrBadRequest, "")
-		util.HandleResponse(ctx, err, resp)
-		return
-	}
 	log.Debug("code = ",oauth_.Code)
-	log.Debug("path = ",oauth_.Path)
-	//state设计做为redis的key
-	log.Debug("state = ",oauth_.State)
 
-	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(oauth_.State,mcache)
-	//验证state
-	if err1 != nil{
-			err = util.NewErr(err1,util.ErrBadRequest, "invalid oauth state")
-			util.HandleResponse(ctx, err, resp)
-			return
-	}
-
-
-	//获取token
 	var oauthTokenUrl = service.GetOauthToken(oauth_.Code)
 	//处理请求的URL,获得Token指针
 	token2,err := service.GetToken(oauthTokenUrl)
@@ -81,23 +59,15 @@ func Oauth(ctx *gin.Context) {
 
 	log.Debug("user = ",*user)
 
-	//redis存储user信息
-	emailForCache := []github.UserEmail{}
-	for _,val:= range emails{
-		emailForCache = append(emailForCache, *val)
-	}
-	mcache.Github = *user
-	mcache.GithubEmails = emailForCache
-	mcache.GithubAuth = true
-
-	err1 = util.Rdb.Replace(oauth_.State,mcache,-1)
+	//生成token
+	jwt_token,err1 := middleware.GenToken(strconv.FormatInt(*user.ID,10))
 	if err1 != nil{
-		err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
-		util.HandleResponse(ctx, err, resp)
+		util.HandleResponse(ctx,util.NewErr(err1,util.ErrInternalServer,"gen token error"),nil)
 		return
 	}
 
-	//尝试获取数据库中该user信息
+
+	//向数据库中存储user信息
 	u := model.User{}
 	u.Id = *user.ID
 	u.Name = *user.Login
@@ -117,6 +87,24 @@ func Oauth(ctx *gin.Context) {
 		return
 	}
 
+	//redis存储user信息
+	mcache := &util.MCache{}
+	emailForCache := []github.UserEmail{}
+	for _,val:= range emails{
+		emailForCache = append(emailForCache, *val)
+	}
+	mcache.Github = *user
+	mcache.GithubEmails = emailForCache
+	mcache.GithubAuth = true
+
+	err1 = util.Rdb.Set(strconv.FormatInt(*user.ID,10),mcache,-1)
+	if err1 != nil{
+		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"set cache error"),nil)
+		return
+	}
+
+	resp["token"] = jwt_token
+	util.HandleResponse(ctx,nil,resp)
 	//重定向到http://localhost:3000/profile
 	//newpath := "http://localhost:3000" + oauth_.Path
 	//log.Debug("重定向", newpath)

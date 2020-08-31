@@ -116,7 +116,7 @@ func MixinAuthMiddleware()gin.HandlerFunc  {
 
 /*
 功能:生成Tokenm
-参数:mixin的userID和github的Id
+说明:uid=github.ID
  */
 func GenToken(uid string) (string, error) {
 
@@ -165,10 +165,10 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		authHeader := c.Request.Header.Get("Authorization")
 		log.Debug("authHeader = ",authHeader)
 
-		//无Token,生成Token返回,生成Uid
+		//无Token,需要授权github
 		if authHeader == "" {
 			log.Debug("No Token")
-			util.HandleResponse(c,util.NewErr(errors.New(""),util.ErrBadRequest,"request have no token"),nil)
+			util.HandleResponse(c,util.NewErr(errors.New(""),util.ErrUnauthorized,"request have no token"),nil)
 			c.Abort()
 			return
 		}
