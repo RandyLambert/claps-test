@@ -50,7 +50,7 @@ func main() {
 		go service.SyncTransfer()
 
 		util.RegisterType()
-		util.Cors()
+		//util.Cors()
 
 		r := gin.Default()
 

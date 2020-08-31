@@ -3,13 +3,11 @@ package middleware
 import (
 	"claps-test/util"
 	"errors"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"net/http"
 	"strings"
 	"time"
@@ -110,56 +108,21 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 	return nil, errors.New("invalid token")
 }
 
-/*
-功能:再无Token的情况下,返回Uid和Token,并且redis缓存uid-mcache
- */
-func NoToken(c *gin.Context)(randomUid string)  {
-	resp := make(map[string]interface{})
-	randomUid = util.RandUp(32)
 
-
-	token,err := GenToken(randomUid)
-	if err != nil{
-		c.AbortWithStatusJSON(http.StatusOK,gin.H{
-			"message":"generate token error.",
-		})
-	}
-	resp["user"] = nil
-	resp["randomUid"] = randomUid
-	resp["mixinAuth"] = false
-	resp["envs"] = gin.H{
-		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
-		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
-		"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
-	}
-	resp["token"] = token
-
-	mcache := util.MCache{}
-
-	err1 := util.Rdb.Set(randomUid,mcache,-1)
-	if err1 != nil{
-		util.HandleResponse(c,util.NewErr(err1,util.ErrDataBase,"cache set error"),nil)
-		return
-	}
-
-	util.HandleResponse(c,nil,resp)
-	return
-}
 
 /*
 功能:判断请求的Token情况
+说明:经过该中间件验证,ctx中一定有cache的key
  */
 func JWTAuthMiddleware() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		authHeader := c.Request.Header.Get("Authorization")
 		log.Debug("authHeader = ",authHeader)
 
-		var randomUid string
 		//无Token,生成Token返回,生成Uid
 		if authHeader == "" {
 			log.Debug("No Token")
-			randomUid = NoToken(c)
-			fmt.Println("randomUid = ",randomUid)
+			util.HandleResponse(c,util.NewErr(errors.New(),util.ErrBadRequest,"request have no token"),nil)
 			c.Abort()
 			return
 		}

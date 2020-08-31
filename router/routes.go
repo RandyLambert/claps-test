@@ -3,6 +3,7 @@ package router
 import (
 	"claps-test/controller"
 	"claps-test/middleware"
+	"claps-test/util"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	store := cookie.NewStore([]byte("secret11111"))
 	//注册session中间件,设置session的sssion的名字,也是cookie的key
 	r.Use(sessions.Sessions("SessionId", store))
+	r.Use(util.Cors())
 
 	r.GET("/_hc", func(ctx *gin.Context) {
 		ctx.JSON(200, "ok")
@@ -23,6 +25,9 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	// /api
 	apiGroup := r.Group("/api")
 	{
+		//api/token
+		apiGroup.GET("/token",controller.GetToken)
+
 		// /api/authinfo
 		apiGroup.GET("/authInfo", middleware.JWTAuthMiddleware(),controller.AuthInfo)
 

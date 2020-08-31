@@ -1,10 +1,13 @@
 package controller
 
 import (
+	"claps-test/middleware"
 	"claps-test/util"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"net/http"
 )
 
 const (
@@ -170,6 +173,50 @@ func AuthInfo(ctx *gin.Context) {
 				"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
 			}})
 	*/
+}
+
+/*
+功能:再无Token的情况下,返回Uid和Token,并且redis缓存uid-mcache
+*/
+func noToken(c *gin.Context)(randomUid string)  {
+	resp := make(map[string]interface{})
+	randomUid = util.RandUp(32)
+
+	token,err := middleware.GenToken(randomUid)
+	if err != nil{
+		c.AbortWithStatusJSON(http.StatusOK,gin.H{
+			"message":"generate token error.",
+		})
+	}
+	resp["token"] = token
+
+	mcache := util.MCache{}
+	err1 := util.Rdb.Set(randomUid,mcache,-1)
+	if err1 != nil{
+		util.HandleResponse(c,util.NewErr(err1,util.ErrDataBase,"cache set error"),nil)
+		return
+	}
+
+	util.HandleResponse(c,nil,resp)
+	return
+}
+
+/*
+功能:判断用户是否携带Token,没有则发放Token
+说明:
+ */
+func GetToken(ctx *gin.Context)  {
+	authHeader := ctx.Request.Header.Get("Authorization")
+	log.Debug("authHeader = ",authHeader)
+
+	var randomUid string
+	//无Token,生成Token返回,生成Uid
+	if authHeader == "" {
+		log.Debug("No Token")
+		randomUid = noToken(ctx)
+		fmt.Println("randomUid = ",randomUid)
+		return
+	}
 }
 
 //模拟三目运算符号
