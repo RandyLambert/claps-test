@@ -6,8 +6,6 @@ import (
 	"claps-test/service"
 	"claps-test/util"
 	"flag"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	log "github.com/sirupsen/logrus"
@@ -49,15 +47,10 @@ func main() {
 		//定期进行提现操作,并更改数据库
 		go service.SyncTransfer()
 
-		util.RegisterType()
+		//util.RegisterType()
 		//util.Cors()
 
 		r := gin.Default()
-
-		//设置session middleware
-		store := cookie.NewStore([]byte("claps-test"))
-		r.Use(sessions.Sessions("mysession", store))
-
 		r = router.CollectRoute(r)
 		serverport := viper.GetString("server.port")
 		if serverport != "" {

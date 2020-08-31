@@ -42,7 +42,7 @@ func UserProfile(ctx *gin.Context) {
 
 /*
 功能:获取用户钱包所有币种的余额
-说明:此时已经登录github
+说明:此时已经登录github,不需要绑定mixin
  */
 func UserAssets(ctx *gin.Context) {
 

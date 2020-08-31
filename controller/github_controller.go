@@ -29,10 +29,15 @@ func Oauth(ctx *gin.Context) {
 
 	resp := make(map[string]interface{})
 
-	if err1 := ctx.ShouldBindQuery(&oauth_);err1 != nil ||
-		oauth_.Code =="" || oauth_.State == "" || oauth_.Path == ""{
-		err1 := util.NewErr(errors.New("invalid query param"), util.ErrBadRequest, "")
-		util.HandleResponse(ctx, err1, resp)
+	if err1 := ctx.ShouldBindQuery(&oauth_);err1 != nil{
+		err := util.NewErr(err1,util.ErrBadRequest, "")
+		util.HandleResponse(ctx, err, resp)
+		return
+	}
+
+	if oauth_.Code =="" || oauth_.State == "" {
+		err := util.NewErr(errors.New("invalid query param"), util.ErrBadRequest, "")
+		util.HandleResponse(ctx, err, resp)
 		return
 	}
 	log.Debug("code = ",oauth_.Code)
@@ -113,8 +118,8 @@ func Oauth(ctx *gin.Context) {
 	}
 
 	//重定向到http://localhost:3000/profile
-	newpath := "http://localhost:3000" + oauth_.Path
-	log.Debug("重定向", newpath)
+	//newpath := "http://localhost:3000" + oauth_.Path
+	//log.Debug("重定向", newpath)
 	//ctx.Redirect(http.StatusMovedPermanently, newpath)
 
 }

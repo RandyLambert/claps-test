@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -10,7 +9,6 @@ import (
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
-		fmt.Println(method)
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH, DELETE")

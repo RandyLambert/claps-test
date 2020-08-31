@@ -5,9 +5,7 @@ import (
 	"claps-test/util"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
@@ -44,7 +42,7 @@ func GithubAuthMiddleware()gin.HandlerFunc  {
 		var val interface{}
 		var ok bool
 		if val,ok = ctx.Get(util.UID);!ok{
-			util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),resp)
+			util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),nil)
 			return
 		}
 		uid := val.(string)
@@ -74,7 +72,7 @@ func MixinAuthMiddleware()gin.HandlerFunc  {
 		var val interface{}
 		var ok bool
 		if val,ok = ctx.Get(util.UID);!ok{
-			util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),resp)
+			util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),nil)
 			return
 		}
 		uid := val.(string)
@@ -170,7 +168,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		//无Token,生成Token返回,生成Uid
 		if authHeader == "" {
 			log.Debug("No Token")
-			util.HandleResponse(c,util.NewErr(errors.New(),util.ErrBadRequest,"request have no token"),nil)
+			util.HandleResponse(c,util.NewErr(errors.New(""),util.ErrBadRequest,"request have no token"),nil)
 			c.Abort()
 			return
 		}

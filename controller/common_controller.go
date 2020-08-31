@@ -42,28 +42,9 @@ func LoginGithub(ctx *gin.Context)  {
 func AuthInfo(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
-	/*
-	//从session中尝试获取用户信息
-	session := sessions.Default(ctx)
-	var randomUid string = ""
-
-	//foxoneToken := session.Get("foxoneToken")
-	user := session.Get("user")
-	//mixin中存储的是用户mixin的user_id
-	mixinToken := session.Get("mixin")
-	 */
-	/*
-	var (
-		randomUid = ""
-		user  *github.User = nil
-	)
-
-	 */
-
 	//获取claim
 	uid,_ := ctx.Get(util.UID)
 	randomUid,_ := uid.(string)
-
 	log.Debug("RandomUid = ",randomUid)
 
 	//从redis取出mcache
