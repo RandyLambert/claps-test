@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"claps-test/service"
 	"claps-test/util"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
@@ -34,37 +35,84 @@ type userInfo struct {
 	github_id string
 }
 
-//判断用户是否登录的中间件
-func GithubAuthMiddleware() gin.HandlerFunc {
+/*
+功能:判断github是否已经授权
+说明:经过了JWT中间件,一定有cache key
+ */
+func GithubAuthMiddleware()gin.HandlerFunc  {
 	return func(ctx *gin.Context) {
-		//获取session
-		session := sessions.Default(ctx)
-		loginuser := session.Get("user")
-		if loginuser == nil {
-			err := util.NewErr(errors.New("用户没有登录github"), util.ErrUnauthorized, "用户没有登录github")
-			util.HandleResponse(ctx, err, nil)
-			ctx.Abort()
-		} else {
-			log.Debug("登录的用户是github", loginuser.(github.User).Name)
-			ctx.Next()
+		var val interface{}
+		var ok bool
+		if val,ok = ctx.Get(util.UID);!ok{
+			util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),resp)
+			return
 		}
+		uid := val.(string)
+
+		mcache := &util.MCache{}
+		err1 := util.Rdb.Get(uid,mcache)
+		if err1 != nil{
+			util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"cache get error"),nil)
+			return
+		}
+
+		//github未登录
+		if !mcache.GithubAuth{
+			util.HandleResponse(ctx,util.NewErr(err1,util.ErrUnauthorized,"github unauthorized"),nil)
+			return
+		}
+		ctx.Next()
 	}
 }
 
-//判断用户是否登录的中间件
-func MixinAuthMiddleware() gin.HandlerFunc {
+/*
+功能:检查是够绑定mixin
+说明:github一定是登录了,从数据库中查询问是否绑定mixin,绑定则更新缓存
+ */
+func MixinAuthMiddleware()gin.HandlerFunc  {
 	return func(ctx *gin.Context) {
-		//获取session
-		session := sessions.Default(ctx)
-		loginuser := session.Get("mixin")
-		if loginuser == nil {
-			err := util.NewErr(errors.New("用户没有登录mixin"), util.ErrUnauthorized, "用户没有登录mixin")
-			util.HandleResponse(ctx, err, nil)
-			ctx.Abort()
-		} else {
-			log.Debug("登录的mixin用户是", loginuser.(string))
+		var val interface{}
+		var ok bool
+		if val,ok = ctx.Get(util.UID);!ok{
+			util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),resp)
+			return
+		}
+		uid := val.(string)
+
+		mcache := &util.MCache{}
+		err1 := util.Rdb.Get(uid,mcache)
+		if err1 != nil{
+			util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"cache get error"),nil)
+			return
+		}
+
+		if mcache.MixinAuth{
 			ctx.Next()
 		}
+
+		//从数据库查询mixin_id
+		mixin_id,err := service.GetMixinIdByUserId(*mcache.Github.ID)
+		if err != nil{
+			util.HandleResponse(ctx,err,nil)
+			ctx.Abort()
+		}
+
+		if mixin_id == ""{
+			util.HandleResponse(ctx,util.NewErr(err1,util.ErrUnauthorized,"mixin unauthorized"),nil)
+			ctx.Abort()
+			return
+		}else {
+			//set cache ,next
+			mcache.MixinId = mixin_id
+			mcache.MixinAuth = true
+			err1 = util.Rdb.Replace(uid,mcache,-1)
+			if err1 != nil{
+				err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
+				util.HandleResponse(ctx, err, nil)
+				return
+			}
+		}
+		ctx.Next()
 	}
 }
 
@@ -112,7 +160,7 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 
 /*
 功能:判断请求的Token情况
-说明:经过该中间件验证,ctx中一定有cache的key
+说明:经过该中间件验证,ctx中一定有cache的key,但是不一定授权了github
  */
 func JWTAuthMiddleware() func(c *gin.Context) {
 	return func(c *gin.Context) {

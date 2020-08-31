@@ -222,11 +222,8 @@ func UserWithdraw(ctx *gin.Context) {
 		return
 	}
 
-	mixinId,err := service.GetMixinIdByUserId(*mcache.Github.ID)
-	if err != nil{
-		util.HandleResponse(ctx,err,nil)
-		return
-	}
+	//已经绑定mixin,直接从缓存中取
+	mixinId := mcache.MixinId
 
 	//判断是否有未完成的提现
 	err3 := service.IfUnfinishedTransfer(mixinId)

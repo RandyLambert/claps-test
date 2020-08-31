@@ -4,9 +4,7 @@ import (
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
@@ -17,67 +15,75 @@ func MixinAssets(ctx *gin.Context) {
 	util.HandleResponse(ctx, err, assets)
 }
 
-//mixin oauth授权认证
+/*
+功能:mixin oauth授权
+说明:授权后更新数据库和缓存
+ */
 func MixinOauth(ctx *gin.Context) {
-	code := ctx.Query("code")
-	state := ctx.Query("state")
-	session := sessions.Default(ctx)
-
-	//判断参数是否存在
-	if code == "" || state == "" {
-		err := util.NewErr(nil, util.ErrBadRequest, "mixin oauth认证参数出错")
-		util.HandleResponse(ctx, err, nil)
-		return
+	type oauth struct {
+		Code string `json:"code" form:"code"`
+		State string `json:"state" form:"state"`
 	}
 
-	//判断state和randomUid是否一致
-	uid := session.Get("uid")
-	if uid == nil {
-		err := util.NewErr(nil, util.ErrInternalServer, "session中没有uid")
-		util.HandleResponse(ctx, err, nil)
-		return
-	}
-	if uid.(string) != state {
-		err := util.NewErr(errors.New("invalid oauth redirect"), util.ErrBadRequest, "")
-		util.HandleResponse(ctx, err, nil)
-		return
-	}
+	var (
+		err *util.Err
+		oauth_ oauth
+		//randomUid = ""
+	)
+	resp := make(map[string]interface{})
 
-	log.Debug(state)
+	//获取请求参数
+	if err1 := ctx.ShouldBindQuery(&oauth_);err1 != nil ||
+		oauth_.Code =="" || oauth_.State == "" {
+		err1 := util.NewErr(errors.New("invalid query param"), util.ErrBadRequest, "")
+		util.HandleResponse(ctx, err1, resp)
+		return
+	}
+	log.Debug("code = ",oauth_.Code)
+	log.Debug("state = ",oauth_.State)
+
+
+	mcache := &util.MCache{}
+	err1 := util.Rdb.Get(oauth_.State,mcache)
+	//验证state
+	if err1 != nil{
+		err = util.NewErr(err1,util.ErrBadRequest, "invalid oauth state")
+		util.HandleResponse(ctx, err, resp)
+		return
+	}
 
 	//用state换取令牌
-	client, err := service.GetMixinAuthorizedClient(ctx, code)
+	client, err := service.GetMixinAuthorizedClient(ctx, oauth_.Code)
 	if err != nil {
 		util.HandleResponse(ctx, err, nil)
 		return
 	}
 
-	//获取mixin用户信息,存入session
+	//获取mixin用户信息
 	user, err2 := service.GetMixinUserInfo(ctx, client)
 	if err2 != nil {
 		util.HandleResponse(ctx, err2, nil)
 		return
 	}
 
-	//将user信息存如session中
-	session.Set("mixin", user.UserID)
-	err3 := session.Save()
-	if err3 != nil {
-		util.HandleResponse(ctx, util.NewErr(err3, util.ErrInternalServer, "设置mixin User session错误"), nil)
+	//更新cache
+	mcache.MixinAuth = true
+	mcache.MixinId = user.UserID
+	err1 = util.Rdb.Replace(oauth_.State,mcache,-1)
+	if err1 != nil{
+		err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
+		util.HandleResponse(ctx, err, resp)
 		return
 	}
 
-	log.Debug("user", user.UserID)
-
 	//github一定是登录,绑定mixin和github
-	userId := *session.Get("user").(github.User).ID
 	//更新数据库中的mixin_id字段
-	err4 := service.UpdateUserMixinId(userId, user.UserID)
+	err4 := service.UpdateUserMixinId(*mcache.Github.ID, user.UserID)
 	if err4 != nil {
 		util.HandleResponse(ctx, err4, nil)
+		return
 	}
 
 	//重定向
 	ctx.Redirect(http.StatusMovedPermanently, "http://localhost:3000/assets")
-
 }

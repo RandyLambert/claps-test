@@ -42,8 +42,6 @@ func Oauth(ctx *gin.Context) {
 
 	mcache := &util.MCache{}
 	err1 := util.Rdb.Get(oauth_.State,mcache)
-
-	//if err1 == persistence.ErrCacheMiss{
 	//验证state
 	if err1 != nil{
 			err = util.NewErr(err1,util.ErrBadRequest, "invalid oauth state")
@@ -89,7 +87,7 @@ func Oauth(ctx *gin.Context) {
 
 	err1 = util.Rdb.Replace(oauth_.State,mcache,-1)
 	if err1 != nil{
-		err = util.NewErr(errors.New("cache error"), util.ErrBadRequest, "")
+		err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
 		util.HandleResponse(ctx, err, resp)
 		return
 	}

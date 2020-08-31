@@ -2,7 +2,6 @@ package util
 
 import (
 	"encoding/json"
-	"github.com/fox-one/mixin-sdk-go"
 	"github.com/google/go-github/v32/github"
 	"math/rand"
 )
@@ -15,8 +14,7 @@ type MCache struct {
 	Github github.User
 	GithubEmails []github.UserEmail
 	GithubAuth bool
-	GithubToken string
-	Mixin mixin.User
+	MixinId string
 	MixinAuth bool
 }
 
