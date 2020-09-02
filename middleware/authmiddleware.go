@@ -177,8 +177,8 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		parts := strings.SplitN(authHeader, " ", 2)
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
 			c.JSON(http.StatusOK, gin.H{
-				"code": 2004,
-				"msg":  "请求头中auth格式有误",
+				"code": util.ErrBadRequest,
+				"msg":  "authorizaion format error",
 			})
 			c.Abort()
 			return
@@ -188,7 +188,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		claim, err := ParseToken(parts[1])
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
-				"code": 2005,
+				"code": util.ErrBadRequest,
 				"msg":  "invalid Token",
 			})
 			c.Abort()

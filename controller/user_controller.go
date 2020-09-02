@@ -52,7 +52,7 @@ func UserAssets(ctx *gin.Context) {
 	var val interface{}
 	var ok bool
 	if val,ok = ctx.Get(util.UID);!ok{
-		util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"ctx get uid error"),resp)
+		util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"cache get uid error"),resp)
 		return
 	}
 	uid := val.(string)
@@ -182,7 +182,7 @@ func UserDonation(ctx *gin.Context) {
 	var sum decimal.Decimal
 
 	for i := range *dto {
-		sum = sum.Add((*dto)[i].Balance)
+		sum = sum.Add((*dto)[i].Total)
 	}
 
 	//从project里面寻找Donations然后求和

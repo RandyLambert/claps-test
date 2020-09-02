@@ -22,6 +22,6 @@ type MemberWalletDto struct {
 	UserId    int64          `json:"user_id,omitempty" gorm:"type:bigint;primary_key;not null"`
 	BotId     string          `json:"bot_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
 	AssetId   string          `json:"asset_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
-	Total     decimal.Decimal `json:",omitempty" gorm:"type:varchar(128);default:null"`
+	Total     decimal.Decimal `json:"total,omitempty" gorm:"type:varchar(128);default:null"`
 	Balance   decimal.Decimal `json:"balance,omitempty" gorm:"type:varchar(128);default:null"`
 }

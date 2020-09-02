@@ -3,6 +3,7 @@ package dao
 import (
 	"claps-test/model"
 	"github.com/jinzhu/gorm"
+	log "github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -25,16 +26,15 @@ func GetUserByUserId(id int64) (user *model.UserMixinId, err error) {
 
 //不管记录是否找到，都将参数赋值给 struct 并保存至数据库
 func InsertOrUpdateUser(user *model.User) (err error) {
-	err = db.Debug().Save(user).Error
-	/*
+
 	var cnt int64
 	db.Debug().Table("user").Where("id = ?",user.Id).Count(&cnt)
 	if cnt == 0{
 		err = db.Debug().Create(user).Error
 		return
+	}else {
+		db.Debug().Model(&user).Omit("mixin_id").Updates(user)
 	}
-	 */
-	//util.DB.Save(user)
 	return
 }
 
@@ -56,20 +56,15 @@ func ListMembersByProjectName(projectName string) (users *[]model.User, err erro
 
 func ListMembersByProjectId(projectId int64) (users *[]model.User, err error) {
 
-	//db.Where("amount > ?", db.Table("orders").Select("AVG(amount)").Where("state = ?", "paid").SubQuery()).Find(&orders)
-	// SELECT * FROM "orders"  WHERE "orders"."deleted_at" IS NULL AND (amount > (SELECT AVG(amount) FROM "orders"  WHERE (state = 'paid')));
 	users = &[]model.User{}
 	err = db.Debug().Where("id IN (?)",
 		db.Debug().Table("member").Select("user_id").Where("project_id=?", projectId).SubQuery()).Find(users).Error
-	// IN
-	//db.Where("name IN (?)", []string{"jinzhu", "jinzhu 2"}).Find(&users)
-	//// SELECT * FROM users WHERE name in ('jinzhu','jinzhu 2');
-
 	return
 }
 
 //根据user_id更新表中的mixin_id信息
 func UpdateUserMixinId(userId int64, mixinId string) (err error) {
+	log.Debug("dao update")
 	err = db.Debug().Model(&model.User{}).Where("id = ?", userId).Update("mixin_id", mixinId).Error
 	return
 }

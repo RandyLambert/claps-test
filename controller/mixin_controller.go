@@ -76,6 +76,7 @@ func MixinOauth(ctx *gin.Context) {
 		return
 	}
 
+	log.Debug("update mixin_id by user_id")
 	//github一定是登录,绑定mixin和github
 	//更新数据库中的mixin_id字段
 	err4 := service.UpdateUserMixinId(*mcache.Github.ID, user.UserID)

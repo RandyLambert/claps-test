@@ -21,7 +21,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		apiGroup.GET("/authInfo", middleware.JWTAuthMiddleware(),controller.AuthInfo)
 		apiGroup.GET("/oauth", controller.Oauth)
 
-		apiGroup.GET("bots/:botId/assets/:assetId", controller.Bot)
+		apiGroup.GET("/bots/:botId/assets/:assetId", controller.Bot)
 
 		// /api/projects
 		projectsGroup := apiGroup.Group("projects")
@@ -37,12 +37,12 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		mixinGroup := apiGroup.Group("/mixin")
 		{
 			mixinGroup.GET("/assets", controller.MixinAssets)
-			mixinGroup.GET("/oauth", middleware.GithubAuthMiddleware(), controller.MixinOauth)
+			mixinGroup.GET("/oauth",  controller.MixinOauth)
 		}
 
 		// /api/user
 		userGroup := apiGroup.Group("/user")
-		userGroup.Use(middleware.JWTAuthMiddleware(),middleware.GithubAuthMiddleware())
+		userGroup.Use(middleware.JWTAuthMiddleware())
 		{
 			userGroup.GET("/profile", controller.UserProfile)
 			userGroup.GET("/assets", controller.UserAssets)
