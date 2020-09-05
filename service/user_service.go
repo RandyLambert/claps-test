@@ -23,9 +23,8 @@ func ListEmailsByToken(githubToken string) (emails []*github.UserEmail, err *uti
 
 	if err2 != nil {
 		err = util.NewErr(err2, util.ErrThirdParty, "从github获取Email错误")
-	} else {
-		log.Debug("获取的email是", emails)
 	}
+
 
 	return
 }

@@ -77,9 +77,13 @@ func Oauth(ctx *gin.Context) {
 	if user.Name != nil {
 		u.DisplayName = *user.Name
 	}
-	if user.Email != nil {
-		u.Email = *user.Email
+	for _,v := range emails{
+		if *v.Primary{
+			u.Email = *v.Email
+			break
+		}
 	}
+
 
 	err = service.InsertOrUpdateUser(&u)
 	if err != nil {
