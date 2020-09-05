@@ -7,7 +7,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 	"strings"
 	"time"
 )
@@ -176,21 +175,15 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		// 按空格分割
 		parts := strings.SplitN(authHeader, " ", 2)
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
-			c.JSON(http.StatusOK, gin.H{
-				"code": util.ErrBadRequest,
-				"msg":  "authorizaion format error",
-			})
+			util.HandleResponse(c,util.NewErr(errors.New(""),util.ErrUnauthorized,"authorization format error"),nil)
 			c.Abort()
 			return
 		}
 
 		// parts[1]是获取到的tokenString，我们使用之前定义好的解析JWT的函数来解析它
-		claim, err := ParseToken(parts[1])
-		if err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"code": util.ErrBadRequest,
-				"msg":  "invalid Token",
-			})
+		claim, err1 := ParseToken(parts[1])
+		if err1 != nil {
+			util.HandleResponse(c,util.NewErr(err1,util.ErrUnauthorized,"invalid token"),nil)
 			c.Abort()
 			return
 		}

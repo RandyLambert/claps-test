@@ -45,6 +45,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		userGroup.Use(middleware.JWTAuthMiddleware())
 		{
 			userGroup.GET("/profile", controller.UserProfile)
+			//查询所有币种的total和balance
 			userGroup.GET("/assets", controller.UserAssets)
 			//查询所有完成和未完成的记录
 			userGroup.GET("/transfers", middleware.MixinAuthMiddleware(),controller.UserTransfer)
