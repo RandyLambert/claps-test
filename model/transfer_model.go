@@ -19,7 +19,7 @@ type Transfer struct {
 	AssetId    string          `json:"asset_id,omitempty" gorm:"type:varchar(50);not null"`
 	Amount     decimal.Decimal `json:"amount,omitempty" gorm:"type:varchar(128);not null"`
 	Memo       string          `json:"memo,omitempty" gorm:"type:varchar(120);not null"`
-	Status     string          `json:"status,omitempty" gorm:"type:char;not null"`
+	Status     string          `json:"status,omitempty" gorm:"type:char;not null,index:status_INDEX"`
 	//0是用户点击提现后(提现操作未完成) 1机器人完成提现
 	CreatedAt time.Time        `json:"created_at,omitempty" gorm:"type:timestamp with time zone"`
 }
