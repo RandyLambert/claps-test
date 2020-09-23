@@ -6,7 +6,7 @@ import (
 )
 
 type Project struct {
-	Id          int64           `json:"id,omitempty" gorm:"type:bigint;primary_key;not null"`
+	Id          int64           `json:"id,omitempty" gorm:"type:serial;primary_key;"`
 	Name        string          `json:"name,omitempty" gorm:"type:varchar(50);not null;unique_index:name_UNIQUE"`
 	DisplayName string          `json:"display_name,omitempty" gorm:"type:varchar(50);default:null"`
 	Description string          `json:"description,omitempty" gorm:"type:varchar(120);default:null"`
@@ -18,7 +18,7 @@ type Project struct {
 }
 
 type ProjectTotal struct {
-	Id        int64          `json:"id,omitempty" gorm:"type:bigint;primary_key;not null"`
+	Id        int64          `json:"id,omitempty" gorm:"type:bigint;primary_key;auto_increment;not null"`
 	Donations int64          `json:"donations,omitempty" gorm:"type:bigint;default:0"`
 	Total     decimal.Decimal `json:"total,omitempty" gorm:"type:varchar(128);default:null"`
 }
