@@ -17,7 +17,7 @@ func init() {
 
 
 //根据project获取所有的仓库信息
-func ListRepositoriesByProjectId(projectId int64) (repositories *[]model.Repository, err error) {
+func ListRepositoriesByProjectId(projectId string) (repositories *[]model.Repository, err error) {
 	repositories = &[]model.Repository{}
 	err = db.Debug().Table("repository").Where("project_id=?", projectId).Scan(repositories).Error
 	return
