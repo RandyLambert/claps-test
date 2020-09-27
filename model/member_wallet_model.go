@@ -6,7 +6,7 @@ import (
 )
 
 type MemberWallet struct {
-	ProjectId int64 `json:"project_id,omitempty" gorm:"type:bigint;primary_key;not null"`
+	ProjectId string `json:"project_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
 	//user表的Id
 	UserId    int64 `json:"user_id,omitempty" gorm:"type:bigint;primary_key;not null"`
 	BotId     string `json:"bot_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
@@ -18,8 +18,8 @@ type MemberWallet struct {
 }
 
 type MemberWalletDto struct {
-	ProjectId int64          `json:"project_id,omitempty" gorm:"type:bigint;primary_key;not null"`
-	UserId    int64          `json:"user_id,omitempty" gorm:"type:bigint;primary_key;not null"`
+	ProjectId string		  `json:"project_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
+	UserId    int64           `json:"user_id,omitempty" gorm:"type:bigint;primary_key;not null"`
 	BotId     string          `json:"bot_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
 	AssetId   string          `json:"asset_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
 	Total     decimal.Decimal `json:"total,omitempty" gorm:"type:varchar(128);default:null"`

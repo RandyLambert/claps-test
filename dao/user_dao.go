@@ -54,7 +54,7 @@ func ListMembersByProjectName(projectName string) (users *[]model.User, err erro
 	return
 }
 
-func ListMembersByProjectId(projectId int64) (users *[]model.User, err error) {
+func ListMembersByProjectId(projectId string) (users *[]model.User, err error) {
 
 	users = &[]model.User{}
 	err = db.Debug().Where("id IN (?)",

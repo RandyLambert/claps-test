@@ -8,7 +8,7 @@ import (
 type Wallet struct {
 	BotId     string          `json:"bot_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
 	AssetId   string          `json:"asset_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
-	ProjectId int64           `json:"project_id,omitempty" gorm:"type:bigint;not null"`
+	ProjectId string          `json:"project_id,omitempty" gorm:"type:varchar(50);not null"`
 	Total     decimal.Decimal `json:"total,omitempty" gorm:"type:varchar(128);default:null"`
 	CreatedAt time.Time		  `json:"created_at,omitempty" gorm:"type:timestamp with time zone"`
 	UpdatedAt time.Time       `json:"updated_at,omitempty" gorm:"type:timestamp with time zone"`

@@ -32,7 +32,7 @@ func ListTransactionsByProjectName(name string) (transactions *[]model.Transacti
 }
 
 //根据项目Id获取项目的所有捐赠
-func CountPatronByProjectIdAndSender(projectId uint32, sender string) (count uint32, err error) {
+func CountPatronByProjectIdAndSender(projectId string, sender string) (count uint32, err error) {
 	//todo 可能需要更改
 	//db.Table("deleted_users").Select("count(distinct(name))").Count(&count)
 	err = db.Debug().Table("transaction").Where("project_id=? AND sender=?", projectId, sender).Count(&count).Error
