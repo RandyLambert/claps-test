@@ -24,11 +24,11 @@ func ListProjectsAll() (projects *[]model.Project, err error) {
 	return
 }
 
-//通过项目名字获取项目
-func GetProjectByName(name string) (project *model.Project, err error) {
+//通过项目id获取项目
+func GetProjectById(projectId string) (project *model.Project, err error) {
 
 	project = &model.Project{}
-	err = db.Debug().Where("name=?", name).Find(&project).Error
+	err = db.Debug().Where("id=?", projectId).Find(&project).Error
 	return
 }
 

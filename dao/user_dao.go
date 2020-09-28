@@ -3,7 +3,6 @@ package dao
 import (
 	"claps-test/model"
 	"github.com/jinzhu/gorm"
-	log "github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -38,22 +37,7 @@ func InsertOrUpdateUser(user *model.User) (err error) {
 	return
 }
 
-//通过projectName获取一个项目的所有成员信息
-func ListMembersByProjectName(projectName string) (users *[]model.User, err error) {
-
-	//db.Where("amount > ?", db.Table("orders").Select("AVG(amount)").Where("state = ?", "paid").SubQuery()).Find(&orders)
-	// SELECT * FROM "orders"  WHERE "orders"."deleted_at" IS NULL AND (amount > (SELECT AVG(amount) FROM "orders"  WHERE (state = 'paid')));
-	users = &[]model.User{}
-	err = db.Debug().Where("id IN (?)",
-		db.Debug().Table("member").Select("user_id").Where("project_id=?",
-			db.Debug().Table("project").Select("project.id").Where("project.name=?", projectName).SubQuery()).SubQuery()).Find(users).Error
-	// IN
-	//db.Where("name IN (?)", []string{"jinzhu", "jinzhu 2"}).Find(&users)
-	//// SELECT * FROM users WHERE name in ('jinzhu','jinzhu 2');
-
-	return
-}
-
+//通过projectId获取一个项目的所有成员信息
 func ListMembersByProjectId(projectId string) (users *[]model.User, err error) {
 
 	users = &[]model.User{}
@@ -64,7 +48,7 @@ func ListMembersByProjectId(projectId string) (users *[]model.User, err error) {
 
 //根据user_id更新表中的mixin_id信息
 func UpdateUserMixinId(userId int64, mixinId string) (err error) {
-	log.Debug("dao update")
+
 	err = db.Debug().Model(&model.User{}).Where("id = ?", userId).Update("mixin_id", mixinId).Error
 	return
 }

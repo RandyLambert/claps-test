@@ -4,46 +4,31 @@ import (
 	"claps-test/dao"
 	"claps-test/model"
 	"claps-test/util"
-	"github.com/gin-gonic/gin"
 )
 
-//通过projectName查询,查询某个项目的详情
-func GetProjectByName(ctx *gin.Context, name string) (projectDetailInfo *map[string]interface{}, err *util.Err) {
+//通过projectid查询,查询某个项目的详情
+func GetProjectById(projectId string) (projectDetailInfo *map[string]interface{}, err *util.Err) {
 
-	project, err1 := dao.GetProjectByName(name)
+	project, err1 := dao.GetProjectById(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目信息失败")
 		return
 	}
 
-	repositoryDtos, err1 := dao.ListRepositoriesByProjectId(project.Id)
+	repositoryDtos, err1 := dao.ListRepositoriesByProjectId(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目仓库失败")
 		return
 	}
 
-	/*
-		for i := range *repositoryDtos {
-			repoInfo,err1 := GetRepositoryInfo(ctx,(*repositoryDtos)[i].Slug)
-			if err1 != nil {
-				err = util.NewErr(err1,util.ErrThirdParty,"获取项目仓库详细信息失败")
-				return
-			}
-			(*repositoryDtos)[i].Forks = *repoInfo.ForksCount
-			(*repositoryDtos)[i].Stars = *repoInfo.StargazersCount
-			(*repositoryDtos)[i].Watchs = *repoInfo.WatchersCount
-			(*repositoryDtos)[i].RepositoryUrl = *repoInfo.ArchiveURL
-		}
-	*/
-
 	//mambers格式不同,删除project_id和userid字段
-	members, err1 := dao.ListMembersByProjectName(project.Name)
+	members, err1 := dao.ListMembersByProjectId(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目成员失败")
 		return
 	}
 
-	botDtos, err1 := dao.ListBotDtosByProjectId(project.Id)
+	botDtos, err1 := dao.ListBotDtosByProjectId(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目机器人失败")
 		return
@@ -77,17 +62,17 @@ func ListProjectsByUserId(userId int64) (projects *[]model.Project, err *util.Er
 	return
 }
 
-func ListTransactionsByProjectName(name string) (transactions *[]model.Transaction, err *util.Err) {
+func ListTransactionsByProjectId(projectId string) (transactions *[]model.Transaction, err *util.Err) {
 
-	transactions, err1 := dao.ListTransactionsByProjectName(name)
+	transactions, err1 := dao.ListTransactionsByProjectId(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目获取捐赠记录失败")
 	}
 	return
 }
 
-func ListMembersByProjectName(projectName string) (members *[]model.User, err *util.Err) {
-	members, err1 := dao.ListMembersByProjectName(projectName)
+func ListMembersByProjectId(projectId string) (members *[]model.User, err *util.Err) {
+	members, err1 := dao.ListMembersByProjectId(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目成员失败")
 	}

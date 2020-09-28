@@ -21,13 +21,12 @@ func InsertTransaction(transaction *model.Transaction) (err error) {
 	return
 }
 
-//获取捐赠记录:assetId货币种类,projectName
-func ListTransactionsByProjectName(name string) (transactions *[]model.Transaction, err error) {
+//获取捐赠记录:通过projectName
+func ListTransactionsByProjectId(projectId string) (transactions *[]model.Transaction, err error) {
 
 	transactions = &[]model.Transaction{}
-	err = db.Debug().Where("project_id=?",
-		db.Debug().Table("project").Select("project.id").Where("project.name=?", name).SubQuery()).Find(transactions).Error
-	//err = util.DB.Debug().Joins("INNER JOIN project ON project.name=?",name).Where("asset_id=?",assetId).Find(transactions).Error
+	err = db.Debug().Where("project_id=?", projectId).Order("created_at desc").Limit(256).Find(transactions).Error
+
 	return
 }
 

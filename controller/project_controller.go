@@ -12,22 +12,17 @@ func Projects(ctx *gin.Context) {
 	util.HandleResponse(ctx, err, projects)
 }
 
-func Project(ctx *gin.Context) {
-
-	projectInfo, err := service.GetProjectByName(ctx, ctx.Param("name"))
-	util.HandleResponse(ctx, err, projectInfo)
-}
-
 /*
 通过Id获取项目的详细信息
  */
 func ProjectById(ctx *gin.Context){
-
+	projectInfo, err := service.GetProjectById(ctx.Param("id"))
+	util.HandleResponse(ctx, err, projectInfo)
 }
 
 func ProjectMembers(ctx *gin.Context) {
 
-	members, err := service.ListMembersByProjectName(ctx.Param("name"))
+	members, err := service.ListMembersByProjectId(ctx.Param("id"))
 	util.HandleResponse(ctx, err, members)
 }
 
@@ -40,6 +35,6 @@ func ProjectTransactions(ctx *gin.Context) {
 	//	return
 	//}
 
-	transactions, err := service.ListTransactionsByProjectName(ctx.Param("name"))
+	transactions, err := service.ListTransactionsByProjectId(ctx.Param("id"))
 	util.HandleResponse(ctx, err, transactions)
 }

@@ -26,10 +26,9 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		projectsGroup := apiGroup.Group("projects")
 		{
 			projectsGroup.GET("/", controller.Projects)
-			projectsGroup.GET("/:name", controller.Project)
-			projectsGroup.GET("/id/:id", controller.ProjectById)
-			projectsGroup.GET("/:name/members", controller.ProjectMembers)
-			projectsGroup.GET("/:name/transactions", controller.ProjectTransactions)
+			projectsGroup.GET("/:id", controller.ProjectById)
+			projectsGroup.GET("/:id/members", controller.ProjectMembers)
+			projectsGroup.GET("/:id/transactions", controller.ProjectTransactions)
 
 		}
 
