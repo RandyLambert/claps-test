@@ -35,6 +35,24 @@ func loginGithub(ctx *gin.Context)  {
 	util.HandleResponse(ctx, nil, resp)
 	return
 }
+
+/*
+功能:返回环境信息
+说明:此时用户没有登录github没有
+ */
+func Enviroments(ctx *gin.Context){
+	resp := make(map[string]interface{})
+
+	resp["envs"] = gin.H{
+		"GITHUB_CLIENT_ID":  util.GithubClinetId,
+		"GITHUB_OAUTH_CALLBACK":  util.GithubOauthCallback,
+		"MIXIN_CLIENT_ID":   util.MixinClientId,
+		"MIXIN_OAUTH_CALLBACK": util.MixinOauthCallback,
+	}
+
+	util.HandleResponse(ctx,nil,resp)
+}
+
 /*
 功能:认证用户信息,判断github和mixin是否登录绑定
 说明:之前有JWTAuthmiddleWare,有jwt说明一定github授权,ctx里设置uid

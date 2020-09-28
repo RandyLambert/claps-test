@@ -18,6 +18,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	apiGroup := r.Group("/api")
 	{
 		apiGroup.GET("/authInfo", middleware.JWTAuthMiddleware(),controller.AuthInfo)
+		apiGroup.GET("/enviroments", controller.Enviroments)
+
 		apiGroup.GET("/oauth", controller.Oauth)
 
 		apiGroup.GET("/bots/:botId/assets/:assetId", controller.Bot)
