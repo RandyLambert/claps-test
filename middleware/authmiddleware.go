@@ -157,7 +157,7 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 
 /*
 功能:判断请求的Token情况
-说明:经过该中间件验证,ctx中一定有cache的key,但是不一定授权了github
+说明:经过该中间件验证,ctx中一定有cache的key,但是不一定授权了mixin
  */
 func JWTAuthMiddleware() func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -188,8 +188,10 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			return
 		}
 
+
 		//set Key
 		c.Set(util.UID,claim.Uid)
+		//uid = randomUid不是githubId
 		c.Next()
 	}
 }

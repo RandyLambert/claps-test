@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
-	"strconv"
 )
 
 
@@ -60,7 +59,8 @@ func Oauth(ctx *gin.Context) {
 	log.Debug("user = ",*user)
 
 	//生成token
-	jwt_token,err1 := middleware.GenToken(strconv.FormatInt(*user.ID,10))
+	randomUid := util.RandUp(32)
+	jwt_token,err1 := middleware.GenToken(randomUid)
 	if err1 != nil{
 		util.HandleResponse(ctx,util.NewErr(err1,util.ErrInternalServer,"gen token error"),nil)
 		return
@@ -101,7 +101,9 @@ func Oauth(ctx *gin.Context) {
 	mcache.GithubEmails = emailForCache
 	mcache.GithubAuth = true
 
-	err1 = util.Rdb.Set(strconv.FormatInt(*user.ID,10),mcache,-1)
+	//cache的key是randomUid
+	//err1 = util.Rdb.Set(strconv.FormatInt(*user.ID,10),mcache,-1)
+	err1 = util.Rdb.Set(randomUid,mcache,-1)
 	if err1 != nil{
 		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"set cache error"),nil)
 		return
@@ -113,5 +115,4 @@ func Oauth(ctx *gin.Context) {
 	//newpath := "http://localhost:3000" + oauth_.Path
 	//log.Debug("重定向", newpath)
 	//ctx.Redirect(http.StatusMovedPermanently, newpath)
-
 }
