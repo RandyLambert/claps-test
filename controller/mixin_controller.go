@@ -6,7 +6,6 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 func MixinAssets(ctx *gin.Context) {
@@ -85,6 +84,7 @@ func MixinOauth(ctx *gin.Context) {
 		return
 	}
 
+	util.HandleResponse(ctx,nil,nil)
 	//重定向
-	ctx.Redirect(http.StatusMovedPermanently, "http://localhost:3000/assets")
+	//ctx.Redirect(http.StatusMovedPermanently, "http://localhost:3000/assets")
 }

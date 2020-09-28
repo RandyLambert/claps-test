@@ -8,6 +8,7 @@ import (
 
 // 声明一个全局的rdb变量
 var Rdb *persistence.RedisStore
+//var Rdb *persistence.InMemoryStore
 
 //jwt的过期时间
 const TokenExpireDuration = time.Hour* 2

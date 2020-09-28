@@ -43,12 +43,10 @@ func loginGithub(ctx *gin.Context)  {
 func Enviroments(ctx *gin.Context){
 	resp := make(map[string]interface{})
 
-	resp["envs"] = gin.H{
-		"GITHUB_CLIENT_ID":  util.GithubClinetId,
-		"GITHUB_OAUTH_CALLBACK":  util.GithubOauthCallback,
-		"MIXIN_CLIENT_ID":   util.MixinClientId,
-		"MIXIN_OAUTH_CALLBACK": util.MixinOauthCallback,
-	}
+	resp["GITHUB_CLIENT_ID"]=util.GithubClinetId
+	resp["GITHUB_OAUTH_CALLBACK"]=util.GithubOauthCallback
+	resp["MIXIN_CLIENT_ID"]=util.MixinClientId
+	resp["MIXIN_OAUTH_CALLBACK"]=util.MixinOauthCallback
 
 	util.HandleResponse(ctx,nil,resp)
 }
@@ -77,11 +75,13 @@ func AuthInfo(ctx *gin.Context) {
 	resp["user"] = mcache.Github
 	resp["randomUid"] = uid
 	resp["mixinAuth"] = mcache.MixinAuth
+	/*
 	resp["envs"] = gin.H{
 		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
 		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
 		"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
 	}
+	 */
 
 	util.HandleResponse(ctx, nil, resp)
 	return
