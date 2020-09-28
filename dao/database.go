@@ -83,3 +83,17 @@ func MigrateInDB(db *gorm.DB) error {
 func Migrate() error {
 	return MigrateInDB(db)
 }
+
+func DeleteAllTables(){
+	log.Print(db.Debug().DropTable("user").Error)
+	log.Print(db.Debug().DropTable("asset").Error)
+	log.Print(db.Debug().DropTable("bot").Error)
+	log.Print(db.Debug().DropTable("bot").Error)
+	log.Print(db.Debug().DropTable("member").Error)
+	log.Print(db.Debug().DropTable("member_wallet").Error)
+	log.Print(db.Debug().DropTable("project").Error)
+	log.Print(db.Debug().DropTable("repository").Error)
+	log.Print(db.Debug().DropTable("transfer").Error)
+	log.Print(db.Debug().DropTable("transaction").Error)
+	log.Print(db.Debug().DropTable("wallet").Error)
+}

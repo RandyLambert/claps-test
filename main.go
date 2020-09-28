@@ -39,6 +39,8 @@ func main() {
 		if multierror := dao.Migrate(); multierror != nil {
 			log.Error(multierror)
 		}
+	case "deletetables": // dangerous
+		dao.DeleteAllTables()
 	default:
 		//定期更新数据库snapshot信息
 		go service.SyncSnapshots()
