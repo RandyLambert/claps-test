@@ -18,6 +18,13 @@ func Project(ctx *gin.Context) {
 	util.HandleResponse(ctx, err, projectInfo)
 }
 
+/*
+通过Id获取项目的详细信息
+ */
+func ProjectById(ctx *gin.Context){
+
+}
+
 func ProjectMembers(ctx *gin.Context) {
 
 	members, err := service.ListMembersByProjectName(ctx.Param("name"))

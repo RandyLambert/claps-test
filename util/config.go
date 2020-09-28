@@ -5,6 +5,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+var MericoAppid string
+var MericoSecret string
+
 func InitConfig() {
 
 	viper.SetConfigName(".env")
@@ -17,6 +20,11 @@ func InitConfig() {
 
 	viper.SetConfigType("json")
 	viper.SetConfigName(viper.GetString("MIXIN_CLIENT_CONFIG"))
+
+	//获取merci的id和secret
+	MericoAppid = viper.GetString("MERICO_APPID")
+	MericoSecret = viper.GetString("MERICO_SECRET")
+
 	//两个配置文件合并
 	err = viper.MergeInConfig()
 	if err != nil {

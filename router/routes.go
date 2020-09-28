@@ -3,13 +3,12 @@ package router
 import (
 	"claps-test/controller"
 	"claps-test/middleware"
-	"claps-test/util"
 	"github.com/gin-gonic/gin"
 )
 
 func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.Use(middleware.LoggerToFile())
-	r.Use(util.Cors())
+	r.Use(middleware.Cors())
 
 	r.GET("/_hc", func(ctx *gin.Context) {
 		ctx.JSON(200, "ok")
@@ -28,6 +27,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		{
 			projectsGroup.GET("/", controller.Projects)
 			projectsGroup.GET("/:name", controller.Project)
+			projectsGroup.GET("/id/:id", controller.ProjectById)
 			projectsGroup.GET("/:name/members", controller.ProjectMembers)
 			projectsGroup.GET("/:name/transactions", controller.ProjectTransactions)
 
