@@ -51,6 +51,8 @@ func GetUserBalanceByAllAssets(userId int64, assets *[]model.Asset) (err *util.E
 				tmp.Total = ((*memberWalletDtos)[j].Total.Mul((*assets)[i].PriceUsd)).Add(tmp.Total)
 			}
 		}
+		tmp.Total = tmp.Total.Truncate(8)
+		tmp.Balance = tmp.Balance.Truncate(8)
 		*dto = append(*dto, tmp)
 	}
 	return

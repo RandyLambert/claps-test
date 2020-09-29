@@ -3,6 +3,7 @@ package main
 import (
 	"claps-test/dao"
 	"claps-test/router"
+	"claps-test/service"
 	"claps-test/util"
 	"flag"
 	"github.com/gin-gonic/gin"
@@ -42,11 +43,11 @@ func main() {
 		dao.DeleteAllTables()
 	default:
 		//定期更新数据库snapshot信息
-		//go service.SyncSnapshots()
+		go service.SyncSnapshots()
 		//定期更新数据库asset信息
-		//go service.SyncAssets()
+		go service.SyncAssets()
 		//定期进行提现操作,并更改数据库
-		//go service.SyncTransfer()
+		go service.SyncTransfer()
 
 		r := gin.Default()
 		r = router.CollectRoute(r)

@@ -130,6 +130,7 @@ func SyncTransfer() {
 				Memo:       (*transfers)[i].Memo,
 			}, bot.Pin)
 
+
 			if err != nil {
 				log.Error(err.Error())
 				continue
@@ -195,7 +196,7 @@ func SyncSnapshots() {
 			}
 
 			//筛选自己的转入
-			if snapshots[i].UserID != "" && snapshots[i].Amount.Cmp(decimal.Zero) > 0 {
+			if snapshots[i].UserID != "" && snapshots[i].Amount.Cmp(decimal.Zero) > 0 && snapshots[i].Memo != "deposit" {
 				//根据机器人从数据库里找到项目
 				projectTotal, err := dao.GetProjectTotalByBotId(snapshots[i].UserID)
 				//错误处理有问题

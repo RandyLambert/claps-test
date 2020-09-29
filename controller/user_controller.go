@@ -193,6 +193,7 @@ func UserDonation(ctx *gin.Context) {
 	}
 
 	log.Debug("donations = ",donations)
+	sum = sum.Truncate(4)
 
 	resp["total"] = sum
 	resp["donations"] = donations
