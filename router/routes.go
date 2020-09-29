@@ -53,7 +53,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 			//请求获得某个用户的捐赠信息的汇总,包括总金额和捐赠人数
 			userGroup.GET("/donation", controller.UserDonation)
 			//提现
-			userGroup.GET("/withdraw", middleware.MixinAuthMiddleware(), controller.UserWithdraw)
+			userGroup.POST("/withdraw", middleware.MixinAuthMiddleware(), controller.UserWithdraw)
 		}
 
 	}

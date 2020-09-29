@@ -2,7 +2,9 @@ package controller
 
 import (
 	"claps-test/middleware"
+	"claps-test/service"
 	"claps-test/util"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -70,6 +72,29 @@ func AuthInfo(ctx *gin.Context) {
 		util.HandleResponse(ctx,util.NewErr(err1,util.ErrInternalServer,"get cacche error"),nil)
 		return
 	}
+
+	//cache中没有mixin信息
+	if !mcache.MixinAuth{
+		//更新mixin信息
+		mixin_id,err := service.GetMixinIdByUserId(*mcache.Github.ID)
+		if err != nil{
+			util.HandleResponse(ctx,err,nil)
+			return
+		}
+
+		if mixin_id != ""{
+			//set cache ,next
+			mcache.MixinId = mixin_id
+			mcache.MixinAuth = true
+			err1 = util.Rdb.Replace(randomUid,*mcache,-1)
+			if err1 != nil{
+				err = util.NewErr(errors.New("cache set error"), util.ErrDataBase, "")
+				util.HandleResponse(ctx, err, nil)
+				return
+			}
+		}
+	}
+
 
 	//从redis中取出github信息返回
 	resp["user"] = mcache.Github
