@@ -18,7 +18,7 @@ func init() {
 
 
 func InsertTransfer(transfer *model.Transfer) (err error) {
-	err = db.Create(transfer).Error
+	err = db.Debug().Create(transfer).Error
 	return
 }
 
