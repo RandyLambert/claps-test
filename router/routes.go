@@ -38,7 +38,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		mixinGroup := apiGroup.Group("/mixin")
 		{
 			mixinGroup.GET("/assets", controller.MixinAssets)
-			mixinGroup.GET("/oauth",  controller.MixinOauth)
+			mixinGroup.GET("/oauth",  middleware.JWTAuthMiddleware(),controller.MixinOauth)
 		}
 
 		// /api/user

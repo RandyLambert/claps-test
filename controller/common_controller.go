@@ -67,7 +67,7 @@ func AuthInfo(ctx *gin.Context) {
 	mcache := &util.MCache{}
 	err1 := util.Rdb.Get(randomUid,mcache)
 	if err1 != nil{
-		log.Error("Get cache error:",err1)
+		util.HandleResponse(ctx,util.NewErr(err1,util.ErrInternalServer,"get cacche error"),nil)
 		return
 	}
 

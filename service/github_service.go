@@ -79,8 +79,7 @@ func GetToken(url string) (token *oauth2.Token, err *util.Err) {
 //用获得的Token获得UserInfo,返回User指针
 func GetUserInfo(token *oauth2.Token) (user *github.User, err *util.Err) {
 
-	log.Debug(token)
-	log.Debug("GitHub Token: ", token.AccessToken)
+	log.Info("GitHub Token: ", token.AccessToken)
 
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
@@ -94,6 +93,7 @@ func GetUserInfo(token *oauth2.Token) (user *github.User, err *util.Err) {
 
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrThirdParty, "向github请求userinfo出错")
+		log.Error(err1)
 		return
 	}
 

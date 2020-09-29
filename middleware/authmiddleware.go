@@ -102,7 +102,7 @@ func MixinAuthMiddleware()gin.HandlerFunc  {
 			//set cache ,next
 			mcache.MixinId = mixin_id
 			mcache.MixinAuth = true
-			err1 = util.Rdb.Replace(uid,mcache,-1)
+			err1 = util.Rdb.Replace(uid,*mcache,-1)
 			if err1 != nil{
 				err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
 				util.HandleResponse(ctx, err, nil)

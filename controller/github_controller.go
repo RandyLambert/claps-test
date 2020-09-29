@@ -31,7 +31,7 @@ func Oauth(ctx *gin.Context) {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
-	log.Debug("code = ",oauth_.Code)
+	log.Info("code = ",oauth_.Code)
 
 	var oauthTokenUrl = service.GetOauthToken(oauth_.Code)
 	//处理请求的URL,获得Token指针

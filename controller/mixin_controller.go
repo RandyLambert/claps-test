@@ -16,7 +16,7 @@ func MixinAssets(ctx *gin.Context) {
 
 /*
 功能:mixin oauth授权
-说明:授权后更新数据库和缓存
+说明:授权后更新数据库和缓存,由于有jwt中间件，所以一定存在cache
  */
 func MixinOauth(ctx *gin.Context) {
 	type oauth struct {
@@ -39,9 +39,24 @@ func MixinOauth(ctx *gin.Context) {
 		return
 	}
 	log.Debug("code = ",oauth_.Code)
-	log.Debug("state = ",oauth_.State)
 
+	var val interface{}
+	var ok bool
+	if val,ok = ctx.Get(util.UID);!ok{
+		util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"cache get uid error"),resp)
+		return
+	}
+	uid := val.(string)
 
+	//从redis获取cache
+	mcache := &util.MCache{}
+	err1 := util.Rdb.Get(uid,mcache)
+	if err1 != nil{
+		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"cache get error"),resp)
+		return
+	}
+
+	/*
 	mcache := &util.MCache{}
 	err1 := util.Rdb.Get(oauth_.State,mcache)
 	//验证state
@@ -50,8 +65,9 @@ func MixinOauth(ctx *gin.Context) {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
+	 */
 
-	//用state换取令牌
+	//用code换取令牌
 	client, err := service.GetMixinAuthorizedClient(ctx, oauth_.Code)
 	if err != nil {
 		util.HandleResponse(ctx, err, nil)
@@ -68,7 +84,7 @@ func MixinOauth(ctx *gin.Context) {
 	//更新cache
 	mcache.MixinAuth = true
 	mcache.MixinId = user.UserID
-	err1 = util.Rdb.Replace(oauth_.State,mcache,-1)
+	err1 = util.Rdb.Replace(uid,*mcache,-1)
 	if err1 != nil{
 		err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
 		util.HandleResponse(ctx, err, resp)
