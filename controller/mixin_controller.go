@@ -34,7 +34,7 @@ func MixinOauth(ctx *gin.Context) {
 	//获取请求参数
 	if err1 := ctx.ShouldBindQuery(&oauth_);err1 != nil ||
 		oauth_.Code =="" || oauth_.State == "" {
-		err1 := util.NewErr(errors.New("invalid query param"), util.ErrBadRequest, "")
+		err1 := util.NewErr(errors.New("invalid query param"), util.ErrBadRequest, "invalid query param")
 		util.HandleResponse(ctx, err1, resp)
 		return
 	}

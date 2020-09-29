@@ -1,35 +1,37 @@
 package util
 
 import (
+	"fmt"
 	"github.com/gin-contrib/cache/persistence"
-	"github.com/spf13/viper"
+	"github.com/google/go-github/v32/github"
 	"time"
 )
 
 // 声明一个全局的rdb变量
-var Rdb *persistence.RedisStore
-//var Rdb *persistence.InMemoryStore
+//var Rdb *persistence.RedisStore
+var Rdb *persistence.InMemoryStore
 
 //jwt的过期时间
 const TokenExpireDuration = time.Hour* 2
 
 // 初始化连接
 func InitClient() (err error) {
-	//Rdb = persistence.NewInMemoryStore(TokenExpireDuration)
+	Rdb = persistence.NewInMemoryStore(TokenExpireDuration)
+	fmt.Println("Hello")
+	/*
 	Rdb = persistence.NewRedisCache(viper.GetString("REDIS_ADDR"),
 		viper.GetString("REDIS_PASSWORD"),TokenExpireDuration)
-
-	/*
-	Rdb = redis.NewClient(&redis.Options{
-		Addr:     config.GetString("REDIS_ADDR"),
-		Password: config.GetString("REDIS_PASSWORD"),
-		DB:       config.GetInt("REDIS_DB"),  // use default DB
-	})
-
-	_, err = Rdb.Ping().Result()
-	if err != nil {
-		return err
-	}
 	 */
+	if Rdb == nil{
+		fmt.Println("Rdb初始化错误")
+	}
+	s := "test"
+	user := github.User{}
+	u := github.User{}
+	user.Email = &s
+	key := RandUp(32)
+	Rdb.Set(key,user,-1)
+	Rdb.Get(key,&u)
+	fmt.Println(u)
 	return nil
 }

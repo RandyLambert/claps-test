@@ -158,6 +158,7 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 /*
 功能:判断请求的Token情况
 说明:经过该中间件验证,ctx中一定有cache的key,但是不一定授权了mixin
+使用memory做缓存时重启可能导致token合法，但是没有对应cache
  */
 func JWTAuthMiddleware() func(c *gin.Context) {
 	return func(c *gin.Context) {

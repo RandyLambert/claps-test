@@ -103,7 +103,7 @@ func Oauth(ctx *gin.Context) {
 
 	//cache的key是randomUid
 	//err1 = util.Rdb.Set(strconv.FormatInt(*user.ID,10),mcache,-1)
-	err1 = util.Rdb.Set(randomUid,mcache,-1)
+	err1 = util.Rdb.Set(randomUid,*mcache,-1)
 	if err1 != nil{
 		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"set cache error"),nil)
 		return
