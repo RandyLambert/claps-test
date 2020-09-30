@@ -14,27 +14,17 @@ func InsertTransfer(botId, assetID, memo string, amount decimal.Decimal, mixinId
 		BotId:   botId,
 		MixinId: mixinId,
 		TraceId: mixinId + assetID,
-		//TransactionId: TransactionID,
 		AssetId: assetID,
 		Amount:  amount,
 		Memo:    memo,
 		Status:  model.UNFINISHED,
 	}
 
-	err1 := dao.InsertTransfer(transfer)
-
-	if err1 != nil {
-		err = util.NewErr(err, util.ErrDataBase, "根据分配算法分配之后算出应为每位member分配多少钱,提现记录首次写入数据库失败导致提现失败")
+	err = dao.InsertTransfer(transfer)
+	if err != nil{
+		log.Error("dao.InsertTransfer 错误",err)
 	}
-	return
-}
 
-//跟新数据库中的transger表中的status为1
-func UpdateTransferStatusByAssetIdAndUserId(mixinId string, assetId string, status string) (err *util.Err) {
-	err1 := dao.UpdateTransferStatusByUserIdAndAssetId(mixinId, assetId, status)
-	if err1 != nil {
-		err = util.NewErr(err1, util.ErrDataBase, "更新数据库transfer状态出错")
-	}
 	return
 }
 
