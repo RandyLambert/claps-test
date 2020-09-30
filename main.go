@@ -6,6 +6,7 @@ import (
 	"claps-test/service"
 	"claps-test/util"
 	"flag"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	log "github.com/sirupsen/logrus"
@@ -27,13 +28,12 @@ func main() {
 
 	cmd := flag.String( "cmd", "", "process identity")
 	flag.Parse()
-
 	initAllConfig()
 	db, _ := dao.InitDB()
 	if db != nil {
 		defer db.Close()
 	}
-
+	fmt.Println("v1.0")
 	switch *cmd {
 	case "migrate", "setdb":
 		if multierror := dao.Migrate(); multierror != nil {
