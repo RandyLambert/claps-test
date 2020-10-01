@@ -272,6 +272,27 @@ func SyncSnapshots() {
 	}
 }
 
+func SyncFiat(){
+	ctx := context.TODO()
+	for{
+		mixinFiats,err := util.MixinClient.ReadExchangeRates(ctx)
+		if err!= nil{
+			log.Error(err.Error())
+		}
+		 fiat := &model.Fiat{}
+		for _,mixinFiat := range mixinFiats{
+			fiat.Code = mixinFiat.Code
+			fiat.Rate = mixinFiat.Rate
+			if dao.UpdateFiat(fiat) != nil{
+				log.Error(err.Error())
+			}
+		}
+
+		time.Sleep(40*time.Minute)
+	}
+
+}
+
 //获取认证之后的客户端
 func GetMixinAuthorizedClient(ctx *gin.Context, code string) (client *mixin.Client, err *util.Err) {
 	//从配置文件中读取Id和密码

@@ -46,6 +46,8 @@ func main() {
 		go service.SyncAssets()
 		//定期进行提现操作,并更改数据库
 		go service.SyncTransfer()
+		//定期获取汇率
+		go service.SyncFiat()
 		//service.TetGetUserBalanceByAllAssets()
 		r := gin.Default()
 		r = router.CollectRoute(r)
