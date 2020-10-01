@@ -17,7 +17,7 @@ func init() {
 
 
 //从数据库中通过ID获取user信息,存储在user中,引用传值
-func GetUserByUserId(id int64) (user *model.UserMixinId, err error) {
+func GetUserById(id int64) (user *model.UserMixinId, err error) {
 	user = &model.UserMixinId{}
 	err = db.Debug().Table("user").Where("id = ?", id).Scan(user).Error
 	return

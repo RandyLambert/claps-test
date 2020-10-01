@@ -7,7 +7,7 @@ import (
 
 type Project struct {
 	Id          string          `json:"id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
-	Name        string          `json:"name,omitempty" gorm:"type:varchar(50);not null;unique_index:name_UNIQUE"`
+	Name        string          `json:"name,omitempty" gorm:"type:varchar(50);not null"`
 	DisplayName string          `json:"display_name,omitempty" gorm:"type:varchar(50);default:null"`
 	Description string          `json:"description,omitempty" gorm:"type:varchar(120);default:null"`
 	AvatarUrl   string          `json:"avatar_url,omitempty" gorm:"type:varchar(100);default:null"`

@@ -6,7 +6,6 @@ import (
 	"claps-test/service"
 	"claps-test/util"
 	"flag"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	log "github.com/sirupsen/logrus"
@@ -33,7 +32,6 @@ func main() {
 	if db != nil {
 		defer db.Close()
 	}
-	fmt.Println("v1.0")
 	switch *cmd {
 	case "migrate", "setdb":
 		if multierror := dao.Migrate(); multierror != nil {
@@ -48,7 +46,7 @@ func main() {
 		go service.SyncAssets()
 		//定期进行提现操作,并更改数据库
 		go service.SyncTransfer()
-
+		//service.TetGetUserBalanceByAllAssets()
 		r := gin.Default()
 		r = router.CollectRoute(r)
 		serverport := viper.GetString("server.port")

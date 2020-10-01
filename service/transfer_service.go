@@ -5,6 +5,7 @@ import (
 	"claps-test/model"
 	"claps-test/util"
 	"errors"
+	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
@@ -13,14 +14,14 @@ func InsertTransfer(botId, assetID, memo string, amount decimal.Decimal, mixinId
 	transfer := &model.Transfer{
 		BotId:   botId,
 		MixinId: mixinId,
-		TraceId: mixinId + assetID,
+		TraceId: uuid.Must(uuid.NewV4()).String(),
 		AssetId: assetID,
 		Amount:  amount,
 		Memo:    memo,
 		Status:  model.UNFINISHED,
 	}
 
-	err = dao.InsertTransfer(transfer)
+	err = dao.InsertOrUpdateTransfer(transfer)
 	if err != nil{
 		log.Error("dao.InsertTransfer 错误",err)
 	}
@@ -36,18 +37,17 @@ func IfUnfinishedTransfer(mixinId string) (err *util.Err) {
 		return
 	}
 	if count != 0 {
-		err = util.NewErr(errors.New("有未完成的提现操作"), util.ErrForbidden, "有未完成的提现操作")
+		err = util.NewErr(errors.New("该提现用户有未完成的提现操作"), util.ErrForbidden, "该提现用户有未完成的提现操作")
 		return
 	}
 
-	log.Debug(count)
 	return
 }
 
 //生成trasfer记录
 func DoTransfer(userId int64, mixinId string) (err *util.Err) {
 
-	memberWallets, err1 := dao.GetMemeberWalletByUserId(userId)
+	memberWallets, err1 := dao.GetMemberWalletByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err, util.ErrDataBase, "获取用户钱包失败导致提现失败")
 		return

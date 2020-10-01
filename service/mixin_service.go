@@ -7,7 +7,6 @@ import (
 	"context"
 	"github.com/fox-one/mixin-sdk-go"
 	"github.com/gin-gonic/gin"
-	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -73,7 +72,6 @@ func SyncAssets() {
 					PriceUsd: assetsInfo[i].PriceUSD,
 				}
 				//第一次使用前,如果数据库没有信息,需要先创建几条记录,之后使用就每次更新即可
-				//err = dao.InsertAsset(asset)
 				err = dao.UpdateAsset(asset)
 
 				if err != nil {
@@ -102,14 +100,14 @@ func SyncTransfer() {
 			continue
 		}
 
-		for i := range *transfers {
+		for _,transfer := range *transfers {
 			//opponentid是转给谁
 			// Transfer transfer to account
 			//	asset_id, opponent_id, amount, traceID, memo
 			// 把该user的钱转账到该账户返回快照
 
 			//sender
-			bot, err := dao.GetBotById((*transfers)[i].BotId)
+			bot, err := dao.GetBotById(transfer.BotId)
 			if err != nil {
 				log.Error(err.Error())
 				continue
@@ -122,30 +120,24 @@ func SyncTransfer() {
 			}
 			//traceid暂时不应该这ls
 			snapshot, err := user.Transfer(ctx, &mixin.TransferInput{
-				TraceID: uuid.Must(uuid.NewV4()).String(),
-				AssetID: (*transfers)[i].AssetId,
+				TraceID: 	transfer.TraceId,
+				AssetID: 	transfer.AssetId,
 				//接收方的mixin_id
-				OpponentID: (*transfers)[i].MixinId,
-				Amount:     (*transfers)[i].Amount,
-				Memo:       (*transfers)[i].Memo,
+				OpponentID: transfer.MixinId,
+				Amount:     transfer.Amount,
+				Memo:       transfer.Memo,
 			}, bot.Pin)
-
 
 			if err != nil {
 				log.Error(err.Error())
 				continue
 			}
 
-			transfer := &map[string]interface{}{
-				"status":      model.FINISHED,
-				"trace_id":    snapshot.TraceID,
-				"snapshot_id": snapshot.SnapshotID,
-				"created_at":  snapshot.CreatedAt,
-			}
-			//log.Error(transfer["status"])
-			//更新trace_id为随机数,主键改变了，不能save
-			err = dao.UpdateTransferTraceId(transfer, (*transfers)[i].TraceId)
+			transfer.SnapshotId = snapshot.SnapshotID
+			transfer.CreatedAt = snapshot.CreatedAt
+			transfer.Status = model.FINISHED
 
+			err = dao.InsertOrUpdateTransfer(&transfer)
 			if err != nil {
 				log.Error(err.Error())
 			}
@@ -302,17 +294,6 @@ func GetMixinAuthorizedClient(ctx *gin.Context, code string) (client *mixin.Clie
 		err = util.NewErr(err2, util.ErrThirdParty, "mixin store to client error")
 		return
 	}
-
-	/*
-		//将client存入session
-		session := sessions.Default(ctx)
-		session.Set("mixinClient",client)
-		err3 := session.Save()
-		if err3 != nil{
-			err = util.NewErr(err3,util.ErrInternalServer,"设置mixin client session 出错")
-			return
-		}
-	*/
 
 	return
 }

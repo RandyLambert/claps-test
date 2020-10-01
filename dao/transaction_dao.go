@@ -21,7 +21,7 @@ func InsertTransaction(transaction *model.Transaction) (err error) {
 	return
 }
 
-//获取捐赠记录:通过projectName
+//获取捐赠记录:通过projectId
 func ListTransactionsByProjectId(projectId string) (transactions *[]model.Transaction, err error) {
 
 	transactions = &[]model.Transaction{}
@@ -30,10 +30,3 @@ func ListTransactionsByProjectId(projectId string) (transactions *[]model.Transa
 	return
 }
 
-//根据项目Id获取项目的所有捐赠
-func CountPatronByProjectIdAndSender(projectId string, sender string) (count uint32, err error) {
-	//todo 可能需要更改
-	//db.Table("deleted_users").Select("count(distinct(name))").Count(&count)
-	err = db.Debug().Table("transaction").Where("project_id=? AND sender=?", projectId, sender).Count(&count).Error
-	return
-}

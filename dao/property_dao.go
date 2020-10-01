@@ -28,8 +28,3 @@ func UpdateProperty(property *model.Property) (err error) {
 	err = db.Save(property).Error
 	return
 }
-
-func InsertProperty(property *model.Property) (err error) {
-	err = db.Create(property).Error
-	return
-}

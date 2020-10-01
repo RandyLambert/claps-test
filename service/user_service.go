@@ -6,11 +6,12 @@ import (
 	"claps-test/util"
 	"context"
 	"github.com/google/go-github/v32/github"
-	log "github.com/sirupsen/logrus"
+	"github.com/shopspring/decimal"
 	"golang.org/x/oauth2"
+	//log "github.com/sirupsen/logrus"
 )
 
-//从gitub服务器请求获取用户的邮箱信息
+//从github服务器请求获取用户的邮箱信息
 func ListEmailsByToken(githubToken string) (emails []*github.UserEmail, err *util.Err) {
 
 	ts := oauth2.StaticTokenSource(
@@ -25,40 +26,73 @@ func ListEmailsByToken(githubToken string) (emails []*github.UserEmail, err *uti
 		err = util.NewErr(err2, util.ErrThirdParty, "从github获取Email错误")
 	}
 
+	return
+}
 
+func GetBalanceAndTotalToUSDByUserId(userId int64,assets *[]model.Asset) (err *util.Err, total decimal.Decimal,balance decimal.Decimal) {
+
+	//遍历assets数组获取所有的币种
+	var assetMap map[string]decimal.Decimal
+	assetMap = make(map[string]decimal.Decimal)
+	//生成币种对应ｍａｐ方便后面调用
+	for _,asset := range *assets{
+		assetMap[asset.AssetId] = asset.PriceUsd
+	}
+
+	memberWalletDtos, err1 := dao.GetMemberWalletByUserId(userId)
+	if err1 != nil {
+		err = util.NewErr(err1, util.ErrDataBase, "查询数据库的用户钱包出错")
+		return
+	}
+
+	//把balance相加到tmp里面
+	if memberWalletDtos != nil {
+		for _,value := range *memberWalletDtos {
+			balance = (value.Balance.Mul(assetMap[value.AssetId])).Add(balance)
+			total = (value.Total.Mul(assetMap[value.AssetId])).Add(total)
+		}
+	}
+	total = total.Truncate(4)
+	balance = balance.Truncate(4)
 	return
 }
 
 //获取用户的所有币种的余额
-func GetUserBalanceByAllAssets(userId int64, assets *[]model.Asset) (err *util.Err, dto *[]model.MemberWalletDto) {
+func GetUserBalanceAndTotalByAllAssets(userId int64,assets *[]model.Asset) (err *util.Err, dto *[]model.MemberWalletDto) {
+
+	//遍历assets数组获取所有的币种
+	var memberWalletMap map[string]*model.MemberWalletDto
+	memberWalletMap = make(map[string]*model.MemberWalletDto)
+
+	//生成币种对应ｍａｐ方便后面调用
+	for _,asset := range *assets{
+		memberWalletMap[asset.AssetId] = &model.MemberWalletDto{AssetId:asset.AssetId}
+	}
+
+	memberWalletDtos, err1 := dao.GetMemberWalletByUserId(userId)
+	if err1 != nil {
+		err = util.NewErr(err1, util.ErrDataBase, "查询数据库的用户钱包出错")
+		return
+	}
 
 	dto = &[]model.MemberWalletDto{}
-	//遍历assets数组获取所有的币种
-	for i := range *assets {
-		tmp := model.MemberWalletDto{}
-		tmp.AssetId = (*assets)[i].AssetId
-
-		memberWalletDtos, err1 := dao.GetMemeberWalletByUserIdAndAssetId(userId, (*assets)[i].AssetId)
-		if err1 != nil {
-			err = util.NewErr(err1, util.ErrDataBase, "查询数据库的用户钱包出错")
-			return
+	//把balance相加到tmp里面
+	if memberWalletDtos != nil {
+		for _,value := range *memberWalletDtos {
+			memberWalletMap[value.AssetId].Balance = value.Balance.Add(memberWalletMap[value.AssetId].Balance)
+			memberWalletMap[value.AssetId].Total = value.Total.Add(memberWalletMap[value.AssetId].Total)
 		}
-		//把balance相加到tmp里面
-		if memberWalletDtos != nil {
-			log.Debug(*memberWalletDtos)
-			for j := range *memberWalletDtos {
-				tmp.Balance = ((*memberWalletDtos)[j].Balance.Mul((*assets)[i].PriceUsd)).Add(tmp.Balance)
-				tmp.Total = ((*memberWalletDtos)[j].Total.Mul((*assets)[i].PriceUsd)).Add(tmp.Total)
-			}
-		}
-		tmp.Total = tmp.Total.Truncate(8)
-		tmp.Balance = tmp.Balance.Truncate(8)
-		*dto = append(*dto, tmp)
 	}
+	for _,memberWallet := range memberWalletMap{
+		memberWallet.Balance = memberWallet.Balance.Truncate(8)
+		memberWallet.Total = memberWallet.Total.Truncate(8)
+		*dto = append(*dto,*memberWallet)
+	}
+
 	return
 }
 
-func GetTransferByMininId(mixinId string) (transfers *[]model.Transfer, err *util.Err) {
+func GetTransferByMixinId(mixinId string) (transfers *[]model.Transfer, err *util.Err) {
 	transfers, err1 := dao.GetTransferByMixinId(mixinId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "数据库查询transfer出错")
@@ -84,7 +118,7 @@ func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
 }
 
 func GetMixinIdByUserId(userId int64) (mixinId string, err *util.Err) {
-	user, err1 := dao.GetUserByUserId(userId)
+	user, err1 := dao.GetUserById(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "从数据库查询user信息错误")
 		return

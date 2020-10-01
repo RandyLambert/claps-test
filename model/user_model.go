@@ -6,7 +6,6 @@ type User struct {
 	DisplayName string `json:"display_name,omitempty" gorm:"type:varchar(50);default:null"`
 	Email       string `json:"email,omitempty" gorm:"type:varchar(50);unique_index:email_UNIQUE;not null"`
 	AvatarUrl   string `json:"avatar_url,omitempty" gorm:"type:varchar(100);default:null"`
-	//UserId string `json:"user_id" gorm:"type:varchar(50);default:null"`
 	MixinId string `json:"mixin_id,omitempty" gorm:"type:varchar(50);default:null"`
 }
 

@@ -5,7 +5,6 @@ import (
 	"claps-test/util"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -22,7 +21,7 @@ func UserProfile(ctx *gin.Context) {
 	uid := ctx.GetString(util.UID)
 	err1 := util.Rdb.Get(uid,&mcache)
 	if err1 != nil{
-		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"Redis get error."),nil)
+		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"cache get error."),nil)
 		return
 	}
 	log.Debug("mcache = ",mcache)
@@ -73,7 +72,7 @@ func UserAssets(ctx *gin.Context) {
 	}
 
 	//查询用户钱包,获得相应的余额,添加到币信息的后面
-	err2, dto := service.GetUserBalanceByAllAssets(*mcache.Github.ID, assets)
+	err2, dto := service.GetUserBalanceAndTotalByAllAssets(*mcache.Github.ID, assets)
 	if err2 != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
@@ -81,21 +80,6 @@ func UserAssets(ctx *gin.Context) {
 
 	resp["assets"] = dto
 	util.HandleResponse(ctx, err, resp)
-}
-
-//从transaction中读取关于自己项目的所有捐赠
-func UserTransactions(ctx *gin.Context) {
-	resp := make(map[string]interface{})
-
-	assetId := ctx.Query("assetId")
-	if assetId == "" {
-		err := util.NewErr(nil, util.ErrBadRequest, "没有币种参数")
-		util.HandleResponse(ctx, err, resp)
-		return
-	}
-	log.Debug("assetId = ", assetId)
-
-	//从transfer表中获取该用户的所有捐赠记录
 }
 
 /*
@@ -134,7 +118,7 @@ func UserTransfer(ctx *gin.Context) {
 	}
 
 	//从transfer表中获取该用户的所有捐赠记录
-	transfers, err := service.GetTransferByMininId(mixinId)
+	transfers, err := service.GetTransferByMixinId(mixinId)
 	resp["transfers"] = transfers
 	util.HandleResponse(ctx, err, resp)
 }
@@ -172,30 +156,21 @@ func UserDonation(ctx *gin.Context) {
 	log.Debug(*assets)
 
 	//查询用户钱包,获得相应的余额,添加到币信息的后面
-	err2, dto := service.GetUserBalanceByAllAssets(*mcache.Github.ID, assets)
+	err2, total,balance := service.GetBalanceAndTotalToUSDByUserId(*mcache.Github.ID, assets)
 	if err2 != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
 
-	//便利dto然后求和
-	var sum decimal.Decimal
-
-	for i := range *dto {
-		sum = sum.Add((*dto)[i].Total)
-	}
-
-	//从project里面寻找Donations然后求和
+	//从project里面寻找Donations
 	donations, err3 := service.SumProjectDonationsByUserId(*mcache.Github.ID)
 	if err3 != nil {
 		util.HandleResponse(ctx, err3, resp)
 		return
 	}
 
-	log.Debug("donations = ",donations)
-	sum = sum.Truncate(4)
-
-	resp["total"] = sum
+	resp["total"] = total
+	resp["balance"] = balance
 	resp["donations"] = donations
 
 	util.HandleResponse(ctx, nil, resp)
