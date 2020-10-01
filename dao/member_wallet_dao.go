@@ -20,6 +20,11 @@ func UpdateMemberWallet(memberWalletDto *model.MemberWalletDto) (err error) {
 	return
 }
 
+func UpdateMemberWalletBalanceToZeroByUserId(userId int64) (err error) {
+	err = db.Debug().Table("member_wallet").Where("user_id = ?", userId).Updates(map[string]interface{}{"balance":"0"}).Error
+	return
+}
+
 func GetMemberWalletByUserId(userId int64) (memberWalletDtos *[]model.MemberWalletDto, err error) {
 	memberWalletDtos = &[]model.MemberWalletDto{}
 	err = db.Debug().Table("member_wallet").Where("user_id = ?", userId).Scan(memberWalletDtos).Error

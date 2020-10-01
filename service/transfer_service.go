@@ -6,6 +6,7 @@ import (
 	"claps-test/util"
 	"errors"
 	"github.com/gofrs/uuid"
+	"github.com/jinzhu/gorm"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
@@ -49,28 +50,31 @@ func DoTransfer(userId int64, mixinId string) (err *util.Err) {
 
 	memberWallets, err1 := dao.GetMemberWalletByUserId(userId)
 	if err1 != nil {
-		err = util.NewErr(err, util.ErrDataBase, "获取用户钱包失败导致提现失败")
+		err = util.NewErr(err1, util.ErrDataBase, "获取用户钱包失败导致提现失败")
 		return
 	}
 
-	for _,value := range *memberWallets {
-		if !value.Balance.Equal(decimal.Zero) {
-			err1 = InsertTransfer(value.BotId, value.AssetId, "恭喜您获得一笔捐赠", value.Balance, mixinId)
-			if err1 != nil {
-				err = util.NewErr(err1, util.ErrDataBase, "插入提现记录失败")
-				return
-			}
-
-			//清零
-			value.Balance = decimal.Zero
-			//更新member_wallet
-			err1 = dao.UpdateMemberWallet(&value)
-			if err1 != nil {
-				err = util.NewErr(err1, util.ErrDataBase, "更新用户钱包可提现值导致提现失败")
-				return
+	if err1 := dao.ExecuteTx(func(tx *gorm.DB) error {
+		for _,value := range *memberWallets {
+			if !value.Balance.Equal(decimal.Zero) {
+				err2 := InsertTransfer(value.BotId, value.AssetId, "恭喜您获得一笔捐赠", value.Balance, mixinId)
+				if err2 != nil {
+					err = util.NewErr(err2, util.ErrDataBase, "插入提现记录失败")
+					return err
+				}
 			}
 		}
+		return nil
+	}); err1 != nil {
+		err = util.NewErr(err1, util.ErrDataBase, "插入提现记录事物出现问题")
+		return err
 	}
 
+	//更新member_wallet
+	err1 = dao.UpdateMemberWalletBalanceToZeroByUserId(userId)
+	if err1 != nil {
+		err = util.NewErr(err1, util.ErrDataBase, "更新用户钱包可提现值导致提现失败")
+		return
+	}
 	return
 }
