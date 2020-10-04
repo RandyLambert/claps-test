@@ -58,7 +58,7 @@ func GetBalanceAndTotalToUSDByUserId(userId int64,assets *[]model.Asset) (err *u
 }
 
 //获取用户的所有币种的余额
-func GetUserBalanceAndTotalByAllAssets(userId int64,assets *[]model.Asset) (err *util.Err, dto *[]model.MemberWalletDto) {
+func GetBalanceAndTotalByUserIdAndAssets(userId int64,assets *[]model.Asset) (err *util.Err, dto *[]model.MemberWalletDto) {
 
 	//遍历assets数组获取所有的币种
 	var memberWalletMap map[string]*model.MemberWalletDto
@@ -82,11 +82,12 @@ func GetUserBalanceAndTotalByAllAssets(userId int64,assets *[]model.Asset) (err 
 			memberWalletMap[value.AssetId].Balance = value.Balance.Add(memberWalletMap[value.AssetId].Balance)
 			memberWalletMap[value.AssetId].Total = value.Total.Add(memberWalletMap[value.AssetId].Total)
 		}
-	}
-	for _,memberWallet := range memberWalletMap{
-		memberWallet.Balance = memberWallet.Balance.Truncate(8)
-		memberWallet.Total = memberWallet.Total.Truncate(8)
-		*dto = append(*dto,*memberWallet)
+
+		for _,memberWallet := range memberWalletMap{
+			memberWallet.Balance = memberWallet.Balance.Truncate(8)
+			memberWallet.Total = memberWallet.Total.Truncate(8)
+			*dto = append(*dto,*memberWallet)
+		}
 	}
 
 	return

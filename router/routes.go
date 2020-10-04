@@ -31,6 +31,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 			projectsGroup.GET("/:id", controller.ProjectById)
 			projectsGroup.GET("/:id/members", controller.ProjectMembers)
 			projectsGroup.GET("/:id/transactions", controller.ProjectTransactions)
+			projectsGroup.GET("/:id/svg",controller.ProjectSvg);
 
 		}
 

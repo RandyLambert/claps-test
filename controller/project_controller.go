@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"claps-test/model"
 	"claps-test/service"
 	"claps-test/util"
 	"github.com/gin-gonic/gin"
@@ -37,4 +38,17 @@ func ProjectTransactions(ctx *gin.Context) {
 
 	transactions, err := service.ListTransactionsByProjectId(ctx.Param("id"))
 	util.HandleResponse(ctx, err, transactions)
+}
+
+func ProjectSvg(ctx *gin.Context){
+	badge := &model.Badge{}
+
+	if err := ctx.ShouldBind(badge);err != nil {
+			err := util.NewErr(nil, util.ErrUnauthorized, "没有QUERY值无法请求成功")
+			util.HandleResponse(ctx, err, nil)
+			return
+	}
+
+	err := service.GetProjectBadge(badge)
+	util.HandleResponse(ctx,err,nil)
 }

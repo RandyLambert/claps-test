@@ -22,3 +22,10 @@ type ProjectTotal struct {
 	Donations int64           `json:"donations,omitempty" gorm:"type:bigint;default:0"`
 	Total     decimal.Decimal `json:"total,omitempty" gorm:"type:varchar(128);default:null"`
 }
+
+type Badge struct {
+	Code    string `form:"code" json:"code" binding:"required"`
+	Color 	string `form:"color" json:"color" binding:"required"`
+	BgColor string `form:"bg_color" json:"bg_color" binding:"required"`
+	Size	string `form:"size" json:"size" binding:"required"`
+}

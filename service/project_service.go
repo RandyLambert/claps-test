@@ -4,6 +4,7 @@ import (
 	"claps-test/dao"
 	"claps-test/model"
 	"claps-test/util"
+	log "github.com/sirupsen/logrus"
 )
 
 //通过projectid查询,查询某个项目的详情
@@ -76,5 +77,17 @@ func ListMembersByProjectId(projectId string) (members *[]model.User, err *util.
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目成员失败")
 	}
+	return
+}
+
+func GetProjectBadge(badge *model.Badge)( err *util.Err){
+	//compact
+	//full
+
+	fiat,err1 := dao.GetFiatByCode(badge.Code)
+	if err1!=nil{
+		err = util.NewErr(err1,util.ErrDataBase,"获取fiat失败")
+	}
+	log.Debug(fiat)
 	return
 }

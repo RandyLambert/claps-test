@@ -72,7 +72,7 @@ func UserAssets(ctx *gin.Context) {
 	}
 
 	//查询用户钱包,获得相应的余额,添加到币信息的后面
-	err2, dto := service.GetUserBalanceAndTotalByAllAssets(*mcache.Github.ID, assets)
+	err2, dto := service.GetBalanceAndTotalByUserIdAndAssets(*mcache.Github.ID, assets)
 	if err2 != nil {
 		util.HandleResponse(ctx, err, resp)
 		return

@@ -26,3 +26,9 @@ func ListFiatsAllByDB()(fiats *[]model.Fiat,err error){
 	err = db.Find(fiats).Error
 	return
 }
+
+func GetFiatByCode(code string)(fiat *model.Fiat,err error) {
+	fiat = &model.Fiat{}
+	err = db.Select("rate").Where("code = ? ", code).Find(&fiat).Error
+	return
+}
