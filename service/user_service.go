@@ -29,13 +29,13 @@ func ListEmailsByToken(githubToken string) (emails []*github.UserEmail, err *uti
 	return
 }
 
-func GetBalanceAndTotalToUSDByUserId(userId int64,assets *[]model.Asset) (err *util.Err, total decimal.Decimal,balance decimal.Decimal) {
+func GetBalanceAndTotalToUSDByUserId(userId int64, assets *[]model.Asset) (err *util.Err, total decimal.Decimal, balance decimal.Decimal) {
 
 	//遍历assets数组获取所有的币种
 	var assetMap map[string]decimal.Decimal
 	assetMap = make(map[string]decimal.Decimal)
 	//生成币种对应ｍａｐ方便后面调用
-	for _,asset := range *assets{
+	for _, asset := range *assets {
 		assetMap[asset.AssetId] = asset.PriceUsd
 	}
 
@@ -47,7 +47,7 @@ func GetBalanceAndTotalToUSDByUserId(userId int64,assets *[]model.Asset) (err *u
 
 	//把balance相加到tmp里面
 	if memberWalletDtos != nil {
-		for _,value := range *memberWalletDtos {
+		for _, value := range *memberWalletDtos {
 			balance = (value.Balance.Mul(assetMap[value.AssetId])).Add(balance)
 			total = (value.Total.Mul(assetMap[value.AssetId])).Add(total)
 		}
@@ -58,15 +58,15 @@ func GetBalanceAndTotalToUSDByUserId(userId int64,assets *[]model.Asset) (err *u
 }
 
 //获取用户的所有币种的余额
-func GetBalanceAndTotalByUserIdAndAssets(userId int64,assets *[]model.Asset) (err *util.Err, dto *[]model.MemberWalletDto) {
+func GetBalanceAndTotalByUserIdAndAssets(userId int64, assets *[]model.Asset) (err *util.Err, dto *[]model.MemberWalletDto) {
 
 	//遍历assets数组获取所有的币种
 	var memberWalletMap map[string]*model.MemberWalletDto
 	memberWalletMap = make(map[string]*model.MemberWalletDto)
 
 	//生成币种对应ｍａｐ方便后面调用
-	for _,asset := range *assets{
-		memberWalletMap[asset.AssetId] = &model.MemberWalletDto{AssetId:asset.AssetId}
+	for _, asset := range *assets {
+		memberWalletMap[asset.AssetId] = &model.MemberWalletDto{AssetId: asset.AssetId}
 	}
 
 	memberWalletDtos, err1 := dao.GetMemberWalletByUserId(userId)
@@ -78,15 +78,15 @@ func GetBalanceAndTotalByUserIdAndAssets(userId int64,assets *[]model.Asset) (er
 	dto = &[]model.MemberWalletDto{}
 	//把balance相加到tmp里面
 	if memberWalletDtos != nil {
-		for _,value := range *memberWalletDtos {
+		for _, value := range *memberWalletDtos {
 			memberWalletMap[value.AssetId].Balance = value.Balance.Add(memberWalletMap[value.AssetId].Balance)
 			memberWalletMap[value.AssetId].Total = value.Total.Add(memberWalletMap[value.AssetId].Total)
 		}
 
-		for _,memberWallet := range memberWalletMap{
+		for _, memberWallet := range memberWalletMap {
 			memberWallet.Balance = memberWallet.Balance.Truncate(8)
 			memberWallet.Total = memberWallet.Total.Truncate(8)
-			*dto = append(*dto,*memberWallet)
+			*dto = append(*dto, *memberWallet)
 		}
 	}
 
@@ -101,7 +101,7 @@ func GetTransferByMixinId(mixinId string) (transfers *[]model.Transfer, err *uti
 	return
 }
 
-func SumProjectDonationsByUserId(userId int64) (donations int64,err *util.Err) {
+func SumProjectDonationsByUserId(userId int64) (donations int64, err *util.Err) {
 	donations, err1 := dao.SumProjectDonationsByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err, util.ErrDataBase, "数据库获取用户项目信息和出错")

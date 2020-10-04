@@ -15,19 +15,18 @@ func init() {
 	})
 }
 
-
 func UpdateFiat(fiat *model.Fiat) (err error) {
 	err = db.Debug().Save(fiat).Error
 	return
 }
 
-func ListFiatsAllByDB()(fiats *[]model.Fiat,err error){
+func ListFiatsAllByDB() (fiats *[]model.Fiat, err error) {
 	fiats = &[]model.Fiat{}
 	err = db.Find(fiats).Error
 	return
 }
 
-func GetFiatByCode(code string)(fiat *model.Fiat,err error) {
+func GetFiatByCode(code string) (fiat *model.Fiat, err error) {
 	fiat = &model.Fiat{}
 	err = db.Select("rate").Where("code = ? ", code).Find(&fiat).Error
 	return

@@ -8,7 +8,7 @@ import (
 )
 
 //通过projectid查询,查询某个项目的详情
-func GetProjectById(projectId string) (projectDetailInfo *map[string]interface{}, err *util.Err) {
+func GetProjectById(projectId int64) (projectDetailInfo *map[string]interface{}, err *util.Err) {
 
 	project, err1 := dao.GetProjectById(projectId)
 	if err1 != nil {
@@ -72,7 +72,7 @@ func ListTransactionsByProjectId(projectId string) (transactions *[]model.Transa
 	return
 }
 
-func ListMembersByProjectId(projectId string) (members *[]model.User, err *util.Err) {
+func ListMembersByProjectId(projectId int64) (members *[]model.User, err *util.Err) {
 	members, err1 := dao.ListMembersByProjectId(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目成员失败")
@@ -80,13 +80,13 @@ func ListMembersByProjectId(projectId string) (members *[]model.User, err *util.
 	return
 }
 
-func GetProjectBadge(badge *model.Badge)( err *util.Err){
+func GetProjectBadge(badge *model.Badge) (err *util.Err) {
 	//compact
 	//full
 
-	fiat,err1 := dao.GetFiatByCode(badge.Code)
-	if err1!=nil{
-		err = util.NewErr(err1,util.ErrDataBase,"获取fiat失败")
+	fiat, err1 := dao.GetFiatByCode(badge.Code)
+	if err1 != nil {
+		err = util.NewErr(err1, util.ErrDataBase, "获取fiat失败")
 	}
 	log.Debug(fiat)
 	return

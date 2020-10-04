@@ -21,7 +21,7 @@ func UpdateMemberWallet(memberWalletDto *model.MemberWalletDto) (err error) {
 }
 
 func UpdateMemberWalletBalanceToZeroByUserId(userId int64) (err error) {
-	err = db.Debug().Table("member_wallet").Where("user_id = ?", userId).Updates(map[string]interface{}{"balance":"0"}).Error
+	err = db.Debug().Table("member_wallet").Where("user_id = ?", userId).Updates(map[string]interface{}{"balance": "0"}).Error
 	return
 }
 
@@ -31,7 +31,7 @@ func GetMemberWalletByUserId(userId int64) (memberWalletDtos *[]model.MemberWall
 	return
 }
 
-func GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(projectId string, userId int64, botId string, assetId string) (member *model.MemberWalletDto, err error) {
+func GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(projectId int64, userId int64, botId string, assetId string) (member *model.MemberWalletDto, err error) {
 	member = &model.MemberWalletDto{}
 	err = db.Debug().Table("member_wallet").Where("project_id=? AND user_id=? AND bot_id=? AND asset_id=?", projectId, userId, botId, assetId).Find(member).Error
 	return

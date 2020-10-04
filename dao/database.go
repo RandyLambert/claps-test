@@ -3,16 +3,16 @@ package dao
 import (
 	"database/sql"
 	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
 	config "github.com/spf13/viper"
 	"time"
-	"github.com/hashicorp/go-multierror"
 )
 
 var db *gorm.DB
 
-func InitDB() (*gorm.DB,error) {
+func InitDB() (*gorm.DB, error) {
 
 	if db != nil {
 		return db, nil
@@ -30,7 +30,7 @@ func InitDB() (*gorm.DB,error) {
 
 	if err != nil {
 		log.Panic("failed to connect database,err :" + err.Error())
-		return nil,err
+		return nil, err
 	}
 
 	db.DB().SetConnMaxLifetime(time.Hour)
@@ -39,7 +39,7 @@ func InitDB() (*gorm.DB,error) {
 
 	db.SingularTable(true)
 
-	return db,nil
+	return db, nil
 }
 
 /*
@@ -84,7 +84,7 @@ func Migrate() error {
 	return MigrateInDB(db)
 }
 
-func DeleteAllTables(){
+func DeleteAllTables() {
 	log.Print(db.Debug().DropTable("user").Error)
 	log.Print(db.Debug().DropTable("asset").Error)
 	log.Print(db.Debug().DropTable("bot").Error)

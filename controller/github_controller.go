@@ -10,32 +10,31 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-
 /*
 功能:用code换取Token
 说明:此时没有发放token,没有cache,成功授权后发放token,设置cache
- */
+*/
 func Oauth(ctx *gin.Context) {
 	type oauth struct {
 		Code string `json:"code" form:"code"`
 	}
 	var (
-		err *util.Err
+		err    *util.Err
 		oauth_ oauth
 	)
 
 	resp := make(map[string]interface{})
 
-	if err1 := ctx.ShouldBindQuery(&oauth_);err1 != nil{
-		err := util.NewErr(err1,util.ErrBadRequest, "")
+	if err1 := ctx.ShouldBindQuery(&oauth_); err1 != nil {
+		err := util.NewErr(err1, util.ErrBadRequest, "")
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
-	log.Info("code = ",oauth_.Code)
+	log.Info("code = ", oauth_.Code)
 
 	var oauthTokenUrl = service.GetOauthToken(oauth_.Code)
 	//处理请求的URL,获得Token指针
-	token2,err := service.GetToken(oauthTokenUrl)
+	token2, err := service.GetToken(oauthTokenUrl)
 	if err != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
@@ -56,16 +55,15 @@ func Oauth(ctx *gin.Context) {
 		return
 	}
 
-	log.Debug("user = ",*user)
+	log.Debug("user = ", *user)
 
 	//生成token
 	randomUid := util.RandUp(32)
-	jwt_token,err1 := middleware.GenToken(randomUid)
-	if err1 != nil{
-		util.HandleResponse(ctx,util.NewErr(err1,util.ErrInternalServer,"gen token error"),nil)
+	jwt_token, err1 := middleware.GenToken(randomUid)
+	if err1 != nil {
+		util.HandleResponse(ctx, util.NewErr(err1, util.ErrInternalServer, "gen token error"), nil)
 		return
 	}
-
 
 	//向数据库中存储user信息
 	u := model.User{}
@@ -77,13 +75,12 @@ func Oauth(ctx *gin.Context) {
 	if user.Name != nil {
 		u.DisplayName = *user.Name
 	}
-	for _,v := range emails{
-		if *v.Primary{
+	for _, v := range emails {
+		if *v.Primary {
 			u.Email = *v.Email
 			break
 		}
 	}
-
 
 	err = service.InsertOrUpdateUser(&u)
 	if err != nil {
@@ -94,7 +91,7 @@ func Oauth(ctx *gin.Context) {
 	//redis存储user信息
 	mcache := &util.MCache{}
 	emailForCache := []github.UserEmail{}
-	for _,val:= range emails{
+	for _, val := range emails {
 		emailForCache = append(emailForCache, *val)
 	}
 	mcache.Github = *user
@@ -103,14 +100,14 @@ func Oauth(ctx *gin.Context) {
 
 	//cache的key是randomUid
 	//err1 = util.Rdb.Set(strconv.FormatInt(*user.ID,10),mcache,-1)
-	err1 = util.Rdb.Set(randomUid,*mcache,-1)
-	if err1 != nil{
-		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"set cache error"),nil)
+	err1 = util.Rdb.Set(randomUid, *mcache, -1)
+	if err1 != nil {
+		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "set cache error"), nil)
 		return
 	}
 
 	resp["token"] = jwt_token
-	util.HandleResponse(ctx,nil,resp)
+	util.HandleResponse(ctx, nil, resp)
 	//重定向到http://localhost:3000/profile
 	//newpath := "http://localhost:3000" + oauth_.Path
 	//log.Debug("重定向", newpath)

@@ -12,7 +12,6 @@ var GithubOauthCallback string
 var MixinClientId string
 var MixinOauthCallback string
 
-
 func InitConfig() {
 
 	viper.SetConfigName(".env")

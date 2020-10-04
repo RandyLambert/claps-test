@@ -15,6 +15,15 @@ func init() {
 	})
 }
 
+func init() {
+	RegisterMigrateHandler(func(db *gorm.DB) error {
+
+		if err := db.AutoMigrate(&model.Member{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
 
 //从数据库中通过ID获取user信息,存储在user中,引用传值
 func GetUserById(id int64) (user *model.UserMixinId, err error) {
@@ -27,18 +36,18 @@ func GetUserById(id int64) (user *model.UserMixinId, err error) {
 func InsertOrUpdateUser(user *model.User) (err error) {
 
 	var cnt int64
-	db.Debug().Table("user").Where("id = ?",user.Id).Count(&cnt)
-	if cnt == 0{
+	db.Debug().Table("user").Where("id = ?", user.Id).Count(&cnt)
+	if cnt == 0 {
 		err = db.Debug().Create(user).Error
 		return
-	}else {
+	} else {
 		db.Debug().Model(&user).Omit("mixin_id").Updates(user)
 	}
 	return
 }
 
 //通过projectId获取一个项目的所有成员信息
-func ListMembersByProjectId(projectId string) (users *[]model.User, err error) {
+func ListMembersByProjectId(projectId int64) (users *[]model.User, err error) {
 
 	users = &[]model.User{}
 	err = db.Debug().Where("id IN (?)",

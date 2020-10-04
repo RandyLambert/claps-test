@@ -15,7 +15,6 @@ func init() {
 	})
 }
 
-
 func GetPropertyByKey(Key string) (property *model.Property, err error) {
 	property = &model.Property{
 		Key: Key,

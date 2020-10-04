@@ -11,16 +11,16 @@ const (
 )
 
 type MCache struct {
-	Github github.User
+	Github       github.User
 	GithubEmails []github.UserEmail
-	GithubAuth bool
-	MixinId string
-	MixinAuth bool
+	GithubAuth   bool
+	MixinId      string
+	MixinAuth    bool
 }
 
 var longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_sky")
 
-func RandUp(n int) string{
+func RandUp(n int) string {
 	if n <= 0 {
 		return ""
 	}
@@ -36,13 +36,13 @@ func RandUp(n int) string{
 	return string(b)
 }
 
-func UserToJson(user *github.User)(userJson string,err error)  {
-	jsonBytes,err := json.Marshal(*user)
+func UserToJson(user *github.User) (userJson string, err error) {
+	jsonBytes, err := json.Marshal(*user)
 	userJson = string(jsonBytes)
 	return
 }
 
-func JsonToUser(userJson string)(user *github.User,err error)  {
+func JsonToUser(userJson string) (user *github.User, err error) {
 	user = &github.User{}
 	err = json.Unmarshal([]byte(userJson), &user)
 	return

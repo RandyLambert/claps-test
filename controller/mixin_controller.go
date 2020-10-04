@@ -17,55 +17,55 @@ func MixinAssets(ctx *gin.Context) {
 /*
 功能:mixin oauth授权
 说明:授权后更新数据库和缓存,由于有jwt中间件，所以一定存在cache
- */
+*/
 func MixinOauth(ctx *gin.Context) {
 	type oauth struct {
-		Code string `json:"code" form:"code"`
+		Code  string `json:"code" form:"code"`
 		State string `json:"state" form:"state"`
 	}
 
 	var (
-		err *util.Err
+		err    *util.Err
 		oauth_ oauth
 		//randomUid = ""
 	)
 	resp := make(map[string]interface{})
 
 	//获取请求参数
-	if err1 := ctx.ShouldBindQuery(&oauth_);err1 != nil ||
-		oauth_.Code =="" || oauth_.State == "" {
+	if err1 := ctx.ShouldBindQuery(&oauth_); err1 != nil ||
+		oauth_.Code == "" || oauth_.State == "" {
 		err1 := util.NewErr(errors.New("invalid query param"), util.ErrBadRequest, "invalid query param")
 		util.HandleResponse(ctx, err1, resp)
 		return
 	}
-	log.Debug("code = ",oauth_.Code)
+	log.Debug("code = ", oauth_.Code)
 
 	var val interface{}
 	var ok bool
-	if val,ok = ctx.Get(util.UID);!ok{
-		util.HandleResponse(ctx,util.NewErr(errors.New(""),util.ErrDataBase,"cache get uid error"),resp)
+	if val, ok = ctx.Get(util.UID); !ok {
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "cache get uid error"), resp)
 		return
 	}
 	uid := val.(string)
 
 	//从redis获取cache
 	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(uid,mcache)
-	if err1 != nil{
-		util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"cache get error"),resp)
+	err1 := util.Rdb.Get(uid, mcache)
+	if err1 != nil {
+		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), resp)
 		return
 	}
 
 	/*
-	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(oauth_.State,mcache)
-	//验证state
-	if err1 != nil{
-		err = util.NewErr(err1,util.ErrBadRequest, "invalid oauth state")
-		util.HandleResponse(ctx, err, resp)
-		return
-	}
-	 */
+		mcache := &util.MCache{}
+		err1 := util.Rdb.Get(oauth_.State,mcache)
+		//验证state
+		if err1 != nil{
+			err = util.NewErr(err1,util.ErrBadRequest, "invalid oauth state")
+			util.HandleResponse(ctx, err, resp)
+			return
+		}
+	*/
 
 	//用code换取令牌
 	client, err := service.GetMixinAuthorizedClient(ctx, oauth_.Code)
@@ -84,8 +84,8 @@ func MixinOauth(ctx *gin.Context) {
 	//更新cache
 	mcache.MixinAuth = true
 	mcache.MixinId = user.UserID
-	err1 = util.Rdb.Replace(uid,*mcache,-1)
-	if err1 != nil{
+	err1 = util.Rdb.Replace(uid, *mcache, -1)
+	if err1 != nil {
 		err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
 		util.HandleResponse(ctx, err, resp)
 		return
@@ -100,7 +100,7 @@ func MixinOauth(ctx *gin.Context) {
 		return
 	}
 
-	util.HandleResponse(ctx,nil,nil)
+	util.HandleResponse(ctx, nil, nil)
 	//重定向
 	//ctx.Redirect(http.StatusMovedPermanently, "http://localhost:3000/assets")
 }

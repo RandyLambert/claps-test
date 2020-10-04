@@ -15,6 +15,15 @@ func init() {
 	})
 }
 
+func init() {
+	RegisterMigrateHandler(func(db *gorm.DB) error {
+
+		if err := db.AutoMigrate(&model.ProjectToMericoGroup{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
 
 //获取所有项目
 func ListProjectsAll() (projects *[]model.Project, err error) {
@@ -25,7 +34,7 @@ func ListProjectsAll() (projects *[]model.Project, err error) {
 }
 
 //通过项目id获取项目
-func GetProjectById(projectId string) (project *model.Project, err error) {
+func GetProjectById(projectId int64) (project *model.Project, err error) {
 
 	project = &model.Project{}
 	err = db.Debug().Where("id=?", projectId).Find(&project).Error
@@ -58,7 +67,7 @@ func SumProjectDonationsByUserId(userId int64) (donations int64, err error) {
 	}
 	var result Result
 	err = db.Debug().Table("project").Select("sum(donations) as total").Where("id IN(?)",
-		db.Debug().Table("member").Select("project_id").Where("user_id=?",userId).SubQuery()).Scan(&result).Error
+		db.Debug().Table("member").Select("project_id").Where("user_id=?", userId).SubQuery()).Scan(&result).Error
 	donations = result.Total
 	return
 }

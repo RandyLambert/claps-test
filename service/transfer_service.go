@@ -23,8 +23,8 @@ func InsertTransfer(botId, assetID, memo string, amount decimal.Decimal, mixinId
 	}
 
 	err = dao.InsertOrUpdateTransfer(transfer)
-	if err != nil{
-		log.Error("dao.InsertTransfer 错误",err)
+	if err != nil {
+		log.Error("dao.InsertTransfer 错误", err)
 	}
 
 	return
@@ -55,7 +55,7 @@ func DoTransfer(userId int64, mixinId string) (err *util.Err) {
 	}
 
 	if err1 := dao.ExecuteTx(func(tx *gorm.DB) error {
-		for _,value := range *memberWallets {
+		for _, value := range *memberWallets {
 			if !value.Balance.Equal(decimal.Zero) {
 				err2 := InsertTransfer(value.BotId, value.AssetId, "恭喜您获得一笔捐赠", value.Balance, mixinId)
 				if err2 != nil {

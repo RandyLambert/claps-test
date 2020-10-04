@@ -100,7 +100,7 @@ func SyncTransfer() {
 			continue
 		}
 
-		for _,transfer := range *transfers {
+		for _, transfer := range *transfers {
 			//opponentid是转给谁
 			// Transfer transfer to account
 			//	asset_id, opponent_id, amount, traceID, memo
@@ -120,8 +120,8 @@ func SyncTransfer() {
 			}
 			//traceid暂时不应该这ls
 			snapshot, err := user.Transfer(ctx, &mixin.TransferInput{
-				TraceID: 	transfer.TraceId,
-				AssetID: 	transfer.AssetId,
+				TraceID: transfer.TraceId,
+				AssetID: transfer.AssetId,
 				//接收方的mixin_id
 				OpponentID: transfer.MixinId,
 				Amount:     transfer.Amount,
@@ -158,7 +158,7 @@ func SyncSnapshots() {
 		//获取最后一次跟新记录
 		property, _ := dao.GetPropertyByKey("last_snapshot_id")
 		var lastSnapshotID string
-		if property != nil{
+		if property != nil {
 			lastSnapshotID = property.Value
 		}
 
@@ -272,23 +272,23 @@ func SyncSnapshots() {
 	}
 }
 
-func SyncFiat(){
+func SyncFiat() {
 	ctx := context.TODO()
-	for{
-		mixinFiats,err := util.MixinClient.ReadExchangeRates(ctx)
-		if err!= nil{
+	for {
+		mixinFiats, err := util.MixinClient.ReadExchangeRates(ctx)
+		if err != nil {
 			log.Error(err.Error())
 		}
-		 fiat := &model.Fiat{}
-		for _,mixinFiat := range mixinFiats{
+		fiat := &model.Fiat{}
+		for _, mixinFiat := range mixinFiats {
 			fiat.Code = mixinFiat.Code
 			fiat.Rate = mixinFiat.Rate
-			if dao.UpdateFiat(fiat) != nil{
+			if dao.UpdateFiat(fiat) != nil {
 				log.Error(err.Error())
 			}
 		}
 
-		time.Sleep(40*time.Minute)
+		time.Sleep(40 * time.Minute)
 	}
 
 }

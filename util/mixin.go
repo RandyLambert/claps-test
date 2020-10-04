@@ -7,7 +7,7 @@ import (
 )
 
 const (
-//case DOGE,XRP,BCH,BTC,ETH:
+	//case DOGE,XRP,BCH,BTC,ETH:
 	BTC  = "c6d0c728-2624-429b-8e0d-d9d19b6592fa"
 	ETH  = "43d61dcd-e413-450d-80b8-101d5e903357"
 	XRP  = "23dfb5a5-5d7b-48b6-905f-3970e3176e27"
@@ -39,9 +39,9 @@ func GetMixin() *mixin.Client {
 	return MixinClient
 }
 
-func CheckAsset(assetId *string) bool{
-	switch *assetId{
-	case DOGE,XRP,BCH,BTC,ETH:
+func CheckAsset(assetId *string) bool {
+	switch *assetId {
+	case DOGE, XRP, BCH, BTC, ETH:
 		return true
 	}
 	return false

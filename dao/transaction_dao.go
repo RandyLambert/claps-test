@@ -15,7 +15,6 @@ func init() {
 	})
 }
 
-
 func InsertTransaction(transaction *model.Transaction) (err error) {
 	err = db.Create(transaction).Error
 	return
@@ -29,4 +28,3 @@ func ListTransactionsByProjectId(projectId string) (transactions *[]model.Transa
 
 	return
 }
-

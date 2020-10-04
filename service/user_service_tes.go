@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 )
+
 func TetGetUserBalanceByAllAssets() {
 	assets, err := ListAssetsAllByDB()
 	if err != nil {
@@ -14,9 +15,9 @@ func TetGetUserBalanceByAllAssets() {
 		return
 	}
 	fmt.Println(dto)
-	err2,total,balance := GetBalanceAndTotalToUSDByUserId(46085959,assets)
+	err2, total, balance := GetBalanceAndTotalToUSDByUserId(46085959, assets)
 	if err2 != nil {
 		return
 	}
-	fmt.Println("total",total,"balance",balance)
+	fmt.Println("total", total, "balance", balance)
 }

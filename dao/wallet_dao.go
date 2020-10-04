@@ -15,7 +15,6 @@ func init() {
 	})
 }
 
-
 func GetWalletTotalByBotIdAndAssetId(botId string, assetId string) (total *model.WalletTotal, err error) {
 	total = &model.WalletTotal{}
 	err = db.Debug().Table("wallet").Where("bot_id=? AND asset_id=?", botId, assetId).Find(total).Error

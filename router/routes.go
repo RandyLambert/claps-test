@@ -17,7 +17,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	// /api
 	apiGroup := r.Group("/api")
 	{
-		apiGroup.GET("/authInfo", middleware.JWTAuthMiddleware(),controller.AuthInfo)
+		apiGroup.GET("/authInfo", middleware.JWTAuthMiddleware(), controller.AuthInfo)
 		apiGroup.GET("/enviroments", controller.Enviroments)
 
 		apiGroup.GET("/oauth", controller.Oauth)
@@ -31,7 +31,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 			projectsGroup.GET("/:id", controller.ProjectById)
 			projectsGroup.GET("/:id/members", controller.ProjectMembers)
 			projectsGroup.GET("/:id/transactions", controller.ProjectTransactions)
-			projectsGroup.GET("/:id/svg",controller.ProjectSvg);
+			projectsGroup.GET("/:id/svg", controller.ProjectSvg)
 
 		}
 
@@ -39,7 +39,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		mixinGroup := apiGroup.Group("/mixin")
 		{
 			mixinGroup.GET("/assets", controller.MixinAssets)
-			mixinGroup.GET("/oauth",  middleware.JWTAuthMiddleware(),controller.MixinOauth)
+			mixinGroup.GET("/oauth", middleware.JWTAuthMiddleware(), controller.MixinOauth)
 		}
 
 		// /api/user
@@ -50,7 +50,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 			//查询所有币种的total和balance
 			userGroup.GET("/assets", controller.UserAssets)
 			//查询所有完成和未完成的记录
-			userGroup.GET("/transfers", middleware.MixinAuthMiddleware(),controller.UserTransfer)
+			userGroup.GET("/transfers", middleware.MixinAuthMiddleware(), controller.UserTransfer)
 			//请求获得某个用户的捐赠信息的汇总,包括总金额和捐赠人数
 			userGroup.GET("/donation", controller.UserDonation)
 			//提现

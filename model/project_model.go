@@ -6,7 +6,7 @@ import (
 )
 
 type Project struct {
-	Id          string          `json:"id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
+	Id          int64           `json:"id,omitempty" gorm:"type:bigserial;primary_key;not null"`
 	Name        string          `json:"name,omitempty" gorm:"type:varchar(50);not null"`
 	DisplayName string          `json:"display_name,omitempty" gorm:"type:varchar(50);default:null"`
 	Description string          `json:"description,omitempty" gorm:"type:varchar(120);default:null"`
@@ -18,14 +18,14 @@ type Project struct {
 }
 
 type ProjectTotal struct {
-	Id        string          `json:"id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
+	Id        int64           `json:"id,omitempty" gorm:"type:bigserial;primary_key;not null"`
 	Donations int64           `json:"donations,omitempty" gorm:"type:bigint;default:0"`
 	Total     decimal.Decimal `json:"total,omitempty" gorm:"type:varchar(128);default:null"`
 }
 
 type Badge struct {
 	Code    string `form:"code" json:"code" binding:"required"`
-	Color 	string `form:"color" json:"color" binding:"required"`
+	Color   string `form:"color" json:"color" binding:"required"`
 	BgColor string `form:"bg_color" json:"bg_color" binding:"required"`
-	Size	string `form:"size" json:"size" binding:"required"`
+	Size    string `form:"size" json:"size" binding:"required"`
 }

@@ -11,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
+
 func initAllConfig() {
 	/*
 		初始化配置文件,Mixin,log,DB和cache
@@ -18,14 +19,14 @@ func initAllConfig() {
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
-	if err := util.InitClient();err != nil{
+	if err := util.InitClient(); err != nil {
 		log.Error(err)
 	}
 }
 
 func main() {
 
-	cmd := flag.String( "cmd", "", "process identity")
+	cmd := flag.String("cmd", "", "process identity")
 	flag.Parse()
 	initAllConfig()
 	db, _ := dao.InitDB()
@@ -51,9 +52,9 @@ func main() {
 		//service.TetGetUserBalanceByAllAssets()
 		r := gin.Default()
 		r = router.CollectRoute(r)
-		serverport := viper.GetString("server.port")
-		if serverport != "" {
-			panic(r.Run(":" + serverport))
+		serverPort := viper.GetString("server.port")
+		if serverPort != "" {
+			panic(r.Run(":" + serverPort))
 		} else {
 			panic(r.Run(":3001"))
 		}
