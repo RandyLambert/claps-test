@@ -2,7 +2,7 @@ package model
 
 type Bot struct {
 	Id           string `gorm:"type:varchar(50);primary_key;not null"`
-	ProjectId    string `gorm:"type:varchar(50);primary_key;not null"`
+	ProjectId    int64  `gorm:"type:bigint;primary_key;not null"`
 	Distribution string `gorm:"type:char;primary_key;not null"`
 	SessionId    string `gorm:"type:varchar(50);not null;unique_index:session_id_UNIQUE"`
 	Pin          string `gorm:"type:varchar(6);not null"`
