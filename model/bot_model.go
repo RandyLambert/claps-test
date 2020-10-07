@@ -12,7 +12,7 @@ type Bot struct {
 
 type BotDto struct {
 	Id           string `json:"id,omitempty" gorm:"type:varchar(50);primary_key;not null"`
-	Distribution string `json:"distribution,omitempty" gorm:"type:enum('0','1','2','3');primary_key;not null"`
+	Distribution string `json:"distribution,omitempty" gorm:"type:char;primary_key;not null"`
 }
 
 const (

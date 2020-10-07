@@ -3,7 +3,7 @@ package model
 import "time"
 
 type Repository struct {
-	Id          int64     `json:"id,omitempty" gorm:"type:bigserial;primary_key;not null"`
+	Id          int64     `json:"id,omitempty" gorm:"type:bigserial;primary_key;auto_increment"`
 	ProjectId   int64     `json:"project_id,omitempty" gorm:"type:bigint;index:repository_project_INDEX;not null"`
 	Type        string    `json:"type,omitempty" gorm:"varchar(10);not null"`
 	Name        string    `json:"name,omitempty" gorm:"type:varchar(50);not null"`
