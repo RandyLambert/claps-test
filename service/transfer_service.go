@@ -23,7 +23,7 @@ func InsertTransfer(botId, assetID, memo string, amount decimal.Decimal, mixinId
 
 	err = model.TRANSFER.InsertOrUpdateTransfer(transfer)
 	if err != nil {
-		log.Error("modelx.InsertOrUpdateTransfer 错误", err)
+		log.Error("model.InsertOrUpdateTransfer 错误", err)
 	}
 
 	return

@@ -239,6 +239,11 @@ func UserWithdrawalWay(ctx *gin.Context) {
 	}
 
 	withdrawalWay := ctx.DefaultPostForm("withdrawal_way", model.WithdrawByClaps)
+	if withdrawalWay != model.WithdrawByClaps && withdrawalWay != model.WithdrawByUser {
+		util.HandleResponse(ctx, util.NewErr(errors.New("该请求post值不属于withdrawByClaps或者withdrawByUser"),
+			util.ErrBadRequest, "该请求post值不属于withdrawByClaps或者withdrawByUser"), resp)
+		return
+	}
 
 	//更新withdrawalWay
 	err2 := service.UpdateUserWithdrawalWay(*mcache.Github.ID, withdrawalWay)
