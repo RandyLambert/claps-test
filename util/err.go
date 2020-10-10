@@ -50,7 +50,7 @@ func sendSuccessResp(c *gin.Context, data interface{}) {
 
 // SendFailResp 返回失败请求,失败就不返回data了
 func sendFailResp(c *gin.Context, httpCode int, err *Err) {
-	c.JSON(httpCode, gin.H{
+	c.AbortWithStatusJSON(httpCode, gin.H{
 		"code":    err.Code,
 		"message": err.Error(),
 	})

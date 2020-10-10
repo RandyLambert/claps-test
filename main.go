@@ -1,7 +1,7 @@
 package main
 
 import (
-	"claps-test/dao"
+	"claps-test/model"
 	"claps-test/router"
 	"claps-test/service"
 	"claps-test/util"
@@ -29,17 +29,17 @@ func main() {
 	cmd := flag.String("cmd", "", "process identity")
 	flag.Parse()
 	initAllConfig()
-	db, _ := dao.InitDB()
+	db, _ := model.InitDB()
 	if db != nil {
 		defer db.Close()
 	}
 	switch *cmd {
 	case "migrate", "setdb":
-		if multierror := dao.Migrate(); multierror != nil {
+		if multierror := model.Migrate(); multierror != nil {
 			log.Error(multierror)
 		}
 	case "deletetables": // dangerous
-		dao.DeleteAllTables()
+		model.DeleteAllTables()
 	default:
 		//定期更新数据库snapshot信息
 		go service.SyncSnapshots()

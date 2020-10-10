@@ -18,7 +18,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	apiGroup := r.Group("/api")
 	{
 		apiGroup.GET("/authInfo", middleware.JWTAuthMiddleware(), controller.AuthInfo)
-		apiGroup.GET("/enviroments", controller.Enviroments)
+		apiGroup.GET("/environments", controller.Enviroments)
 
 		apiGroup.GET("/oauth", controller.Oauth)
 
@@ -55,6 +55,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 			userGroup.GET("/donation", controller.UserDonation)
 			//提现
 			userGroup.POST("/withdraw", middleware.MixinAuthMiddleware(), controller.UserWithdraw)
+			userGroup.POST("/withdrawalWay",middleware.MixinAuthMiddleware(),controller.UserWithdrawalWay)
 		}
 
 	}

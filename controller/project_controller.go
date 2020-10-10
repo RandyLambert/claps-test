@@ -10,9 +10,26 @@ import (
 )
 
 func Projects(ctx *gin.Context) {
-
-	projects, err := service.ListProjectsAll()
-	util.HandleResponse(ctx, err, projects)
+	query := &model.PaginationQ{}
+	err1 := ctx.ShouldBindQuery(query)
+	if err1 != nil {
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrBadRequest, "project query error"), nil)
+		return
+	}
+	projects,number,err := service.ListProjectsByQuery(query)
+	if err != nil {
+		util.HandleResponse(ctx, err, nil)
+		return
+	}
+	query.Total = number
+	resp := &map[string]interface{}{
+		"projects":projects,
+		"query":query,
+	}
+	util.HandleResponse(ctx, err, resp)
+	//log.Debug(number)
+	//util.HandleResponse(ctx,err,projects)
+	return
 }
 
 /*
@@ -21,7 +38,7 @@ func Projects(ctx *gin.Context) {
 func ProjectById(ctx *gin.Context) {
 	projectId, err1 := strconv.ParseInt(ctx.Param("id"), 10, 64)
 	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "projectId strconv err"), nil)
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrBadRequest, "projectId strconv err"), nil)
 		return
 	}
 	projectInfo, err := service.GetProjectById(projectId)
@@ -31,7 +48,7 @@ func ProjectById(ctx *gin.Context) {
 func ProjectMembers(ctx *gin.Context) {
 	projectId, err1 := strconv.ParseInt(ctx.Param("id"), 10, 64)
 	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "projectId strconv err"), nil)
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrBadRequest, "projectId strconv err"), nil)
 		return
 	}
 	members, err := service.ListMembersByProjectId(projectId)
@@ -39,23 +56,35 @@ func ProjectMembers(ctx *gin.Context) {
 }
 
 func ProjectTransactions(ctx *gin.Context) {
+	projectId, err1 := strconv.ParseInt(ctx.Param("id"), 10, 64)
+	if err1 != nil {
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrBadRequest, "projectId strconv err"), nil)
+		return
+	}
 
-	//assetId := ctx.Query("assetId")
-	//if assetId == "" {
-	//	err := util.NewErr(nil, util.ErrUnauthorized, "没有QUERY值无法请求成功")
-	//	util.HandleResponse(ctx, err, nil)
-	//	return
-	//}
+	query := &model.PaginationQ{}
+	err1 = ctx.ShouldBindQuery(query)
+	if err1 != nil {
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrBadRequest, "project query error"), nil)
+		return
+	}
 
-	transactions, err := service.ListTransactionsByProjectId(ctx.Param("id"))
-	util.HandleResponse(ctx, err, transactions)
+	transactions, number ,err := service.ListTransactionsByProjectIdAndQuery(projectId,query)
+	query.Total = number
+	resp := &map[string]interface{}{
+		"transactions":transactions,
+		"query":query,
+	}
+	util.HandleResponse(ctx, err, resp)
+
+	return
 }
 
 func ProjectSvg(ctx *gin.Context) {
 	badge := &model.Badge{}
 
-	if err := ctx.ShouldBind(badge); err != nil {
-		err := util.NewErr(nil, util.ErrUnauthorized, "没有QUERY值无法请求成功")
+	if err := ctx.ShouldBindQuery(badge); err != nil {
+		err := util.NewErr(nil, util.ErrBadRequest, "没有QUERY值无法请求成功")
 		util.HandleResponse(ctx, err, nil)
 		return
 	}

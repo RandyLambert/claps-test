@@ -1,5 +1,17 @@
 package model
 
+import "github.com/jinzhu/gorm"
+
+func init() {
+	RegisterMigrateHandler(func(db *gorm.DB) error {
+
+		if err := db.AutoMigrate(&Bot{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 type Bot struct {
 	Id           string `gorm:"type:varchar(50);primary_key;not null"`
 	ProjectId    int64  `gorm:"type:bigint;primary_key;not null"`
@@ -16,8 +28,30 @@ type BotDto struct {
 }
 
 const (
-	PersperAlgorithm = "0" //persper算法
-	Commits          = "1" //commit数量
-	ChangedLines     = "2" //代码行数
-	IdenticalAmount  = "3" //平均分配
+	MericoAlgorithm = "0" //Merico算法
+	Commits         = "1" //commit数量
+	ChangedLines    = "2" //代码行数
+	IdenticalAmount = "3" //平均分配
 )
+
+
+var BOT *Bot
+
+func (bot *Bot) GetBotById(botId string) (botData *Bot, err error) {
+	botData = &Bot{}
+	err = db.Debug().Where("id=?", botId).Find(botData).Error
+	return
+}
+
+//根据projectId获取所有的机器人Id
+func (bot *Bot) ListBotDtosByProjectId(projectId int64) (botDto *[]BotDto, err error) {
+	botDto = &[]BotDto{}
+	err = db.Debug().Table("bot").Where("project_id=?", projectId).Scan(botDto).Error
+	return
+}
+
+func (bot *Bot) GetBotDtoById(botId string) (botDto *BotDto, err error) {
+	botDto = &BotDto{}
+	err = db.Table("bot").Where("id=?", botId).Scan(botDto).Error
+	return
+}

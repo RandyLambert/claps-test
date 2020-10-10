@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"claps-test/model"
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
@@ -103,22 +104,23 @@ func UserTransfer(ctx *gin.Context) {
 		return
 	}
 
-	//用户如果提现过一定是绑定了mixin,没有mixin则是没有提现记录
-	mixinId, err := service.GetMixinIdByUserId(*mcache.Github.ID)
-	if err != nil {
-		util.HandleResponse(ctx, err, nil)
-		return
-	}
-
-	//可能封装成中间件,判断mixin是否登录
-	if mixinId == "" {
-		util.HandleResponse(ctx, util.NewErr(nil, util.ErrUnauthorized, "没有绑定mixin没有提现记录"), nil)
+	query := &model.PaginationQ{}
+	err1 = ctx.ShouldBindQuery(query)
+	if err1 != nil {
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrBadRequest, "transfer query error"), nil)
 		return
 	}
 
 	//从transfer表中获取该用户的所有捐赠记录
-	transfers, err := service.GetTransferByMixinId(mixinId)
+	transfers,number,err := service.ListTransfersByProjectIdAndQuery(mcache.MixinId,query)
+	if err != nil {
+		util.HandleResponse(ctx, err, nil)
+		return
+	}
+	query.Total = number
 	resp["transfers"] = transfers
+	resp["query"] = query
+
 	util.HandleResponse(ctx, err, resp)
 }
 
@@ -207,7 +209,7 @@ func UserWithdraw(ctx *gin.Context) {
 		return
 	}
 
-	//生成trasfer记录
+	//生成transfer记录
 	err2 := service.DoTransfer(*mcache.Github.ID, mixinId)
 	if err2 != nil {
 		util.HandleResponse(ctx, err2, nil)
@@ -216,4 +218,33 @@ func UserWithdraw(ctx *gin.Context) {
 	util.HandleResponse(ctx, nil, nil)
 
 	//等协程完成转账
+}
+
+func UserWithdrawalWay(ctx *gin.Context){
+	resp := make(map[string]interface{})
+
+	var val interface{}
+	var ok bool
+	if val, ok = ctx.Get(util.UID); !ok {
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "ctx get uid error"), resp)
+		return
+	}
+	uid := val.(string)
+
+	mcache := &util.MCache{}
+	err1 := util.Rdb.Get(uid, mcache)
+	if err1 != nil {
+		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), resp)
+		return
+	}
+
+	withdrawalWay := ctx.DefaultPostForm("withdrawal_way", model.WithdrawByClaps)
+
+	//更新withdrawalWay
+	err2 := service.UpdateUserWithdrawalWay(*mcache.Github.ID, withdrawalWay)
+	if err2 != nil {
+		util.HandleResponse(ctx, err2, nil)
+		return
+	}
+	util.HandleResponse(ctx, nil, nil)
 }

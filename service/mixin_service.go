@@ -1,7 +1,6 @@
 package service
 
 import (
-	"claps-test/dao"
 	"claps-test/model"
 	"claps-test/util"
 	"context"
@@ -15,7 +14,7 @@ import (
 
 //获取所有币的信息
 func GetAssetByMixinClient(botId string, assetId string) (asset *mixin.Asset, err *util.Err) {
-	bot, err1 := dao.GetBotById(botId)
+	bot, err1 := model.BOT.GetBotById(botId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "通过相应botid获取bot信息信息错误")
 		return
@@ -72,7 +71,7 @@ func SyncAssets() {
 					PriceUsd: assetsInfo[i].PriceUSD,
 				}
 				//第一次使用前,如果数据库没有信息,需要先创建几条记录,之后使用就每次更新即可
-				err = dao.UpdateAsset(asset)
+				err = model.ASSET.UpdateAsset(asset)
 
 				if err != nil {
 					log.Error(err.Error())
@@ -88,7 +87,7 @@ func SyncTransfer() {
 	ctx := context.TODO()
 	for {
 		//找到状态为UNFINISHED的trasfer
-		transfers, err := dao.ListTransfersByStatus(model.UNFINISHED)
+		transfers, err := model.TRANSFER.ListTransfersByStatus(model.UNFINISHED)
 		if err != nil {
 			log.Error(err.Error())
 			continue
@@ -101,13 +100,13 @@ func SyncTransfer() {
 		}
 
 		for _, transfer := range *transfers {
-			//opponentid是转给谁
+			//opponentId是转给谁
 			// Transfer transfer to account
 			//	asset_id, opponent_id, amount, traceID, memo
 			// 把该user的钱转账到该账户返回快照
 
 			//sender
-			bot, err := dao.GetBotById(transfer.BotId)
+			bot, err := model.BOT.GetBotById(transfer.BotId)
 			if err != nil {
 				log.Error(err.Error())
 				continue
@@ -137,7 +136,7 @@ func SyncTransfer() {
 			transfer.CreatedAt = snapshot.CreatedAt
 			transfer.Status = model.FINISHED
 
-			err = dao.InsertOrUpdateTransfer(&transfer)
+			err = model.TRANSFER.InsertOrUpdateTransfer(&transfer)
 			if err != nil {
 				log.Error(err.Error())
 			}
@@ -156,7 +155,7 @@ func SyncSnapshots() {
 	//死循环,读到上次最后一条就break
 	for {
 		//获取最后一次跟新记录
-		property, _ := dao.GetPropertyByKey("last_snapshot_id")
+		property, _ := model.PROPERTY.GetPropertyByKey("last_snapshot_id")
 		var lastSnapshotID string
 		if property != nil {
 			lastSnapshotID = property.Value
@@ -190,7 +189,7 @@ func SyncSnapshots() {
 			//筛选自己的转入
 			if snapshots[i].UserID != "" && snapshots[i].Amount.Cmp(decimal.Zero) > 0 && snapshots[i].Memo != "deposit" {
 				//根据机器人从数据库里找到项目
-				projectTotal, err := dao.GetProjectTotalByBotId(snapshots[i].UserID)
+				projectTotal, err := model.PROJECT.GetProjectTotalByBotId(snapshots[i].UserID)
 				//错误处理有问题
 				if err != nil {
 					log.Error(err.Error())
@@ -207,14 +206,14 @@ func SyncSnapshots() {
 					Receiver:  snapshots[i].UserID,
 				}
 				//插入捐赠记录
-				err = dao.InsertTransaction(transaction)
+				err = model.TRANSACTION.InsertTransaction(transaction)
 				if err != nil {
 					log.Error(err.Error())
 					continue
 				}
 
 				//查找汇率等详细信息
-				asset, err := dao.GetPriceUsdByAssetId(snapshots[i].Asset.AssetID)
+				asset, err := model.ASSET.GetPriceUsdByAssetId(snapshots[i].Asset.AssetID)
 				if err != nil {
 					log.Error(err.Error())
 					continue
@@ -224,30 +223,30 @@ func SyncSnapshots() {
 				projectTotal.Total = projectTotal.Total.Add(asset.PriceUsd.Mul(snapshots[i].Amount))
 				projectTotal.Donations += 1
 
-				err = dao.UpdateProjectTotal(projectTotal)
+				err = model.PROJECT.UpdateProjectTotal(projectTotal)
 				if err != nil {
 					log.Error(err.Error())
 					continue
 				}
 
 				//更新项目钱包
-				walletTotal, err := dao.GetWalletTotalByBotIdAndAssetId(snapshots[i].UserID, snapshots[i].Asset.AssetID)
+				walletTotal, err := model.WALLET.GetWalletTotalByBotIdAndAssetId(snapshots[i].UserID, snapshots[i].Asset.AssetID)
 				if err != nil {
 					log.Error(err.Error())
 					continue
 				}
 				walletTotal.Total = walletTotal.Total.Add(snapshots[i].Amount)
-				err = dao.UpdateWalletTotal(walletTotal)
+				err = model.WALLET.UpdateWalletTotal(walletTotal)
 				if err != nil {
 					log.Error(err.Error())
 					continue
 				}
 				//根据不同的分配算法进行配置
-				bot, err := dao.GetBotDtoById(snapshots[i].UserID)
+				bot, err := model.BOT.GetBotDtoById(snapshots[i].UserID)
 
 				switch bot.Distribution {
-				case model.PersperAlgorithm:
-					distributionByPersperAlgorithm(transaction)
+				case model.MericoAlgorithm:
+					distributionByMericoAlgorithm(transaction)
 				case model.Commits:
 					distributionByCommits(transaction)
 				case model.ChangedLines:
@@ -263,7 +262,7 @@ func SyncSnapshots() {
 			Key:   "last_snapshot_id",
 			Value: lastSnapshotID,
 		}
-		err = dao.UpdateProperty(property)
+		err = model.PROPERTY.UpdateProperty(property)
 		if err != nil {
 			log.Error(err.Error())
 		}
@@ -283,7 +282,7 @@ func SyncFiat() {
 		for _, mixinFiat := range mixinFiats {
 			fiat.Code = mixinFiat.Code
 			fiat.Rate = mixinFiat.Rate
-			if dao.UpdateFiat(fiat) != nil {
+			if model.FIAT.UpdateFiat(fiat) != nil {
 				log.Error(err.Error())
 			}
 		}

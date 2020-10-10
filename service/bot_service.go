@@ -1,7 +1,7 @@
 package service
 
 import (
-	"claps-test/dao"
+	"claps-test/model"
 	"claps-test/util"
 	"context"
 	"github.com/fox-one/mixin-sdk-go"
@@ -9,7 +9,7 @@ import (
 
 func GetAssetByBotIdAndAssetId(botId string, assetId string) (asset *mixin.Asset, err *util.Err) {
 
-	bot, err1 := dao.GetBotById(botId)
+	bot, err1 := model.BOT.GetBotById(botId)
 	if err1 != nil {
 		err = util.NewErr(err, util.ErrDataBase, "通过botid获取bot信息失败")
 	}

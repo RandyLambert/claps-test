@@ -1,13 +1,12 @@
 package service
 
 import (
-	"claps-test/dao"
 	"claps-test/model"
 	"claps-test/util"
 )
 
 func GetAssetById(assetID string) (asset *model.Asset, err *util.Err) {
-	asset, err1 := dao.GetAssetById(assetID)
+	asset, err1 := model.ASSET.GetAssetById(assetID)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "通过id获取asset信息失败")
 	}
@@ -16,7 +15,7 @@ func GetAssetById(assetID string) (asset *model.Asset, err *util.Err) {
 
 //把数据库中asset表中的数据读出来
 func ListAssetsAllByDB() (assets *[]model.Asset, err *util.Err) {
-	assets, err1 := dao.ListAssetsAllByDB()
+	assets, err1 := model.ASSET.ListAssetsAllByDB()
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取全部assets信息失败")
 	}

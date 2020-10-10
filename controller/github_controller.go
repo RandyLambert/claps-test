@@ -59,7 +59,7 @@ func Oauth(ctx *gin.Context) {
 
 	//生成token
 	randomUid := util.RandUp(32)
-	jwt_token, err1 := middleware.GenToken(randomUid)
+	jwtToken, err1 := middleware.GenToken(randomUid)
 	if err1 != nil {
 		util.HandleResponse(ctx, util.NewErr(err1, util.ErrInternalServer, "gen token error"), nil)
 		return
@@ -106,10 +106,10 @@ func Oauth(ctx *gin.Context) {
 		return
 	}
 
-	resp["token"] = jwt_token
+	resp["token"] = jwtToken
 	util.HandleResponse(ctx, nil, resp)
 	//重定向到http://localhost:3000/profile
-	//newpath := "http://localhost:3000" + oauth_.Path
+	//newPath := "http://localhost:3000" + oauth_.Path
 	//log.Debug("重定向", newpath)
-	//ctx.Redirect(http.StatusMovedPermanently, newpath)
+	//ctx.Redirect(http.StatusMovedPermanently, newPath)
 }

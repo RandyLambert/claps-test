@@ -87,19 +87,19 @@ func MixinAuthMiddleware() gin.HandlerFunc {
 		}
 
 		//从数据库查询mixin_id
-		mixin_id, err := service.GetMixinIdByUserId(*mcache.Github.ID)
+		mixinId, err := service.GetMixinIdByUserId(*mcache.Github.ID)
 		if err != nil {
 			util.HandleResponse(ctx, err, nil)
 			ctx.Abort()
 		}
 
-		if mixin_id == "" {
+		if mixinId == "" {
 			util.HandleResponse(ctx, util.NewErr(err1, util.ErrUnauthorized, "mixin unauthorized"), nil)
 			ctx.Abort()
 			return
 		} else {
 			//set cache ,next
-			mcache.MixinId = mixin_id
+			mcache.MixinId = mixinId
 			mcache.MixinAuth = true
 			err1 = util.Rdb.Replace(uid, *mcache, -1)
 			if err1 != nil {
@@ -113,7 +113,7 @@ func MixinAuthMiddleware() gin.HandlerFunc {
 }
 
 /*
-功能:生成Tokenm
+功能:生成Token
 说明:uid=github.ID
 */
 func GenToken(uid string) (string, error) {

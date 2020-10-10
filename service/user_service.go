@@ -1,7 +1,6 @@
 package service
 
 import (
-	"claps-test/dao"
 	"claps-test/model"
 	"claps-test/util"
 	"context"
@@ -39,7 +38,7 @@ func GetBalanceAndTotalToUSDByUserId(userId int64, assets *[]model.Asset) (err *
 		assetMap[asset.AssetId] = asset.PriceUsd
 	}
 
-	memberWalletDtos, err1 := dao.GetMemberWalletByUserId(userId)
+	memberWalletDtos, err1 := model.MEMBERWALLET.GetMemberWalletByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "查询数据库的用户钱包出错")
 		return
@@ -69,7 +68,7 @@ func GetBalanceAndTotalByUserIdAndAssets(userId int64, assets *[]model.Asset) (e
 		memberWalletMap[asset.AssetId] = &model.MemberWalletDto{AssetId: asset.AssetId}
 	}
 
-	memberWalletDtos, err1 := dao.GetMemberWalletByUserId(userId)
+	memberWalletDtos, err1 := model.MEMBERWALLET.GetMemberWalletByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "查询数据库的用户钱包出错")
 		return
@@ -93,16 +92,25 @@ func GetBalanceAndTotalByUserIdAndAssets(userId int64, assets *[]model.Asset) (e
 	return
 }
 
-func GetTransferByMixinId(mixinId string) (transfers *[]model.Transfer, err *util.Err) {
-	transfers, err1 := dao.GetTransferByMixinId(mixinId)
+func ListTransfersByMixinId(mixinId string) (transfers *[]model.Transfer, err *util.Err) {
+	transfers, err1 := model.TRANSFER.ListTransferByMixinId(mixinId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "数据库查询transfer出错")
 	}
 	return
 }
 
+func ListTransfersByProjectIdAndQuery(mixinId string,q *model.PaginationQ) (transfers *[]model.Transfer, number int, err *util.Err) {
+
+	transfers, number, err1 := model.TRANSFER.ListTransfersByMixinIdAndQuery(mixinId,q)
+	if err1 != nil {
+		err = util.NewErr(err1, util.ErrDataBase, "获取项目获取捐赠记录失败")
+	}
+	return
+}
+
 func SumProjectDonationsByUserId(userId int64) (donations int64, err *util.Err) {
-	donations, err1 := dao.SumProjectDonationsByUserId(userId)
+	donations, err1 := model.PROJECT.SumProjectDonationsByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err, util.ErrDataBase, "数据库获取用户项目信息和出错")
 	}
@@ -111,7 +119,7 @@ func SumProjectDonationsByUserId(userId int64) (donations int64, err *util.Err) 
 
 //更新user表中的mixin_id字段
 func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
-	err1 := dao.UpdateUserMixinId(userId, mixinId)
+	err1 := model.USER.UpdateUserMixinId(userId, mixinId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "更新数据库mixin_id错误")
 	}
@@ -119,11 +127,19 @@ func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
 }
 
 func GetMixinIdByUserId(userId int64) (mixinId string, err *util.Err) {
-	user, err1 := dao.GetUserById(userId)
+	user, err1 := model.USER.GetUserById(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "从数据库查询user信息错误")
 		return
 	}
 	mixinId = user.MixinId
+	return
+}
+
+func UpdateUserWithdrawalWay(userId int64,withdrawWal string)(err *util.Err){
+	err1 := model.USER.UpdateUserWithdrawalWay(userId,withdrawWal)
+	if err1 != nil {
+		err = util.NewErr(err1, util.ErrDataBase, "更新数据库withdrawalWay信息错误")
+	}
 	return
 }
