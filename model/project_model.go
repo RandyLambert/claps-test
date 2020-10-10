@@ -40,7 +40,9 @@ type Badge struct {
 	BgColor string `form:"bg_color" json:"bg_color" binding:"required"`
 	Size    string `form:"size" json:"size" binding:"required"`
 }
+
 var PROJECT *Project
+
 //获取所有项目
 func (proj *Project) ListProjectsAll() (projects *[]Project, err error) {
 
@@ -49,31 +51,30 @@ func (proj *Project) ListProjectsAll() (projects *[]Project, err error) {
 	return
 }
 
-
-func (proj *Project) getProjectsNumbers() (number int,err error) {
+func (proj *Project) getProjectsNumbers() (number int, err error) {
 
 	err = db.Debug().Table("project").Count(&number).Error
 	return
 }
 
-func (proj * Project) ListProjectsByQuery(q *PaginationQ) (projects *[]Project,number int,err error) {
+func (proj *Project) ListProjectsByQuery(q *PaginationQ) (projects *[]Project, number int, err error) {
 	projects = &[]Project{}
-	number,err = proj.getProjectsNumbers()
+	number, err = proj.getProjectsNumbers()
 	if err != nil {
 		return
 	}
 
 	tx := db.Debug().Table("project")
-	if q.Limit < 0{
+	if q.Limit < 0 {
 		q.Limit = 20
 	}
 
-	if q.Offset < 0{
+	if q.Offset < 0 {
 		q.Offset = 0
 	}
 
-	if q.Q != ""{
-		tx = tx.Where("name Like ?","%" + q.Q + "%")
+	if q.Q != "" {
+		tx = tx.Where("name Like ?", "%"+q.Q+"%")
 	}
 
 	err = tx.Limit(q.Limit).Offset(q.Offset).Find(projects).Error
@@ -119,6 +120,6 @@ func (proj *Project) SumProjectDonationsByUserId(userId int64) (donations int64,
 	return
 }
 
-func (proj *Project) GetProjectsTotal()(total uint32,err error) {
+func (proj *Project) GetProjectsTotal() (total uint32, err error) {
 	return
 }

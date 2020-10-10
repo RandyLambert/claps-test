@@ -17,7 +17,7 @@ func init() {
 }
 
 type MemberWallet struct {
-	ProjectId int64 		  `json:"project_id,omitempty" gorm:"type:bigint;primary_key;not null"`
+	ProjectId int64 `json:"project_id,omitempty" gorm:"type:bigint;primary_key;not null"`
 	//user表的Id
 	UserId    int64           `json:"user_id,omitempty" gorm:"type:bigint;primary_key;not null"`
 	BotId     string          `json:"bot_id,omitempty" gorm:"type:varchar(50);primary_key;not null"`

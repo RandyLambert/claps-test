@@ -15,7 +15,6 @@ func init() {
 	})
 }
 
-
 type Repository struct {
 	Id          int64     `json:"id,omitempty" gorm:"type:bigserial;primary_key;auto_increment"`
 	ProjectId   int64     `json:"project_id,omitempty" gorm:"type:bigint;index:repository_project_INDEX;not null"`
@@ -28,6 +27,7 @@ type Repository struct {
 }
 
 var REPOSITORY *Repository
+
 //根据project获取所有的仓库信息
 func (repository *Repository) ListRepositoriesByProjectId(projectId int64) (repositories *[]Repository, err error) {
 	repositories = &[]Repository{}

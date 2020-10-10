@@ -77,7 +77,7 @@ func distributionByIdenticalAmount(transaction *model.Transaction) {
 func WithdrawNowOrNot(member *model.User) (err *util.Err) {
 	//判断是否有未完成的提现
 	if member.WithdrawalWay == model.WithdrawByClaps {
-		if member.MixinId != ""{
+		if member.MixinId != "" {
 			err = IfUnfinishedTransfer(member.MixinId)
 			if err != nil {
 				return

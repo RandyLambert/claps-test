@@ -22,18 +22,18 @@ type Fiat struct {
 
 var FIAT *Fiat
 
-func(fiat *Fiat) UpdateFiat(fiatData *Fiat) (err error) {
+func (fiat *Fiat) UpdateFiat(fiatData *Fiat) (err error) {
 	err = db.Debug().Save(fiatData).Error
 	return
 }
 
-func(fiat *Fiat) ListFiatsAllByDB() (fiats *[]Fiat, err error) {
+func (fiat *Fiat) ListFiatsAllByDB() (fiats *[]Fiat, err error) {
 	fiats = &[]Fiat{}
 	err = db.Find(fiats).Error
 	return
 }
 
-func(fiat *Fiat) GetFiatByCode(code string) (fiatData *Fiat, err error) {
+func (fiat *Fiat) GetFiatByCode(code string) (fiatData *Fiat, err error) {
 	fiatData = &Fiat{}
 	err = db.Select("rate").Where("code = ? ", code).Find(&fiat).Error
 	return

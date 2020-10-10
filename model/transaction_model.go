@@ -42,26 +42,26 @@ func (transaction *Transaction) ListTransactionsByProjectId(projectId int64) (tr
 	return
 }
 
-func (transaction *Transaction) getTransactionsNumbersByProjectId(projectId int64) (number int,err error) {
+func (transaction *Transaction) getTransactionsNumbersByProjectId(projectId int64) (number int, err error) {
 
-	err = db.Debug().Table("transaction").Where("project_id = ?",projectId).Count(&number).Error
+	err = db.Debug().Table("transaction").Where("project_id = ?", projectId).Count(&number).Error
 	return
 }
 
-func (transaction *Transaction) ListTransactionsByProjectIdAndQuery(projectId int64,q *PaginationQ) (transactions *[]Transaction,number int,err error) {
+func (transaction *Transaction) ListTransactionsByProjectIdAndQuery(projectId int64, q *PaginationQ) (transactions *[]Transaction, number int, err error) {
 
 	transactions = &[]Transaction{}
-	number,err = transaction.getTransactionsNumbersByProjectId(projectId)
+	number, err = transaction.getTransactionsNumbersByProjectId(projectId)
 	if err != nil {
 		return
 	}
 
 	tx := db.Debug().Table("transaction")
-	if q.Limit < 0{
+	if q.Limit < 0 {
 		q.Limit = 20
 	}
 
-	if q.Offset < 0{
+	if q.Offset < 0 {
 		q.Offset = 0
 	}
 	err = tx.Limit(q.Limit).Offset(q.Offset).Find(transactions).Error

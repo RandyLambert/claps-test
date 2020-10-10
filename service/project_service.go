@@ -52,8 +52,8 @@ func ListProjectsAll() (projects *[]model.Project, err *util.Err) {
 	return
 }
 
-func ListProjectsByQuery(q *model.PaginationQ) (projects *[]model.Project,number int, err *util.Err){
-	projects,number,err1 := model.PROJECT.ListProjectsByQuery(q)
+func ListProjectsByQuery(q *model.PaginationQ) (projects *[]model.Project, number int, err *util.Err) {
+	projects, number, err1 := model.PROJECT.ListProjectsByQuery(q)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "根据query获取项目失败失败")
 	}
@@ -79,9 +79,9 @@ func ListTransactionsByProjectId(projectId int64) (transactions *[]model.Transac
 	return
 }
 
-func ListTransactionsByProjectIdAndQuery(projectId int64,q *model.PaginationQ) (transactions *[]model.Transaction, number int, err *util.Err) {
+func ListTransactionsByProjectIdAndQuery(projectId int64, q *model.PaginationQ) (transactions *[]model.Transaction, number int, err *util.Err) {
 
-	transactions, number, err1 := model.TRANSACTION.ListTransactionsByProjectIdAndQuery(projectId,q)
+	transactions, number, err1 := model.TRANSACTION.ListTransactionsByProjectIdAndQuery(projectId, q)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目获取捐赠记录失败")
 	}

@@ -55,7 +55,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 			userGroup.GET("/donation", controller.UserDonation)
 			//提现
 			userGroup.POST("/withdraw", middleware.MixinAuthMiddleware(), controller.UserWithdraw)
-			userGroup.POST("/withdrawalWay",middleware.MixinAuthMiddleware(),controller.UserWithdrawalWay)
+			userGroup.POST("/withdrawalWay", middleware.MixinAuthMiddleware(), controller.UserWithdrawalWay)
 		}
 
 	}

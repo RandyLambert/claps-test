@@ -34,7 +34,6 @@ const (
 	IdenticalAmount = "3" //平均分配
 )
 
-
 var BOT *Bot
 
 func (bot *Bot) GetBotById(botId string) (botData *Bot, err error) {

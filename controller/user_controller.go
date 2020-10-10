@@ -112,7 +112,7 @@ func UserTransfer(ctx *gin.Context) {
 	}
 
 	//从transfer表中获取该用户的所有捐赠记录
-	transfers,number,err := service.ListTransfersByProjectIdAndQuery(mcache.MixinId,query)
+	transfers, number, err := service.ListTransfersByProjectIdAndQuery(mcache.MixinId, query)
 	if err != nil {
 		util.HandleResponse(ctx, err, nil)
 		return
@@ -220,7 +220,7 @@ func UserWithdraw(ctx *gin.Context) {
 	//等协程完成转账
 }
 
-func UserWithdrawalWay(ctx *gin.Context){
+func UserWithdrawalWay(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
 	var val interface{}

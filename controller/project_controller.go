@@ -16,15 +16,15 @@ func Projects(ctx *gin.Context) {
 		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrBadRequest, "project query error"), nil)
 		return
 	}
-	projects,number,err := service.ListProjectsByQuery(query)
+	projects, number, err := service.ListProjectsByQuery(query)
 	if err != nil {
 		util.HandleResponse(ctx, err, nil)
 		return
 	}
 	query.Total = number
 	resp := &map[string]interface{}{
-		"projects":projects,
-		"query":query,
+		"projects": projects,
+		"query":    query,
 	}
 	util.HandleResponse(ctx, err, resp)
 	//log.Debug(number)
@@ -69,11 +69,11 @@ func ProjectTransactions(ctx *gin.Context) {
 		return
 	}
 
-	transactions, number ,err := service.ListTransactionsByProjectIdAndQuery(projectId,query)
+	transactions, number, err := service.ListTransactionsByProjectIdAndQuery(projectId, query)
 	query.Total = number
 	resp := &map[string]interface{}{
-		"transactions":transactions,
-		"query":query,
+		"transactions": transactions,
+		"query":        query,
 	}
 	util.HandleResponse(ctx, err, resp)
 

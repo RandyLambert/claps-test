@@ -28,7 +28,7 @@ type Transfer struct {
 	Memo       string          `json:"memo,omitempty" gorm:"type:varchar(120);not null"`
 	Status     string          `json:"status,omitempty" gorm:"type:char;not null;index:status_INDEX"`
 	//0是用户点击提现后(提现操作未完成) 1机器人完成提现
-	CreatedAt time.Time 	   `json:"created_at,omitempty" gorm:"type:timestamp with time zone"`
+	CreatedAt time.Time `json:"created_at,omitempty" gorm:"type:timestamp with time zone"`
 }
 
 const (
@@ -37,6 +37,7 @@ const (
 )
 
 var TRANSFER *Transfer
+
 func (transfer *Transfer) InsertOrUpdateTransfer(transferData *Transfer) (err error) {
 	err = db.Debug().Save(transferData).Error
 	return
@@ -48,26 +49,26 @@ func (transfer *Transfer) ListTransferByMixinId(mixinId string) (transfers *[]Tr
 	return
 }
 
-func (transfer *Transfer) getTransfersNumbersByMixinId(mixinId string) (number int,err error) {
+func (transfer *Transfer) getTransfersNumbersByMixinId(mixinId string) (number int, err error) {
 
-	err = db.Debug().Table("transfer").Where("mixin_id = ?",mixinId).Count(&number).Error
+	err = db.Debug().Table("transfer").Where("mixin_id = ?", mixinId).Count(&number).Error
 	return
 }
 
-func (transfer *Transfer) ListTransfersByMixinIdAndQuery(mixinId string,q *PaginationQ) (transfers *[]Transfer,number int,err error) {
+func (transfer *Transfer) ListTransfersByMixinIdAndQuery(mixinId string, q *PaginationQ) (transfers *[]Transfer, number int, err error) {
 
 	transfers = &[]Transfer{}
-	number,err = transfer.getTransfersNumbersByMixinId(mixinId)
+	number, err = transfer.getTransfersNumbersByMixinId(mixinId)
 	if err != nil {
 		return
 	}
 
 	tx := db.Debug().Table("transfer")
-	if q.Limit < 0{
+	if q.Limit < 0 {
 		q.Limit = 20
 	}
 
-	if q.Offset < 0{
+	if q.Offset < 0 {
 		q.Offset = 0
 	}
 	err = tx.Limit(q.Limit).Offset(q.Offset).Find(transfers).Error

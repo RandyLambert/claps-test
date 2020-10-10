@@ -100,9 +100,9 @@ func ListTransfersByMixinId(mixinId string) (transfers *[]model.Transfer, err *u
 	return
 }
 
-func ListTransfersByProjectIdAndQuery(mixinId string,q *model.PaginationQ) (transfers *[]model.Transfer, number int, err *util.Err) {
+func ListTransfersByProjectIdAndQuery(mixinId string, q *model.PaginationQ) (transfers *[]model.Transfer, number int, err *util.Err) {
 
-	transfers, number, err1 := model.TRANSFER.ListTransfersByMixinIdAndQuery(mixinId,q)
+	transfers, number, err1 := model.TRANSFER.ListTransfersByMixinIdAndQuery(mixinId, q)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目获取捐赠记录失败")
 	}
@@ -136,8 +136,8 @@ func GetMixinIdByUserId(userId int64) (mixinId string, err *util.Err) {
 	return
 }
 
-func UpdateUserWithdrawalWay(userId int64,withdrawWal string)(err *util.Err){
-	err1 := model.USER.UpdateUserWithdrawalWay(userId,withdrawWal)
+func UpdateUserWithdrawalWay(userId int64, withdrawWal string) (err *util.Err) {
+	err1 := model.USER.UpdateUserWithdrawalWay(userId, withdrawWal)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "更新数据库withdrawalWay信息错误")
 	}
