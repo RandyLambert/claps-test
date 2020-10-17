@@ -32,10 +32,13 @@ const (
 	WithdrawByClaps = "1" //捐赠到了自动提现到绑定的mixin账号
 )
 
-var USER *User
+var (
+	USER        *User
+	USERMIXINID *UserMixinId
+)
 
 //从数据库中通过ID获取user信息,存储在user中,引用传值
-func (user *User) GetUserById(id int64) (userData *UserMixinId, err error) {
+func (user *UserMixinId) GetUserById(id int64) (userData *UserMixinId, err error) {
 	userData = &UserMixinId{}
 	err = db.Debug().Table("user").Where("id = ?", id).Scan(userData).Error
 	return

@@ -189,7 +189,7 @@ func SyncSnapshots() {
 			//筛选自己的转入
 			if snapshots[i].UserID != "" && snapshots[i].Amount.Cmp(decimal.Zero) > 0 && snapshots[i].Memo != "deposit" {
 				//根据机器人从数据库里找到项目
-				projectTotal, err := model.PROJECT.GetProjectTotalByBotId(snapshots[i].UserID)
+				projectTotal, err := model.PROJECTTOTAL.GetProjectTotalByBotId(snapshots[i].UserID)
 				//错误处理有问题
 				if err != nil {
 					log.Error(err.Error())
@@ -213,7 +213,7 @@ func SyncSnapshots() {
 				}
 
 				//查找汇率等详细信息
-				asset, err := model.ASSET.GetPriceUsdByAssetId(snapshots[i].Asset.AssetID)
+				asset, err := model.ASSETTOUSD.GetPriceUsdByAssetId(snapshots[i].Asset.AssetID)
 				if err != nil {
 					log.Error(err.Error())
 					continue
@@ -223,14 +223,14 @@ func SyncSnapshots() {
 				projectTotal.Total = projectTotal.Total.Add(asset.PriceUsd.Mul(snapshots[i].Amount))
 				projectTotal.Donations += 1
 
-				err = model.PROJECT.UpdateProjectTotal(projectTotal)
+				err = model.PROJECTTOTAL.UpdateProjectTotal(projectTotal)
 				if err != nil {
 					log.Error(err.Error())
 					continue
 				}
 
 				//更新项目钱包
-				walletTotal, err := model.WALLET.GetWalletTotalByBotIdAndAssetId(snapshots[i].UserID, snapshots[i].Asset.AssetID)
+				walletTotal, err := model.WALLETTOTAL.GetWalletTotalByBotIdAndAssetId(snapshots[i].UserID, snapshots[i].Asset.AssetID)
 				if err != nil {
 					log.Error(err.Error())
 					continue
@@ -242,17 +242,17 @@ func SyncSnapshots() {
 					continue
 				}
 				//根据不同的分配算法进行配置
-				bot, err := model.BOT.GetBotDtoById(snapshots[i].UserID)
+				bot, err := model.BOTDTO.GetBotDtoById(snapshots[i].UserID)
 
 				switch bot.Distribution {
 				case model.MericoAlgorithm:
-					distributionByMericoAlgorithm(transaction)
+					go distributionByMericoAlgorithm(transaction)
 				case model.Commits:
-					distributionByCommits(transaction)
+					go distributionByCommits(transaction)
 				case model.ChangedLines:
-					distributionByChangedLines(transaction)
+					go distributionByChangedLines(transaction)
 				case model.IdenticalAmount:
-					distributionByIdenticalAmount(transaction)
+					go distributionByIdenticalAmount(transaction)
 				}
 			}
 		}

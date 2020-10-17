@@ -41,7 +41,10 @@ type Badge struct {
 	Size    string `form:"size" json:"size" binding:"required"`
 }
 
-var PROJECT *Project
+var (
+	PROJECT      *Project
+	PROJECTTOTAL *ProjectTotal
+)
 
 //获取所有项目
 func (proj *Project) ListProjectsAll() (projects *[]Project, err error) {
@@ -65,11 +68,11 @@ func (proj *Project) ListProjectsByQuery(q *PaginationQ) (projects *[]Project, n
 	}
 
 	tx := db.Debug().Table("project")
-	if q.Limit < 0 {
+	if q.Limit <= 0 {
 		q.Limit = 20
 	}
 
-	if q.Offset < 0 {
+	if q.Offset <= 0 {
 		q.Offset = 0
 	}
 
@@ -97,14 +100,14 @@ func (proj *Project) ListProjectsByUserId(userId int64) (projects *[]Project, er
 	return
 }
 
-func (proj *Project) GetProjectTotalByBotId(BotId string) (projectTotal *ProjectTotal, err error) {
+func (projTotal *ProjectTotal) GetProjectTotalByBotId(BotId string) (projectTotal *ProjectTotal, err error) {
 	projectTotal = &ProjectTotal{}
 	err = db.Debug().Table("project").Select("id,donations,total").Where("id=?",
 		db.Debug().Table("bot").Select("project_id").Where("id=?", BotId).SubQuery()).Scan(projectTotal).Error
 	return
 }
 
-func (proj *Project) UpdateProjectTotal(projectTotal *ProjectTotal) (err error) {
+func (projTotal *ProjectTotal) UpdateProjectTotal(projectTotal *ProjectTotal) (err error) {
 	err = db.Debug().Table("project").Save(projectTotal).Error
 	return
 }
@@ -117,9 +120,5 @@ func (proj *Project) SumProjectDonationsByUserId(userId int64) (donations int64,
 	err = db.Debug().Table("project").Select("sum(donations) as total").Where("id IN(?)",
 		db.Debug().Table("member").Select("project_id").Where("user_id=?", userId).SubQuery()).Scan(&result).Error
 	donations = result.Total
-	return
-}
-
-func (proj *Project) GetProjectsTotal() (total uint32, err error) {
 	return
 }

@@ -32,9 +32,12 @@ type WalletTotal struct {
 	Total   decimal.Decimal `json:"total,omitempty" gorm:"type:varchar(128);not null;default:null"`
 }
 
-var WALLET *Wallet
+var (
+	WALLET      *Wallet
+	WALLETTOTAL *WalletTotal
+)
 
-func (wallet *Wallet) GetWalletTotalByBotIdAndAssetId(botId string, assetId string) (total *WalletTotal, err error) {
+func (wallet *WalletTotal) GetWalletTotalByBotIdAndAssetId(botId string, assetId string) (total *WalletTotal, err error) {
 	total = &WalletTotal{}
 	err = db.Debug().Table("wallet").Where("bot_id=? AND asset_id=?", botId, assetId).Find(total).Error
 	return

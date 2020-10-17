@@ -28,7 +28,7 @@ func GetProjectById(projectId int64) (projectDetailInfo *map[string]interface{},
 		return
 	}
 
-	botDtos, err1 := model.BOT.ListBotDtosByProjectId(projectId)
+	botDtos, err1 := model.BOTDTO.ListBotDtosByProjectId(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目机器人失败")
 		return

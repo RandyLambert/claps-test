@@ -57,14 +57,15 @@ func (transaction *Transaction) ListTransactionsByProjectIdAndQuery(projectId in
 	}
 
 	tx := db.Debug().Table("transaction")
-	if q.Limit < 0 {
+	if q.Limit <= 0 {
 		q.Limit = 20
 	}
 
-	if q.Offset < 0 {
+	if q.Offset <= 0 {
 		q.Offset = 0
 	}
-	err = tx.Limit(q.Limit).Offset(q.Offset).Find(transactions).Error
+	err = tx.Where("project_id = ?",
+		projectId).Order("created_at desc").Limit(q.Limit).Offset(q.Offset).Find(transactions).Error
 
 	return
 }

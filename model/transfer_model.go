@@ -64,14 +64,15 @@ func (transfer *Transfer) ListTransfersByMixinIdAndQuery(mixinId string, q *Pagi
 	}
 
 	tx := db.Debug().Table("transfer")
-	if q.Limit < 0 {
+	if q.Limit <= 0 {
 		q.Limit = 20
 	}
 
-	if q.Offset < 0 {
+	if q.Offset <= 0 {
 		q.Offset = 0
 	}
-	err = tx.Limit(q.Limit).Offset(q.Offset).Find(transfers).Error
+	err = tx.Where("mixin_id = ?",
+		mixinId).Order("created_at desc").Limit(q.Limit).Offset(q.Offset).Find(transfers).Error
 
 	return
 }

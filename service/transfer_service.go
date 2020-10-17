@@ -47,7 +47,7 @@ func IfUnfinishedTransfer(mixinId string) (err *util.Err) {
 //生成transfer记录
 func DoTransfer(userId int64, mixinId string) (err *util.Err) {
 
-	memberWallets, err1 := model.MEMBERWALLET.GetMemberWalletByUserId(userId)
+	memberWallets, err1 := model.MEMBERWALLETDTO.GetMemberWalletByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取用户钱包失败导致提现失败")
 		return

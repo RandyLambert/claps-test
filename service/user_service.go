@@ -38,7 +38,7 @@ func GetBalanceAndTotalToUSDByUserId(userId int64, assets *[]model.Asset) (err *
 		assetMap[asset.AssetId] = asset.PriceUsd
 	}
 
-	memberWalletDtos, err1 := model.MEMBERWALLET.GetMemberWalletByUserId(userId)
+	memberWalletDtos, err1 := model.MEMBERWALLETDTO.GetMemberWalletByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "查询数据库的用户钱包出错")
 		return
@@ -68,7 +68,7 @@ func GetBalanceAndTotalByUserIdAndAssets(userId int64, assets *[]model.Asset) (e
 		memberWalletMap[asset.AssetId] = &model.MemberWalletDto{AssetId: asset.AssetId}
 	}
 
-	memberWalletDtos, err1 := model.MEMBERWALLET.GetMemberWalletByUserId(userId)
+	memberWalletDtos, err1 := model.MEMBERWALLETDTO.GetMemberWalletByUserId(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "查询数据库的用户钱包出错")
 		return
@@ -127,7 +127,7 @@ func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
 }
 
 func GetMixinIdByUserId(userId int64) (mixinId string, err *util.Err) {
-	user, err1 := model.USER.GetUserById(userId)
+	user, err1 := model.USERMIXINID.GetUserById(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "从数据库查询user信息错误")
 		return

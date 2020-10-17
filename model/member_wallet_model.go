@@ -37,9 +37,12 @@ type MemberWalletDto struct {
 	Balance   decimal.Decimal `json:"balance,omitempty" gorm:"type:varchar(128);default:null"`
 }
 
-var MEMBERWALLET *MemberWallet
+var (
+	MEMBERWALLET    *MemberWallet
+	MEMBERWALLETDTO *MemberWalletDto
+)
 
-func (MemberWallet *MemberWallet) UpdateMemberWallet(memberWalletDto *MemberWalletDto) (err error) {
+func (MemberWallet *MemberWalletDto) UpdateMemberWallet(memberWalletDto *MemberWalletDto) (err error) {
 	err = db.Debug().Table("member_wallet").Save(memberWalletDto).Error
 	return
 }
@@ -49,13 +52,13 @@ func (MemberWallet *MemberWallet) UpdateMemberWalletBalanceToZeroByUserId(userId
 	return
 }
 
-func (MemberWallet *MemberWallet) GetMemberWalletByUserId(userId int64) (memberWalletDtos *[]MemberWalletDto, err error) {
+func (MemberWallet *MemberWalletDto) GetMemberWalletByUserId(userId int64) (memberWalletDtos *[]MemberWalletDto, err error) {
 	memberWalletDtos = &[]MemberWalletDto{}
 	err = db.Debug().Table("member_wallet").Where("user_id = ?", userId).Scan(memberWalletDtos).Error
 	return
 }
 
-func (MemberWallet *MemberWallet) GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(projectId int64, userId int64, botId string, assetId string) (member *MemberWalletDto, err error) {
+func (MemberWallet *MemberWalletDto) GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(projectId int64, userId int64, botId string, assetId string) (member *MemberWalletDto, err error) {
 	member = &MemberWalletDto{}
 	err = db.Debug().Table("member_wallet").Where("project_id=? AND user_id=? AND bot_id=? AND asset_id=?", projectId, userId, botId, assetId).Find(member).Error
 	return

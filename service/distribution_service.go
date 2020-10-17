@@ -37,7 +37,7 @@ func distributionByIdenticalAmount(transaction *model.Transaction) {
 	if err1 := model.ExecuteTx(func(tx *gorm.DB) error {
 		for i := range *members {
 			//获得相应的用户钱包
-			walletTotal, err := model.MEMBERWALLET.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(transaction.ProjectId, (*members)[i].Id, transaction.Receiver, transaction.AssetId)
+			walletTotal, err := model.MEMBERWALLETDTO.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(transaction.ProjectId, (*members)[i].Id, transaction.Receiver, transaction.AssetId)
 			if err != nil {
 				log.Error(err.Error())
 				return err
@@ -51,7 +51,7 @@ func distributionByIdenticalAmount(transaction *model.Transaction) {
 				walletTotal.Balance = walletTotal.Balance.Add(amount)
 			}
 			//更新钱包
-			err = model.MEMBERWALLET.UpdateMemberWallet(walletTotal)
+			err = model.MEMBERWALLETDTO.UpdateMemberWallet(walletTotal)
 			if err != nil {
 				log.Error(err.Error())
 				return err

@@ -34,7 +34,10 @@ const (
 	IdenticalAmount = "3" //平均分配
 )
 
-var BOT *Bot
+var (
+	BOT    *Bot
+	BOTDTO *BotDto
+)
 
 func (bot *Bot) GetBotById(botId string) (botData *Bot, err error) {
 	botData = &Bot{}
@@ -43,13 +46,13 @@ func (bot *Bot) GetBotById(botId string) (botData *Bot, err error) {
 }
 
 //根据projectId获取所有的机器人Id
-func (bot *Bot) ListBotDtosByProjectId(projectId int64) (botDto *[]BotDto, err error) {
+func (bot *BotDto) ListBotDtosByProjectId(projectId int64) (botDto *[]BotDto, err error) {
 	botDto = &[]BotDto{}
 	err = db.Debug().Table("bot").Where("project_id=?", projectId).Scan(botDto).Error
 	return
 }
 
-func (bot *Bot) GetBotDtoById(botId string) (botDto *BotDto, err error) {
+func (bot *BotDto) GetBotDtoById(botId string) (botDto *BotDto, err error) {
 	botDto = &BotDto{}
 	err = db.Table("bot").Where("id=?", botId).Scan(botDto).Error
 	return
