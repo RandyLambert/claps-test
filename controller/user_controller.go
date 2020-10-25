@@ -25,7 +25,6 @@ func UserProfile(ctx *gin.Context) {
 		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error."), nil)
 		return
 	}
-	log.Debug("mcache = ", mcache)
 
 	//根据userId获取所有project信息,Total和Patrons字段添加
 	projects, err := service.ListProjectsByUserId(*mcache.Github.ID)

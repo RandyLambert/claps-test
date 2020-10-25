@@ -58,17 +58,6 @@ func MixinOauth(ctx *gin.Context) {
 		return
 	}
 
-	/*
-		mcache := &util.MCache{}
-		err1 := util.Rdb.Get(oauth_.State,mcache)
-		//验证state
-		if err1 != nil{
-			err = util.NewErr(err1,util.ErrBadRequest, "invalid oauth state")
-			util.HandleResponse(ctx, err, resp)
-			return
-		}
-	*/
-
 	//用code换取令牌
 	client, err := service.GetMixinAuthorizedClient(ctx, oauth_.Code)
 	if err != nil {
@@ -103,6 +92,4 @@ func MixinOauth(ctx *gin.Context) {
 	}
 
 	util.HandleResponse(ctx, nil, nil)
-	//重定向
-	//ctx.Redirect(http.StatusMovedPermanently, "http://localhost:3000/assets")
 }

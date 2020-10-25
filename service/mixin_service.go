@@ -32,6 +32,7 @@ func CreateMixinClient(bot *model.Bot) (client *mixin.Client, err *util.Err) {
 	}
 	return
 }
+
 /**
  * @Description: 每隔5分钟异步更新数据库中的asset信息
  */
@@ -69,6 +70,7 @@ func SyncAssets() {
 		time.Sleep(time.Minute * 5)
 	}
 }
+
 /**
  * @Description: 每隔300毫秒在数据库中获取处于未完成状态的捐赠,然后创建对应bot完成转账操作
  */
@@ -134,6 +136,8 @@ func SyncTransfer() {
 		time.Sleep(300 * time.Millisecond)
 	}
 }
+
+
 /**
  * @Description: 每隔300毫秒,通过主bot异步获取mixin主网所有的转账信息,并通过判断是否有userId来判断这边转账是否针对与主bot下的子bot,
 	对符合条件的的转账按照所选择的分配方式获取对应给每个member需要分配多少对应虚拟货币的金额,并加到对应member的member_wallet的total和balance字段
@@ -263,6 +267,8 @@ func SyncSnapshots() {
 		time.Sleep(100 * time.Millisecond)
 	}
 }
+
+
 /**
  * @Description:每隔40min,异步更新数据库中的fiat表
  */
@@ -286,6 +292,8 @@ func SyncFiat() {
 	}
 
 }
+
+
 /**
  * @Description: 获取认证之后的客户端
  * @param ctx
@@ -317,6 +325,8 @@ func GetMixinAuthorizedClient(ctx *gin.Context, code string) (client *mixin.Clie
 
 	return
 }
+
+
 /**
  * @Description: 获取对应mixin用户信息
  * @param ctx

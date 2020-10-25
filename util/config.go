@@ -8,9 +8,10 @@ import (
 var MericoAppid string
 var MericoSecret string
 var GithubClinetId string
-//var GithubOauthCallback string
+var GithubOauthCallback string
 var MixinClientId string
 var MixinOauthCallback string
+var MySecret string
 
 func InitConfig() {
 
@@ -25,12 +26,13 @@ func InitConfig() {
 	viper.SetConfigType("json")
 	viper.SetConfigName(viper.GetString("MIXIN_CLIENT_CONFIG"))
 
+	MySecret = viper.GetString("TOKEN_SECRET")
 	//获取merci的id和secret
 	MericoAppid = viper.GetString("MERICO_APPID")
 	MericoSecret = viper.GetString("MERICO_SECRET")
 	//获取envs
 	GithubClinetId = viper.GetString("GITHUB_CLIENT_ID")
-	//GithubOauthCallback = viper.GetString("GITHUB_OAUTH_CALLBACK")
+	GithubOauthCallback = viper.GetString("GITHUB_OAUTH_CALLBACK")
 	MixinClientId = viper.GetString("MIXIN_CLIENT_ID")
 	MixinOauthCallback = viper.GetString("MIXIN_OAUTH_CALLBACK")
 

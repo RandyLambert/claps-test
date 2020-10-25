@@ -25,6 +25,7 @@ func InsertOrUpdateUser(user *model.User) (err *util.Err) {
 	}
 	return
 }
+
 /**
  * @Description: 拼接含有code和clientID和client_secret，成一个URL用来换取Token,返回一个拼接的URL,code 表示github认证服务器返回的code
  * @param code
@@ -38,6 +39,7 @@ func GetOauthToken(code string) string {
 	//fmt.Println(str)
 	return str
 }
+
 /**
  * @Description: 根据参数URL去请求，然后换取Token,返回Token指针和错误信息
  * @param url

@@ -5,43 +5,17 @@ import (
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"net/http"
 )
 
-const (
-	RANDOMUID = "randomUid"
-)
-
-/*
-功能:返回前端randomUid
-说明:调用此函数时候用户没有登录github,生成randomUid,并存储redis
-*/
-func loginGithub(ctx *gin.Context) {
-	resp := make(map[string]interface{})
-	uid, _ := ctx.Get(util.UID)
-	randomUid, _ := uid.(string)
-
-	resp["user"] = nil
-	resp["randomUid"] = randomUid
-	resp["mixinAuth"] = false
-	resp["envs"] = gin.H{
-		"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
-		"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
-		"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
-	}
-	util.HandleResponse(ctx, nil, resp)
-	return
-}
 
 /*
 功能:返回环境信息
 说明:此时用户没有登录github没有
 */
-func Enviroments(ctx *gin.Context) {
+func Environments(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
 	resp["GITHUB_CLIENT_ID"] = util.GithubClinetId
@@ -98,13 +72,6 @@ func AuthInfo(ctx *gin.Context) {
 	resp["user"] = mcache.Github
 	resp["randomUid"] = uid
 	resp["mixinAuth"] = mcache.MixinAuth
-	/*
-		resp["envs"] = gin.H{
-			"GITHUB_CLIENT_ID":      viper.GetString("GITHUB_CLIENT_ID"),
-			"GITHUB_OAUTH_CALLBACK": viper.GetString("GITHUB_OAUTH_CALLBACK"),
-			"MIXIN_CLIENT_ID":       viper.GetString("MIXIN_CLIENT_ID"),
-		}
-	*/
 
 	util.HandleResponse(ctx, nil, resp)
 	return
@@ -134,24 +101,6 @@ func noToken(c *gin.Context) (randomUid string) {
 
 	util.HandleResponse(c, nil, resp)
 	return
-}
-
-/*
-功能:判断用户是否携带Token,没有则发放Token
-说明:
-*/
-func getToken(ctx *gin.Context) {
-	authHeader := ctx.Request.Header.Get("Authorization")
-	log.Debug("authHeader = ", authHeader)
-
-	var randomUid string
-	//无Token,生成Token返回,生成Uid
-	if authHeader == "" {
-		log.Debug("No Token")
-		randomUid = noToken(ctx)
-		fmt.Println("randomUid = ", randomUid)
-		return
-	}
 }
 
 /**

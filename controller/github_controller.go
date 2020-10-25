@@ -7,7 +7,6 @@ import (
 	"claps-test/util"
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
-	log "github.com/sirupsen/logrus"
 )
 
 /**
@@ -30,7 +29,6 @@ func Oauth(ctx *gin.Context) {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
-	log.Info("code = ", oauth_.Code)
 
 	var oauthTokenUrl = service.GetOauthToken(oauth_.Code)
 	//处理请求的URL,获得Token指针
@@ -54,8 +52,6 @@ func Oauth(ctx *gin.Context) {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
-
-	log.Debug("user = ", *user)
 
 	//生成token
 	randomUid := util.RandUp(32)
@@ -108,8 +104,4 @@ func Oauth(ctx *gin.Context) {
 
 	resp["token"] = jwtToken
 	util.HandleResponse(ctx, nil, resp)
-	//重定向到http://localhost:3000/profile
-	//newPath := "http://localhost:3000" + oauth_.Path
-	//log.Debug("重定向", newpath)
-	//ctx.Redirect(http.StatusMovedPermanently, newPath)
 }

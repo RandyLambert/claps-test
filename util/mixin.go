@@ -38,6 +38,7 @@ func InitMixin() *mixin.Client {
 func GetMixin() *mixin.Client {
 	return MixinClient
 }
+
 /**
  * @Description: 默认支持如下5中币种
  * @param assetId

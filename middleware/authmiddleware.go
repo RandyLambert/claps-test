@@ -12,54 +12,11 @@ import (
 )
 
 type MyClaims struct {
-	//MixinId string `json:"mixin_id"`
-	//GithubId string `json:"github_id"`
 	Uid string `json:"uid"`
 	jwt.StandardClaims
 }
 
-var MySecret = []byte("claps-dev")
 
-const (
-	MIXINID  = "mixin_id"
-	GITHUBID = "gtihub_id"
-	TOKEN    = "token"
-)
-
-type userInfo struct {
-	mixin_id  string
-	github_id string
-}
-
-/**
- * @Description: 判断github是否已经授权,经过了JWT中间件,一定有cache key
- * @return gin.HandlerFunc
- */
-func GithubAuthMiddleware() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		var val interface{}
-		var ok bool
-		if val, ok = ctx.Get(util.UID); !ok {
-			util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "ctx get uid error"), nil)
-			return
-		}
-		uid := val.(string)
-
-		mcache := &util.MCache{}
-		err1 := util.Rdb.Get(uid, mcache)
-		if err1 != nil {
-			util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), nil)
-			return
-		}
-
-		//github未登录
-		if !mcache.GithubAuth {
-			util.HandleResponse(ctx, util.NewErr(err1, util.ErrUnauthorized, "github unauthorized"), nil)
-			return
-		}
-		ctx.Next()
-	}
-}
 /**
  * @Description: 检查是够绑定mixin,github一定是登录了,从数据库中查询问是否绑定mixin,绑定则更新缓存
  * @return gin.HandlerFunc
@@ -131,9 +88,10 @@ func GenToken(uid string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 
 	// 使用指定的secret签名并获得完整的编码后的字符串token
-	return token.SignedString(MySecret)
+	return token.SignedString(util.MySecret)
 
 }
+
 /**
  * @Description: 解析jwt为Myclaim
  * @param tokenString
@@ -143,7 +101,7 @@ func GenToken(uid string) (string, error) {
 func ParseToken(tokenString string) (*MyClaims, error) {
 	// 解析token
 	token, err := jwt.ParseWithClaims(tokenString, &MyClaims{}, func(token *jwt.Token) (i interface{}, err error) {
-		return MySecret, nil
+		return util.MySecret, nil
 	})
 	if err != nil {
 		return nil, err
@@ -187,42 +145,6 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			ctx.Abort()
 			return
 		}
-
-		/*
-			mcache := &util.MCache{}
-			err1 = util.Rdb.Get(claim.Uid,mcache)
-			if err1 != nil{
-				util.HandleResponse(ctx,util.NewErr(err1,util.ErrDataBase,"cache get error"),nil)
-				return
-			}
-
-			if mcache.MixinAuth{
-				ctx.Next()
-				return
-			}
-			//更新mixin信息
-			mixin_id,err := service.GetMixinIdByUserId(*mcache.Github.ID)
-			if err != nil{
-				util.HandleResponse(ctx,err,nil)
-				ctx.Abort()
-				return
-			}
-
-			if mixin_id == ""{
-				ctx.Next()
-				return
-			}else {
-				//set cache ,next
-				mcache.MixinId = mixin_id
-				mcache.MixinAuth = true
-				err1 = util.Rdb.Replace(claim.Uid,*mcache,-1)
-				if err1 != nil{
-					err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
-					util.HandleResponse(ctx, err, nil)
-					return
-				}
-			}
-		*/
 
 		//set Key
 		ctx.Set(util.UID, claim.Uid)
