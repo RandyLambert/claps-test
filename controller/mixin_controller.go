@@ -7,7 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
-
+/**
+ * @Description: 返回数据库中asset表中的数据
+ * @param ctx
+ */
 func MixinAssets(ctx *gin.Context) {
 
 	assets, err := service.ListAssetsAllByDB()
