@@ -42,9 +42,10 @@ func InitDB() (*gorm.DB, error) {
 	return db, nil
 }
 
-/*
-获取数据库句柄
-*/
+/**
+ * @Description: 获取数据库句柄
+ * @return *sql.DB
+ */
 func GetSqlDB() *sql.DB {
 	return db.DB()
 }
@@ -60,7 +61,11 @@ func ExecuteTx(fn func(*gorm.DB) error) error {
 	return tx.Commit().Error
 }
 
-// Auto migrate
+/**
+ * @Description: Auto migrate
+ * @param db
+ * @return error
+ */
 type MigrateHandler func(db *gorm.DB) error
 
 var registeredMigrateHandlers []MigrateHandler

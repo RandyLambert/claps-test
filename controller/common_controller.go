@@ -154,7 +154,13 @@ func getToken(ctx *gin.Context) {
 	}
 }
 
-//模拟三目运算符号
+/**
+ * @Description: 模拟三目运算符号
+ * @param condition
+ * @param trueVal
+ * @param falseVal
+ * @return interface{}
+ */
 func If(condition bool, trueVal, falseVal interface{}) interface{} {
 	if condition {
 		return trueVal

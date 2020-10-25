@@ -9,10 +9,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-/*
-功能:返回用户的邮箱数组和项目数组
-说明:执行该函数,一定登录了github
-*/
+/**
+ * @Description: 返回用户的邮箱数组和项目数组,执行该函数,一定登录了github
+ * @param ctx
+ */
 func UserProfile(ctx *gin.Context) {
 	var err *util.Err
 	resp := make(map[string]interface{})
@@ -39,10 +39,10 @@ func UserProfile(ctx *gin.Context) {
 	util.HandleResponse(ctx, err, resp)
 }
 
-/*
-功能:获取用户钱包所有币种的余额
-说明:此时已经登录github,不需要绑定mixin
-*/
+/**
+ * @Description: 获取用户钱包所有币种的余额,此时已经登录github,不需要绑定mixin
+ * @param ctx
+ */
 func UserAssets(ctx *gin.Context) {
 
 	var err *util.Err
@@ -82,10 +82,10 @@ func UserAssets(ctx *gin.Context) {
 	util.HandleResponse(ctx, err, resp)
 }
 
-/*
-功能:获取某币种的交易记录,从transfer表里面读取数据
-说明:用户一定登录了github和mixin,中间件保证
-*/
+/**
+ * @Description: 获取某币种的交易记录,从transfer表里面读取数据,用户一定登录了github和mixin,中间件保证
+ * @param ctx
+ */
 func UserTransfer(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
@@ -124,11 +124,10 @@ func UserTransfer(ctx *gin.Context) {
 	util.HandleResponse(ctx, err, resp)
 }
 
-//获取某用户的所有的受捐赠记录的汇总
-/*
-功能:请求获得某个用户的捐赠信息的汇总,包括总金额和捐赠人数
-说明:不需要绑定mixin
-*/
+/**
+ * @Description: 请求获得某个用户的捐赠信息的汇总,包括总金额和捐赠人数,不需要绑定mixin
+ * @param ctx
+ */
 func UserDonation(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
@@ -177,10 +176,10 @@ func UserDonation(ctx *gin.Context) {
 	util.HandleResponse(ctx, nil, resp)
 }
 
-/*
-功能:用户提现某种货币,把表中的status由0变为1
-说明:已经中间件验证绑定了mixin
-*/
+/**
+ * @Description: 用户提现某种货币,把表中的status由0变为1,已经中间件验证绑定了mixin
+ * @param ctx
+ */
 func UserWithdraw(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
@@ -220,6 +219,10 @@ func UserWithdraw(ctx *gin.Context) {
 	//等协程完成转账
 }
 
+/**
+ * @Description: 修改用户的提现方式,已经中间件验证绑定了mixin
+ * @param ctx
+ */
 func UserWithdrawalWay(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 

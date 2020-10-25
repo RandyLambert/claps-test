@@ -46,20 +46,37 @@ var (
 	PROJECTTOTAL *ProjectTotal
 )
 
-//获取所有项目
+/**
+ * @Description: 获取所有项目
+ * @receiver proj
+ * @return projects
+ * @return err
+ */
 func (proj *Project) ListProjectsAll() (projects *[]Project, err error) {
 
 	projects = &[]Project{}
 	err = db.Debug().Find(projects).Error
 	return
 }
-
+/**
+ * @Description: 获取一共有多少条project记录
+ * @receiver proj
+ * @return number
+ * @return err
+ */
 func (proj *Project) getProjectsNumbers() (number int, err error) {
 
 	err = db.Debug().Table("project").Count(&number).Error
 	return
 }
-
+/**
+ * @Description: 通过query获取projects
+ * @receiver proj
+ * @param q
+ * @return projects
+ * @return number
+ * @return err
+ */
 func (proj *Project) ListProjectsByQuery(q *PaginationQ) (projects *[]Project, number int, err error) {
 	projects = &[]Project{}
 	number, err = proj.getProjectsNumbers()
@@ -84,7 +101,13 @@ func (proj *Project) ListProjectsByQuery(q *PaginationQ) (projects *[]Project, n
 	return
 }
 
-//通过项目id获取项目
+/**
+ * @Description: 通过项目id获取项目
+ * @receiver proj
+ * @param projectId
+ * @return project
+ * @return err
+ */
 func (proj *Project) GetProjectById(projectId int64) (project *Project, err error) {
 
 	project = &Project{}
@@ -92,7 +115,13 @@ func (proj *Project) GetProjectById(projectId int64) (project *Project, err erro
 	return
 }
 
-//根据userId获取所有项目
+/**
+ * @Description: 根据userId获取所有项目
+ * @receiver proj
+ * @param userId
+ * @return projects
+ * @return err
+ */
 func (proj *Project) ListProjectsByUserId(userId int64) (projects *[]Project, err error) {
 	projects = &[]Project{}
 	err = db.Debug().Where("id IN(?)",
@@ -100,18 +129,36 @@ func (proj *Project) ListProjectsByUserId(userId int64) (projects *[]Project, er
 	return
 }
 
+/**
+ * @Description: 根据botId获取对应project的Total值和收到的捐赠笔数
+ * @receiver projTotal
+ * @param BotId
+ * @return projectTotal
+ * @return err
+ */
 func (projTotal *ProjectTotal) GetProjectTotalByBotId(BotId string) (projectTotal *ProjectTotal, err error) {
 	projectTotal = &ProjectTotal{}
 	err = db.Debug().Table("project").Select("id,donations,total").Where("id=?",
 		db.Debug().Table("bot").Select("project_id").Where("id=?", BotId).SubQuery()).Scan(projectTotal).Error
 	return
 }
-
+/**
+ * @Description: 更新project的捐赠total和收到的捐赠笔数
+ * @receiver projTotal
+ * @param projectTotal
+ * @return err
+ */
 func (projTotal *ProjectTotal) UpdateProjectTotal(projectTotal *ProjectTotal) (err error) {
 	err = db.Debug().Table("project").Save(projectTotal).Error
 	return
 }
-
+/**
+ * @Description: 统计一个用户有获得了多少笔来自不同项目的捐赠捐赠
+ * @receiver proj
+ * @param userId
+ * @return donations
+ * @return err
+ */
 func (proj *Project) SumProjectDonationsByUserId(userId int64) (donations int64, err error) {
 	type Result struct {
 		Total int64

@@ -6,7 +6,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"time"
 )
-
+/**
+ * @Description:注册自动迁移函数
+ */
 func init() {
 	RegisterMigrateHandler(func(db *gorm.DB) error {
 
@@ -37,24 +39,49 @@ const (
 )
 
 var TRANSFER *Transfer
-
+/**
+ * @Description: 首次插入或者更新transfer的status值
+ * @receiver transfer
+ * @param transferData
+ * @return err
+ */
 func (transfer *Transfer) InsertOrUpdateTransfer(transferData *Transfer) (err error) {
 	err = db.Debug().Save(transferData).Error
 	return
 }
-
+/**
+ * @Description: 通过mixinId获取对应transfers的值,暂时废弃
+ * @receiver transfer
+ * @param mixinId
+ * @return transfers
+ * @return err
+ */
 func (transfer *Transfer) ListTransferByMixinId(mixinId string) (transfers *[]Transfer, err error) {
 	transfers = &[]Transfer{}
 	err = db.Debug().Where("mixin_id = ?", mixinId).Find(transfers).Error
 	return
 }
-
+/**
+ * @Description: 通过mixinId获取对应transfers的值,暂时废弃
+ * @receiver transfer
+ * @param mixinId
+ * @return transfers
+ * @return err
+ */
 func (transfer *Transfer) getTransfersNumbersByMixinId(mixinId string) (number int, err error) {
 
 	err = db.Debug().Table("transfer").Where("mixin_id = ?", mixinId).Count(&number).Error
 	return
 }
-
+/**
+ * @Description: 通过mixinId和query值获取对应transfers的值
+ * @receiver transfer
+ * @param mixinId
+ * @param q
+ * @return transfers
+ * @return number
+ * @return err
+ */
 func (transfer *Transfer) ListTransfersByMixinIdAndQuery(mixinId string, q *PaginationQ) (transfers *[]Transfer, number int, err error) {
 
 	transfers = &[]Transfer{}
@@ -77,13 +104,25 @@ func (transfer *Transfer) ListTransfersByMixinIdAndQuery(mixinId string, q *Pagi
 	return
 }
 
-//status only '0' or '1'
+/**
+ * @Description: status only '0' or '1'
+ * @receiver transfer
+ * @param status
+ * @return transfers
+ * @return err
+ */
 func (transfer *Transfer) ListTransfersByStatus(status string) (transfers *[]Transfer, err error) {
 	transfers = &[]Transfer{}
 	err = db.Where("status=?", status).Find(transfers).Error
 	return
 }
-
+/**
+ * @Description: 统计该mixinId提现记录处于未完成状态的数量
+ * @receiver transfer
+ * @param mixinId
+ * @return count
+ * @return err
+ */
 func (transfer *Transfer) CountUnfinishedTransfer(mixinId string) (count int, err error) {
 	err = db.Debug().Table("transfer").Where("status = ? AND mixin_id = ?", UNFINISHED, mixinId).Count(&count).Error
 	log.Debug(count)

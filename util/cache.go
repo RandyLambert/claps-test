@@ -6,14 +6,21 @@ import (
 	"time"
 )
 
-// 声明一个全局的rdb变量
+/**
+ * @Description: 声明一个全局的rdb变量
+ */
 //var Rdb *persistence.RedisStore
 var Rdb *persistence.InMemoryStore
 
-//jwt的过期时间
+/**
+ * @Description: jwt的过期时间
+ */
 const TokenExpireDuration = time.Hour * 2
 
-// 初始化连接
+/**
+ * @Description: 初始化连接
+ * @return err
+ */
 func InitClient() (err error) {
 	Rdb = persistence.NewInMemoryStore(TokenExpireDuration)
 	/*

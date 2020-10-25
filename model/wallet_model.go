@@ -5,7 +5,9 @@ import (
 	"github.com/shopspring/decimal"
 	"time"
 )
-
+/**
+ * @Description:注册自动迁移函数
+ */
 func init() {
 	RegisterMigrateHandler(func(db *gorm.DB) error {
 
@@ -36,13 +38,25 @@ var (
 	WALLET      *Wallet
 	WALLETTOTAL *WalletTotal
 )
-
+/**
+ * @Description: 通过对应捐赠方式和对应币种获取该币种的total值
+ * @receiver wallet
+ * @param botId
+ * @param assetId
+ * @return total
+ * @return err
+ */
 func (wallet *WalletTotal) GetWalletTotalByBotIdAndAssetId(botId string, assetId string) (total *WalletTotal, err error) {
 	total = &WalletTotal{}
 	err = db.Debug().Table("wallet").Where("bot_id=? AND asset_id=?", botId, assetId).Find(total).Error
 	return
 }
-
+/**
+ * @Description: 更新对应币种的total值
+ * @receiver wallet
+ * @param walletTotal
+ * @return err
+ */
 func (wallet *Wallet) UpdateWalletTotal(walletTotal *WalletTotal) (err error) {
 	err = db.Table("wallet").Save(walletTotal).Error
 	return

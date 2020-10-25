@@ -31,10 +31,10 @@ type userInfo struct {
 	github_id string
 }
 
-/*
-功能:判断github是否已经授权
-说明:经过了JWT中间件,一定有cache key
-*/
+/**
+ * @Description: 判断github是否已经授权,经过了JWT中间件,一定有cache key
+ * @return gin.HandlerFunc
+ */
 func GithubAuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var val interface{}
@@ -60,11 +60,10 @@ func GithubAuthMiddleware() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
-
-/*
-功能:检查是够绑定mixin
-说明:github一定是登录了,从数据库中查询问是否绑定mixin,绑定则更新缓存
-*/
+/**
+ * @Description: 检查是够绑定mixin,github一定是登录了,从数据库中查询问是否绑定mixin,绑定则更新缓存
+ * @return gin.HandlerFunc
+ */
 func MixinAuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var val interface{}
@@ -112,10 +111,12 @@ func MixinAuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-/*
-功能:生成Token
-说明:uid=github.ID
-*/
+/**
+ * @Description: 生成Token,uid=github.ID
+ * @param uid
+ * @return string
+ * @return error
+ */
 func GenToken(uid string) (string, error) {
 
 	c := MyClaims{
@@ -133,11 +134,12 @@ func GenToken(uid string) (string, error) {
 	return token.SignedString(MySecret)
 
 }
-
-/*
-功能:解析jwt为Myclaim
-参数:jwt字符号
-*/
+/**
+ * @Description: 解析jwt为Myclaim
+ * @param tokenString
+ * @return *MyClaims
+ * @return error
+ */
 func ParseToken(tokenString string) (*MyClaims, error) {
 	// 解析token
 	token, err := jwt.ParseWithClaims(tokenString, &MyClaims{}, func(token *jwt.Token) (i interface{}, err error) {
@@ -152,12 +154,11 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 	return nil, errors.New("invalid token")
 }
 
-/*
-功能:判断请求的Token情况
-说明:经过该中间件验证,ctx中一定有cache的key,但是不一定授权了mixin
-使用memory做缓存时重启可能导致token合法，但是没有对应cache
-自动查询数据库，填充mixin是否登录
-*/
+/**
+ * @Description: 判断请求的Token情况,经过该中间件验证,ctx中一定有cache的key,但是不一定授权了mixin
+	使用memory做缓存时重启可能导致token合法，但是没有对应cache,自动查询数据库，填充mixin是否登录
+ * @return func(c *gin.Context)
+ */
 func JWTAuthMiddleware() func(c *gin.Context) {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.Request.Header.Get("Authorization")

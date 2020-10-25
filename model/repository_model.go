@@ -4,7 +4,9 @@ import (
 	"github.com/jinzhu/gorm"
 	"time"
 )
-
+/**
+ * @Description:注册自动迁移函数
+ */
 func init() {
 	RegisterMigrateHandler(func(db *gorm.DB) error {
 
@@ -28,7 +30,13 @@ type Repository struct {
 
 var REPOSITORY *Repository
 
-//根据project获取所有的仓库信息
+/**
+ * @Description: 根据project获取所有的仓库信息
+ * @receiver repository
+ * @param projectId
+ * @return repositories
+ * @return err
+ */
 func (repository *Repository) ListRepositoriesByProjectId(projectId int64) (repositories *[]Repository, err error) {
 	repositories = &[]Repository{}
 	err = db.Debug().Table("repository").Where("project_id=?", projectId).Scan(repositories).Error

@@ -11,11 +11,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
-
+/**
+ * @Description:初始化配置文件,Mixin,log,DB和cache
+ */
 func initAllConfig() {
-	/*
-		初始化配置文件,Mixin,log,DB和cache
-	*/
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
@@ -49,7 +48,7 @@ func main() {
 		go service.SyncTransfer()
 		//定期获取汇率
 		go service.SyncFiat()
-		//service.TetGetUserBalanceByAllAssets()
+
 		r := gin.Default()
 		r = router.CollectRoute(r)
 		serverPort := viper.GetString("server.port")

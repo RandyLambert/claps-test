@@ -5,21 +5,19 @@ import (
 	"claps-test/util"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v32/github"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 	"net/http"
-	"strings"
 )
 
-/*
-	第一次登录没有插入,有就更新
-*/
+/**
+ * @Description: 第一次登录没有插入,有就更新
+ * @param user
+ * @return err
+ */
 func InsertOrUpdateUser(user *model.User) (err *util.Err) {
 	err1 := model.USER.InsertOrUpdateUser(user)
 	if err1 != nil {
@@ -27,11 +25,11 @@ func InsertOrUpdateUser(user *model.User) (err *util.Err) {
 	}
 	return
 }
-
-/*
-拼接含有code和clientID和client_secret，成一个URL用来换取Token,返回一个拼接的URL
-code 表示github认证服务器返回的code
-*/
+/**
+ * @Description: 拼接含有code和clientID和client_secret，成一个URL用来换取Token,返回一个拼接的URL,code 表示github认证服务器返回的code
+ * @param code
+ * @return string
+ */
 func GetOauthToken(code string) string {
 	str := fmt.Sprintf(
 		"https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s",
@@ -40,10 +38,12 @@ func GetOauthToken(code string) string {
 	//fmt.Println(str)
 	return str
 }
-
-/*
-根据参数URL去请求，然后换取Token,返回Token指针和错误信息
-*/
+/**
+ * @Description: 根据参数URL去请求，然后换取Token,返回Token指针和错误信息
+ * @param url
+ * @return token
+ * @return err
+ */
 func GetToken(url string) (token *oauth2.Token, err *util.Err) {
 
 	req, err1 := http.NewRequest(http.MethodGet, url, nil)
@@ -75,7 +75,12 @@ func GetToken(url string) (token *oauth2.Token, err *util.Err) {
 	return
 }
 
-//用获得的Token获得UserInfo,返回User指针
+/**
+ * @Description: 用获得的Token获得UserInfo,返回User指针
+ * @param token
+ * @return user
+ * @return err
+ */
 func GetUserInfo(token *oauth2.Token) (user *github.User, err *util.Err) {
 
 	log.Info("GitHub Token: ", token.AccessToken)
@@ -94,38 +99,6 @@ func GetUserInfo(token *oauth2.Token) (user *github.User, err *util.Err) {
 		err = util.NewErr(err1, util.ErrThirdParty, "向github请求userinfo出错")
 		log.Error(err1)
 		return
-	}
-
-	return
-}
-
-//获取仓库的star数目,如果出错err信息不为空
-func GetRepositoryInfo(c *gin.Context, slug string) (repoInfo *github.Repository, err *util.Err) {
-	session := sessions.Default(c)
-	githubToken := session.Get("githubToken")
-
-	if githubToken == nil {
-		err = util.NewErr(errors.New("无Token"), util.ErrUnauthorized, "无Token")
-		return
-	}
-	log.Debug("获取star数量", githubToken)
-	log.Debug("传入的slug是", slug)
-	//把slug分成owner和repo
-	str := strings.Split(slug, "/")
-	log.Debug("owner是", str[0])
-	log.Debug("repo是", str[1])
-
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: githubToken.(string)},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	client := github.NewClient(tc)
-
-	repoInfo, _, err1 := client.Repositories.Get(ctx, str[0], str[1])
-	if err1 != nil {
-		err = util.NewErr(err1, util.ErrThirdParty, "获取repo信息出错")
 	}
 
 	return

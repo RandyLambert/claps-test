@@ -9,7 +9,16 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
-
+/**
+ * @Description: 为避免提现多次转账,先首次生成提现记录到数据库,提现记录状态为unfinished,如果某一个用户有unfinished的记录则不允许提现,
+每隔300毫秒,数据库中会异步获取为完成的提现记录,真正调用转账函数,如果转账成功,则修改转账记录状态为finished,否则不修改状态值,在此期间用户不能二次提现
+ * @param botId
+ * @param assetID
+ * @param memo
+ * @param amount
+ * @param mixinId
+ * @return err
+ */
 func InsertTransfer(botId, assetID, memo string, amount decimal.Decimal, mixinId string) (err error) {
 	transfer := &model.Transfer{
 		BotId:   botId,
@@ -29,7 +38,11 @@ func InsertTransfer(botId, assetID, memo string, amount decimal.Decimal, mixinId
 	return
 }
 
-//判断某种币是否有未完成的提现操作,err非nil标有有未完成,err=nil表示没有未完成
+/**
+ * @Description: 判断某种币是否有未完成的提现操作,err非nil标有有未完成,err=nil表示没有未完成
+ * @param mixinId
+ * @return err
+ */
 func IfUnfinishedTransfer(mixinId string) (err *util.Err) {
 	count, err1 := model.TRANSFER.CountUnfinishedTransfer(mixinId)
 	if err1 != nil {
@@ -44,7 +57,12 @@ func IfUnfinishedTransfer(mixinId string) (err *util.Err) {
 	return
 }
 
-//生成transfer记录
+/**
+ * @Description: 生成transfer记录
+ * @param userId
+ * @param mixinId
+ * @return err
+ */
 func DoTransfer(userId int64, mixinId string) (err *util.Err) {
 
 	memberWallets, err1 := model.MEMBERWALLETDTO.GetMemberWalletByUserId(userId)

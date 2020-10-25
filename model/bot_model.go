@@ -1,7 +1,9 @@
 package model
 
 import "github.com/jinzhu/gorm"
-
+/**
+ * @Description:注册自动迁移函数
+ */
 func init() {
 	RegisterMigrateHandler(func(db *gorm.DB) error {
 
@@ -38,20 +40,39 @@ var (
 	BOT    *Bot
 	BOTDTO *BotDto
 )
-
+/**
+ * @Description: 通过botId获取bot信息
+ * @receiver bot
+ * @param botId
+ * @return botData
+ * @return err
+ */
 func (bot *Bot) GetBotById(botId string) (botData *Bot, err error) {
 	botData = &Bot{}
 	err = db.Debug().Where("id=?", botId).Find(botData).Error
 	return
 }
 
-//根据projectId获取所有的机器人Id
+/**
+ * @Description: 根据projectId获取所有的BotId
+ * @receiver bot
+ * @param projectId
+ * @return botDto
+ * @return err
+ */
 func (bot *BotDto) ListBotDtosByProjectId(projectId int64) (botDto *[]BotDto, err error) {
 	botDto = &[]BotDto{}
 	err = db.Debug().Table("bot").Where("project_id=?", projectId).Scan(botDto).Error
 	return
 }
 
+/**
+ * @Description: 根据BotId获取所有的BotId
+ * @receiver bot
+ * @param botId
+ * @return botDto
+ * @return err
+ */
 func (bot *BotDto) GetBotDtoById(botId string) (botDto *BotDto, err error) {
 	botDto = &BotDto{}
 	err = db.Table("bot").Where("id=?", botId).Scan(botDto).Error

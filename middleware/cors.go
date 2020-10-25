@@ -5,7 +5,10 @@ import (
 	"net/http"
 )
 
-//解决跨域问题中间件
+/**
+ * @Description: 解决跨域问题中间件
+ * @return gin.HandlerFunc
+ */
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method

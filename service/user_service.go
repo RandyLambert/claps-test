@@ -10,7 +10,12 @@ import (
 	//log "github.com/sirupsen/logrus"
 )
 
-//从github服务器请求获取用户的邮箱信息
+/**
+ * @Description: 从github服务器请求获取用户的邮箱信息
+ * @param githubToken
+ * @return emails
+ * @return err
+ */
 func ListEmailsByToken(githubToken string) (emails []*github.UserEmail, err *util.Err) {
 
 	ts := oauth2.StaticTokenSource(
@@ -27,13 +32,20 @@ func ListEmailsByToken(githubToken string) (emails []*github.UserEmail, err *uti
 
 	return
 }
-
+/**
+ * @Description: 通过userId获得对应各个币种的balance和total值转为usd之后的和,精度取4位
+ * @param userId
+ * @param assets
+ * @return err
+ * @return total
+ * @return balance
+ */
 func GetBalanceAndTotalToUSDByUserId(userId int64, assets *[]model.Asset) (err *util.Err, total decimal.Decimal, balance decimal.Decimal) {
 
 	//遍历assets数组获取所有的币种
 	var assetMap map[string]decimal.Decimal
 	assetMap = make(map[string]decimal.Decimal)
-	//生成币种对应ｍａｐ方便后面调用
+	//生成币种对应map方便后面调用
 	for _, asset := range *assets {
 		assetMap[asset.AssetId] = asset.PriceUsd
 	}
@@ -56,7 +68,13 @@ func GetBalanceAndTotalToUSDByUserId(userId int64, assets *[]model.Asset) (err *
 	return
 }
 
-//获取用户的所有币种的余额
+/**
+ * @Description: 获取用户的所有币种的余额
+ * @param userId
+ * @param assets
+ * @return err
+ * @return dto
+ */
 func GetBalanceAndTotalByUserIdAndAssets(userId int64, assets *[]model.Asset) (err *util.Err, dto *[]model.MemberWalletDto) {
 
 	//遍历assets数组获取所有的币种
@@ -91,7 +109,12 @@ func GetBalanceAndTotalByUserIdAndAssets(userId int64, assets *[]model.Asset) (e
 
 	return
 }
-
+/**
+ * @Description: 通过mixinId获取transfers,暂时废弃
+ * @param mixinId
+ * @return transfers
+ * @return err
+ */
 func ListTransfersByMixinId(mixinId string) (transfers *[]model.Transfer, err *util.Err) {
 	transfers, err1 := model.TRANSFER.ListTransferByMixinId(mixinId)
 	if err1 != nil {
@@ -99,7 +122,14 @@ func ListTransfersByMixinId(mixinId string) (transfers *[]model.Transfer, err *u
 	}
 	return
 }
-
+/**
+ * @Description: 通过mixinId和query值获取transfers
+ * @param mixinId
+ * @param q
+ * @return transfers
+ * @return number
+ * @return err
+ */
 func ListTransfersByProjectIdAndQuery(mixinId string, q *model.PaginationQ) (transfers *[]model.Transfer, number int, err *util.Err) {
 
 	transfers, number, err1 := model.TRANSFER.ListTransfersByMixinIdAndQuery(mixinId, q)
@@ -108,7 +138,12 @@ func ListTransfersByProjectIdAndQuery(mixinId string, q *model.PaginationQ) (tra
 	}
 	return
 }
-
+/**
+ * @Description: 统计一个用户有获得了多少笔来自不同项目的捐赠捐赠
+ * @param userId
+ * @return donations
+ * @return err
+ */
 func SumProjectDonationsByUserId(userId int64) (donations int64, err *util.Err) {
 	donations, err1 := model.PROJECT.SumProjectDonationsByUserId(userId)
 	if err1 != nil {
@@ -117,7 +152,12 @@ func SumProjectDonationsByUserId(userId int64) (donations int64, err *util.Err) 
 	return
 }
 
-//更新user表中的mixin_id字段
+/**
+ * @Description: 更新user表中的mixin_id字段
+ * @param userId
+ * @param mixinId
+ * @return err
+ */
 func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
 	err1 := model.USER.UpdateUserMixinId(userId, mixinId)
 	if err1 != nil {
@@ -125,7 +165,12 @@ func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
 	}
 	return
 }
-
+/**
+ * @Description: 通过用户的userId获取对应绑定的mixinId
+ * @param userId
+ * @return mixinId
+ * @return err
+ */
 func GetMixinIdByUserId(userId int64) (mixinId string, err *util.Err) {
 	user, err1 := model.USERMIXINID.GetUserById(userId)
 	if err1 != nil {
@@ -135,7 +180,12 @@ func GetMixinIdByUserId(userId int64) (mixinId string, err *util.Err) {
 	mixinId = user.MixinId
 	return
 }
-
+/**
+ * @Description: 更新用户的提现方式
+ * @param userId
+ * @param withdrawWal
+ * @return err
+ */
 func UpdateUserWithdrawalWay(userId int64, withdrawWal string) (err *util.Err) {
 	err1 := model.USER.UpdateUserWithdrawalWay(userId, withdrawWal)
 	if err1 != nil {

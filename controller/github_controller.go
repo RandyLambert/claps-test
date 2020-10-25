@@ -10,10 +10,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-/*
-功能:用code换取Token
-说明:此时没有发放token,没有cache,成功授权后发放token,设置cache
-*/
+/**
+ * @Description: 用code换取Token,此时没有发放token,没有cache,成功授权后发放token,设置cache
+ * @param ctx
+ */
 func Oauth(ctx *gin.Context) {
 	type oauth struct {
 		Code string `json:"code" form:"code"`

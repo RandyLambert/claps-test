@@ -1,7 +1,9 @@
 package model
 
 import "github.com/jinzhu/gorm"
-
+/**
+ * @Description:注册自动迁移函数
+ */
 func init() {
 	RegisterMigrateHandler(func(db *gorm.DB) error {
 

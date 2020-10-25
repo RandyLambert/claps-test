@@ -8,7 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
-
+/**
+ * @Description: 按照query值获取projects信息
+ * @param ctx
+ */
 func Projects(ctx *gin.Context) {
 	query := &model.PaginationQ{}
 	err1 := ctx.ShouldBindQuery(query)
@@ -27,14 +30,13 @@ func Projects(ctx *gin.Context) {
 		"query":    query,
 	}
 	util.HandleResponse(ctx, err, resp)
-	//log.Debug(number)
-	//util.HandleResponse(ctx,err,projects)
 	return
 }
 
-/*
-通过Id获取项目的详细信息
-*/
+/**
+ * @Description: 通过Id获取项目的详细信息
+ * @param ctx
+ */
 func ProjectById(ctx *gin.Context) {
 	projectId, err1 := strconv.ParseInt(ctx.Param("id"), 10, 64)
 	if err1 != nil {
@@ -44,7 +46,10 @@ func ProjectById(ctx *gin.Context) {
 	projectInfo, err := service.GetProjectById(projectId)
 	util.HandleResponse(ctx, err, projectInfo)
 }
-
+/**
+ * @Description: 根据projectId获取对应Project的member信息
+ * @param ctx
+ */
 func ProjectMembers(ctx *gin.Context) {
 	projectId, err1 := strconv.ParseInt(ctx.Param("id"), 10, 64)
 	if err1 != nil {
@@ -54,7 +59,10 @@ func ProjectMembers(ctx *gin.Context) {
 	members, err := service.ListMembersByProjectId(projectId)
 	util.HandleResponse(ctx, err, members)
 }
-
+/**
+ * @Description: 根据对应的projectId和query值获取对应project获得的捐赠信息
+ * @param ctx
+ */
 func ProjectTransactions(ctx *gin.Context) {
 	projectId, err1 := strconv.ParseInt(ctx.Param("id"), 10, 64)
 	if err1 != nil {
@@ -79,7 +87,10 @@ func ProjectTransactions(ctx *gin.Context) {
 
 	return
 }
-
+/**
+ * @Description: TODO 生成对应project的svg图
+ * @param ctx
+ */
 func ProjectSvg(ctx *gin.Context) {
 	badge := &model.Badge{}
 

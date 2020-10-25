@@ -38,7 +38,11 @@ func InitMixin() *mixin.Client {
 func GetMixin() *mixin.Client {
 	return MixinClient
 }
-
+/**
+ * @Description: 默认支持如下5中币种
+ * @param assetId
+ * @return bool
+ */
 func CheckAsset(assetId *string) bool {
 	switch *assetId {
 	case DOGE, XRP, BCH, BTC, ETH:

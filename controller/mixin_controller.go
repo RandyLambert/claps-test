@@ -13,11 +13,10 @@ func MixinAssets(ctx *gin.Context) {
 	assets, err := service.ListAssetsAllByDB()
 	util.HandleResponse(ctx, err, assets)
 }
-
-/*
-功能:mixin oauth授权
-说明:授权后更新数据库和缓存,由于有jwt中间件，所以一定存在cache
-*/
+/**
+ * @Description:  mixin oauth授权, 授权后更新数据库和缓存,由于有jwt中间件，所以一定存在cache中
+ * @param ctx
+ */
 func MixinOauth(ctx *gin.Context) {
 	type oauth struct {
 		Code  string `json:"code" form:"code"`
@@ -48,7 +47,7 @@ func MixinOauth(ctx *gin.Context) {
 	}
 	uid := val.(string)
 
-	//从redis获取cache
+	//从缓存中获取cache
 	mcache := &util.MCache{}
 	err1 := util.Rdb.Get(uid, mcache)
 	if err1 != nil {

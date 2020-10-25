@@ -10,9 +10,10 @@ import (
 	"time"
 )
 
-/*
-初始化日志,logrus日志库
-*/
+/**
+ * @Description: logrus日志库,设置log等级
+ * @param level
+ */
 func setLogLevel(level string) {
 	switch level {
 	case "InfoLevel":
@@ -33,7 +34,10 @@ func setLogLevel(level string) {
 		logrus.SetLevel(logrus.InfoLevel)
 	}
 }
-
+/**
+ * @Description: 设置log格式
+ * @param formatter
+ */
 func setLogFormatter(formatter string) {
 	if formatter == "json" {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
@@ -41,7 +45,9 @@ func setLogFormatter(formatter string) {
 		logrus.SetFormatter(&logrus.TextFormatter{})
 	}
 }
-
+/**
+ * @Description: 设置log输出文件
+ */
 func setLogOutput() {
 	now := time.Now()
 	//获取日志文件路径

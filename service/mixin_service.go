@@ -11,26 +11,12 @@ import (
 	"github.com/spf13/viper"
 	"time"
 )
-
-//获取所有币的信息
-func GetAssetByMixinClient(botId string, assetId string) (asset *mixin.Asset, err *util.Err) {
-	bot, err1 := model.BOT.GetBotById(botId)
-	if err1 != nil {
-		err = util.NewErr(err1, util.ErrDataBase, "通过相应botid获取bot信息信息错误")
-		return
-	}
-	mixinClient, err := CreateMixinClient(bot)
-	if err != nil {
-		return
-	}
-	asset, err1 = mixinClient.ReadAsset(context.Background(), assetId)
-	if err1 != nil {
-		err = util.NewErr(err1, util.ErrThirdParty, "通过mixin获取asset信息错误")
-	}
-	return
-
-}
-
+/**
+ * @Description: 通过bot信息创建一个mixin客户端,完成主bot初始化和对应转账功能
+ * @param bot
+ * @return client
+ * @return err
+ */
 func CreateMixinClient(bot *model.Bot) (client *mixin.Client, err *util.Err) {
 
 	s := &mixin.Keystore{
@@ -42,11 +28,13 @@ func CreateMixinClient(bot *model.Bot) (client *mixin.Client, err *util.Err) {
 
 	client, err1 := mixin.NewFromKeystore(s)
 	if err1 != nil {
-		err = util.NewErr(err1, util.ErrThirdParty, "创建mixinclient失败")
+		err = util.NewErr(err1, util.ErrThirdParty, "创建mixinClient失败")
 	}
 	return
 }
-
+/**
+ * @Description: 每隔5分钟异步更新数据库中的asset信息
+ */
 func SyncAssets() {
 
 	ctx := context.TODO()
@@ -81,12 +69,14 @@ func SyncAssets() {
 		time.Sleep(time.Minute * 5)
 	}
 }
-
+/**
+ * @Description: 每隔300毫秒在数据库中获取处于未完成状态的捐赠,然后创建对应bot完成转账操作
+ */
 func SyncTransfer() {
 
 	ctx := context.TODO()
 	for {
-		//找到状态为UNFINISHED的trasfer
+		//找到状态为UNFINISHED的transfer
 		transfers, err := model.TRANSFER.ListTransfersByStatus(model.UNFINISHED)
 		if err != nil {
 			log.Error(err.Error())
@@ -117,7 +107,7 @@ func SyncTransfer() {
 				log.Error(err1.Errord.Error())
 				continue
 			}
-			//traceid暂时不应该这ls
+			//traceId暂时不应该这ls
 			snapshot, err := user.Transfer(ctx, &mixin.TransferInput{
 				TraceID: transfer.TraceId,
 				AssetID: transfer.AssetId,
@@ -144,7 +134,10 @@ func SyncTransfer() {
 		time.Sleep(300 * time.Millisecond)
 	}
 }
-
+/**
+ * @Description: 每隔300毫秒,通过主bot异步获取mixin主网所有的转账信息,并通过判断是否有userId来判断这边转账是否针对与主bot下的子bot,
+	对符合条件的的转账按照所选择的分配方式获取对应给每个member需要分配多少对应虚拟货币的金额,并加到对应member的member_wallet的total和balance字段
+ */
 func SyncSnapshots() {
 
 	ctx := context.TODO()
@@ -270,7 +263,9 @@ func SyncSnapshots() {
 		time.Sleep(100 * time.Millisecond)
 	}
 }
-
+/**
+ * @Description:每隔40min,异步更新数据库中的fiat表
+ */
 func SyncFiat() {
 	ctx := context.TODO()
 	for {
@@ -291,8 +286,13 @@ func SyncFiat() {
 	}
 
 }
-
-//获取认证之后的客户端
+/**
+ * @Description: 获取认证之后的客户端
+ * @param ctx
+ * @param code
+ * @return client
+ * @return err
+ */
 func GetMixinAuthorizedClient(ctx *gin.Context, code string) (client *mixin.Client, err *util.Err) {
 	//从配置文件中读取Id和密码
 	clientId := viper.GetString("MIXIN_CLIENT_ID")
@@ -317,7 +317,13 @@ func GetMixinAuthorizedClient(ctx *gin.Context, code string) (client *mixin.Clie
 
 	return
 }
-
+/**
+ * @Description: 获取对应mixin用户信息
+ * @param ctx
+ * @param client
+ * @return user
+ * @return err
+ */
 func GetMixinUserInfo(ctx *gin.Context, client *mixin.Client) (user *mixin.User, err *util.Err) {
 
 	user, err1 := client.UserMe(ctx)

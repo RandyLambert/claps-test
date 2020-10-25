@@ -8,20 +8,32 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
-
+/**
+ * @Description: 根据merico的接口获取DevValue,之后进行对对应project的members进行分配操作,并修改对应的member_wallet的balance和total字段
+ * @param transaction
+ */
 func distributionByMericoAlgorithm(transaction *model.Transaction) {
 
 }
-
+/**
+ * @Description: 根据merico的接口获取对应project中members的commits值,之后进行对对应project的members进行分配操作,并修改对应的member_wallet的balance和total字段
+ * @param transaction
+ */
 func distributionByCommits(transaction *model.Transaction) {
 
 }
-
+/**
+ * @Description: 根据merico的接口获取对应project中members的changeLine值,之后进行对对应project的members进行分配操作,并修改对应的member_wallet的balance和total字段
+ * @param transaction
+ */
 func distributionByChangedLines(transaction *model.Transaction) {
 
 }
 
-//平均分配算法
+/**
+ * @Description: 根据平均分配算法,之后进行对对应project的members进行分配操作,并修改对应的member_wallet的balance和total字段
+ * @param transaction
+ */
 func distributionByIdenticalAmount(transaction *model.Transaction) {
 	//通过项目ID获取所有成员
 	members, err := model.USER.ListMembersByProjectId(transaction.ProjectId)

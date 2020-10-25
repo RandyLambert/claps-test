@@ -1,7 +1,9 @@
 package model
 
 import "github.com/jinzhu/gorm"
-
+/**
+ * @Description:注册自动迁移函数
+ */
 func init() {
 	RegisterMigrateHandler(func(db *gorm.DB) error {
 
@@ -37,14 +39,25 @@ var (
 	USERMIXINID *UserMixinId
 )
 
-//从数据库中通过ID获取user信息,存储在user中,引用传值
+/**
+ * @Description: 从数据库中通过ID获取user信息,存储在user中,引用传值
+ * @receiver user
+ * @param id
+ * @return userData
+ * @return err
+ */
 func (user *UserMixinId) GetUserById(id int64) (userData *UserMixinId, err error) {
 	userData = &UserMixinId{}
 	err = db.Debug().Table("user").Where("id = ?", id).Scan(userData).Error
 	return
 }
 
-//不管记录是否找到，都将参数赋值给 struct 并保存至数据库
+/**
+ * @Description: 不管记录是否找到，都将参数赋值给 struct 并保存至数据库
+ * @receiver user
+ * @param userData
+ * @return err
+ */
 func (user *User) InsertOrUpdateUser(userData *User) (err error) {
 
 	var cnt int64
@@ -58,7 +71,13 @@ func (user *User) InsertOrUpdateUser(userData *User) (err error) {
 	return
 }
 
-//通过projectId获取一个项目的所有成员信息
+/**
+ * @Description: 通过projectId获取一个项目的所有成员信息
+ * @receiver user
+ * @param projectId
+ * @return users
+ * @return err
+ */
 func (user *User) ListMembersByProjectId(projectId int64) (users *[]User, err error) {
 
 	users = &[]User{}
@@ -67,14 +86,26 @@ func (user *User) ListMembersByProjectId(projectId int64) (users *[]User, err er
 	return
 }
 
-//根据user_id更新表中的mixin_id信息
+/**
+ * @Description: 根据user_id更新表中的mixin_id信息
+ * @receiver user
+ * @param userId
+ * @param mixinId
+ * @return err
+ */
 func (user *User) UpdateUserMixinId(userId int64, mixinId string) (err error) {
 
 	err = db.Debug().Model(&User{}).Where("id = ?", userId).Update("mixin_id", mixinId).Error
 	return
 }
 
-//通过userId更新WithdrawalWay
+/**
+ * @Description: 通过userId更新WithdrawalWay
+ * @receiver user
+ * @param userId
+ * @param withdrawalWay
+ * @return err
+ */
 func (user *User) UpdateUserWithdrawalWay(userId int64, withdrawalWay string) (err error) {
 	err = db.Debug().Model(&User{}).Where("id = ?", userId).Update("withdrawal_way", withdrawalWay).Error
 	return

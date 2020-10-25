@@ -5,8 +5,12 @@ import (
 	"claps-test/util"
 	log "github.com/sirupsen/logrus"
 )
-
-//通过projectid查询,查询某个项目的详情
+/**
+ * @Description: 通过projectId查询,查询某个项目的详情
+ * @param projectId
+ * @return projectDetailInfo
+ * @return err
+ */
 func GetProjectById(projectId int64) (projectDetailInfo *map[string]interface{}, err *util.Err) {
 
 	project, err1 := model.PROJECT.GetProjectById(projectId)
@@ -42,8 +46,11 @@ func GetProjectById(projectId int64) (projectDetailInfo *map[string]interface{},
 	}
 	return
 }
-
-//获取数据库中所有project
+/**
+ * @Description: 获取数据库中所有project,暂时弃用
+ * @return projects
+ * @return err
+ */
 func ListProjectsAll() (projects *[]model.Project, err *util.Err) {
 	projects, err1 := model.PROJECT.ListProjectsAll()
 	if err1 != nil {
@@ -51,7 +58,13 @@ func ListProjectsAll() (projects *[]model.Project, err *util.Err) {
 	}
 	return
 }
-
+/**
+ * @Description: 通过query值获取project信息
+ * @param q
+ * @return projects
+ * @return number
+ * @return err
+ */
 func ListProjectsByQuery(q *model.PaginationQ) (projects *[]model.Project, number int, err *util.Err) {
 	projects, number, err1 := model.PROJECT.ListProjectsByQuery(q)
 	if err1 != nil {
@@ -59,8 +72,12 @@ func ListProjectsByQuery(q *model.PaginationQ) (projects *[]model.Project, numbe
 	}
 	return
 }
-
-//查询某用户的所有项目,获取数据库中所有project
+/**
+ * @Description: 查询某用户的所有项目,获取数据库中所有project
+ * @param userId
+ * @return projects
+ * @return err
+ */
 func ListProjectsByUserId(userId int64) (projects *[]model.Project, err *util.Err) {
 	projects, err1 := model.PROJECT.ListProjectsByUserId(userId)
 	if err1 != nil {
@@ -69,7 +86,12 @@ func ListProjectsByUserId(userId int64) (projects *[]model.Project, err *util.Er
 
 	return
 }
-
+/**
+ * @Description: 获取数据库中对应projectId的所有transaction,暂时弃用
+ * @param projectId
+ * @return transactions
+ * @return err
+ */
 func ListTransactionsByProjectId(projectId int64) (transactions *[]model.Transaction, err *util.Err) {
 
 	transactions, err1 := model.TRANSACTION.ListTransactionsByProjectId(projectId)
@@ -78,7 +100,14 @@ func ListTransactionsByProjectId(projectId int64) (transactions *[]model.Transac
 	}
 	return
 }
-
+/**
+ * @Description: 通过projectId和query值获取transaction信息
+ * @param projectId
+ * @param q
+ * @return transactions
+ * @return number
+ * @return err
+ */
 func ListTransactionsByProjectIdAndQuery(projectId int64, q *model.PaginationQ) (transactions *[]model.Transaction, number int, err *util.Err) {
 
 	transactions, number, err1 := model.TRANSACTION.ListTransactionsByProjectIdAndQuery(projectId, q)
@@ -87,7 +116,12 @@ func ListTransactionsByProjectIdAndQuery(projectId int64, q *model.PaginationQ) 
 	}
 	return
 }
-
+/**
+ * @Description: 通过projectId获取对应项目成员的信息
+ * @param projectId
+ * @return members
+ * @return err
+ */
 func ListMembersByProjectId(projectId int64) (members *[]model.User, err *util.Err) {
 	members, err1 := model.USER.ListMembersByProjectId(projectId)
 	if err1 != nil {
@@ -95,7 +129,11 @@ func ListMembersByProjectId(projectId int64) (members *[]model.User, err *util.E
 	}
 	return
 }
-
+/**
+ * @Description: TODO 获取项目badge,未完成
+ * @param badge
+ * @return err
+ */
 func GetProjectBadge(badge *model.Badge) (err *util.Err) {
 	//compact
 	//full

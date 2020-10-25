@@ -5,7 +5,9 @@ import (
 	"github.com/shopspring/decimal"
 	"time"
 )
-
+/**
+ * @Description:注册自动迁移函数
+ */
 func init() {
 	RegisterMigrateHandler(func(db *gorm.DB) error {
 
@@ -33,7 +35,13 @@ func (transaction *Transaction) InsertTransaction(transactionData *Transaction) 
 	return
 }
 
-//获取捐赠记录:通过projectId
+/**
+ * @Description: 获取捐赠记录:通过projectId,已废弃
+ * @receiver transaction
+ * @param projectId
+ * @return transactions
+ * @return err
+ */
 func (transaction *Transaction) ListTransactionsByProjectId(projectId int64) (transactions *[]Transaction, err error) {
 
 	transactions = &[]Transaction{}
@@ -41,13 +49,25 @@ func (transaction *Transaction) ListTransactionsByProjectId(projectId int64) (tr
 
 	return
 }
-
+/**
+ * @Description: 获取给项目一共获得了多少比捐赠
+ * @receiver transaction
+ * @param projectId
+ * @return number
+ * @return err
+ */
 func (transaction *Transaction) getTransactionsNumbersByProjectId(projectId int64) (number int, err error) {
 
 	err = db.Debug().Table("transaction").Where("project_id = ?", projectId).Count(&number).Error
 	return
 }
-
+/**
+ * @Description: 通过projectId和query值,获取捐赠记录
+ * @receiver transaction
+ * @param projectId
+ * @return transactions
+ * @return err
+ */
 func (transaction *Transaction) ListTransactionsByProjectIdAndQuery(projectId int64, q *PaginationQ) (transactions *[]Transaction, number int, err error) {
 
 	transactions = &[]Transaction{}
