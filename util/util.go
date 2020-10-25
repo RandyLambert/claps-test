@@ -18,7 +18,11 @@ type MCache struct {
 }
 
 var longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_sky")
-
+/**
+ * @Description: 生成一个长度为n的随机字符串
+ * @param n
+ * @return string
+ */
 func RandUp(n int) string {
 	if n <= 0 {
 		return ""

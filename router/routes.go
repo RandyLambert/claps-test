@@ -5,10 +5,15 @@ import (
 	"claps-test/middleware"
 	"github.com/gin-gonic/gin"
 )
-
+/**
+ * @Description: 注册所有路由
+ * @param r
+ * @return *gin.Engine
+ */
 func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.Use(middleware.LoggerToFile())
 	r.Use(middleware.Cors())
+	r.Use(gin.Recovery())
 
 	r.GET("/_hc", func(ctx *gin.Context) {
 		ctx.JSON(200, "ok")

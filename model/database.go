@@ -11,7 +11,11 @@ import (
 )
 
 var db *gorm.DB
-
+/**
+ * @Description: 初始化数据库
+ * @return *gorm.DB
+ * @return error
+ */
 func InitDB() (*gorm.DB, error) {
 
 	if db != nil {
@@ -38,6 +42,11 @@ func InitDB() (*gorm.DB, error) {
 	db.DB().SetMaxIdleConns(32)
 
 	db.SingularTable(true)
+	if config.GetString("gorm.logMode") == "false" {
+		db.LogMode(false)
+	} else {
+		db.LogMode(true)
+	}
 
 	return db, nil
 }
@@ -50,6 +59,11 @@ func GetSqlDB() *sql.DB {
 	return db.DB()
 }
 
+/**
+ * @Description: 事物函数封装
+ * @param fn
+ * @return error
+ */
 func ExecuteTx(fn func(*gorm.DB) error) error {
 	tx := db.Begin()
 	defer tx.RollbackUnlessCommitted()
@@ -73,7 +87,11 @@ var registeredMigrateHandlers []MigrateHandler
 func RegisterMigrateHandler(h MigrateHandler) {
 	registeredMigrateHandlers = append(registeredMigrateHandlers, h)
 }
-
+/**
+ * @Description: model中init里注册的函数
+ * @param db
+ * @return error
+ */
 func MigrateInDB(db *gorm.DB) error {
 	var result *multierror.Error
 	for _, h := range registeredMigrateHandlers {
@@ -87,18 +105,4 @@ func MigrateInDB(db *gorm.DB) error {
 
 func Migrate() error {
 	return MigrateInDB(db)
-}
-
-func DeleteAllTables() {
-	log.Print(db.Debug().DropTable("user").Error)
-	log.Print(db.Debug().DropTable("asset").Error)
-	log.Print(db.Debug().DropTable("bot").Error)
-	log.Print(db.Debug().DropTable("bot").Error)
-	log.Print(db.Debug().DropTable("member").Error)
-	log.Print(db.Debug().DropTable("member_wallet").Error)
-	log.Print(db.Debug().DropTable("project").Error)
-	log.Print(db.Debug().DropTable("repository").Error)
-	log.Print(db.Debug().DropTable("transfer").Error)
-	log.Print(db.Debug().DropTable("transaction").Error)
-	log.Print(db.Debug().DropTable("wallet").Error)
 }

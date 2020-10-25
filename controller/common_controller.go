@@ -10,11 +10,10 @@ import (
 	"net/http"
 )
 
-
-/*
-功能:返回环境信息
-说明:此时用户没有登录github没有
-*/
+/**
+ * @Description: 返回环境信息,此时用户没有登录github没有
+ * @param ctx
+ */
 func Environments(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
@@ -26,10 +25,10 @@ func Environments(ctx *gin.Context) {
 	util.HandleResponse(ctx, nil, resp)
 }
 
-/*
-功能:认证用户信息,判断github和mixin是否登录绑定
-说明:之前有JWTAuthmiddleWare,有jwt说明一定github授权,ctx里设置uid
-*/
+/**
+ * @Description: 认证用户信息,判断github和mixin是否登录绑定,之前有JWTAuthMiddleWare,有jwt说明一定github授权,ctx里设置uid
+ * @param ctx
+ */
 func AuthInfo(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
@@ -49,15 +48,15 @@ func AuthInfo(ctx *gin.Context) {
 	//cache中没有mixin信息
 	if !mcache.MixinAuth {
 		//更新mixin信息
-		mixin_id, err := service.GetMixinIdByUserId(*mcache.Github.ID)
+		mixinId, err := service.GetMixinIdByUserId(*mcache.Github.ID)
 		if err != nil {
 			util.HandleResponse(ctx, err, nil)
 			return
 		}
 
-		if mixin_id != "" {
+		if mixinId != "" {
 			//set cache ,next
-			mcache.MixinId = mixin_id
+			mcache.MixinId = mixinId
 			mcache.MixinAuth = true
 			err1 = util.Rdb.Replace(randomUid, *mcache, -1)
 			if err1 != nil {
@@ -77,9 +76,11 @@ func AuthInfo(ctx *gin.Context) {
 	return
 }
 
-/*
-功能:再无Token的情况下,返回Uid和Token,并且redis缓存uid-mcache
-*/
+/**
+ * @Description: 再无Token的情况下,返回Uid和Token,并且redis缓存uid-mcache,弃用
+ * @param c
+ * @return randomUid
+ */
 func noToken(c *gin.Context) (randomUid string) {
 	resp := make(map[string]interface{})
 	randomUid = util.RandUp(32)

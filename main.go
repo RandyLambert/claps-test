@@ -37,8 +37,6 @@ func main() {
 		if multierror := model.Migrate(); multierror != nil {
 			log.Error(multierror)
 		}
-	case "deletetables": // dangerous
-		model.DeleteAllTables()
 	default:
 		//定期更新数据库snapshot信息
 		go service.SyncSnapshots()
@@ -49,7 +47,7 @@ func main() {
 		//定期获取汇率
 		go service.SyncFiat()
 
-		r := gin.Default()
+		r := gin.New()
 		r = router.CollectRoute(r)
 		serverPort := viper.GetString("server.port")
 		if serverPort != "" {
