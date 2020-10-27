@@ -15,7 +15,7 @@ var Rdb *persistence.InMemoryStore
 /**
  * @Description: jwt的过期时间
  */
-const TokenExpireDuration = time.Hour * 2
+const TokenExpireDuration = time.Hour*72
 
 /**
  * @Description: 初始化连接

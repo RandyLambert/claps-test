@@ -1,6 +1,7 @@
 package util
 
 import (
+	"claps-test/util"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -10,10 +11,12 @@ import (
 	"strings"
 )
 
-const MERICO = "https://cloud.merico.cn"
 const CONTENTTYPE = "application/json"
 
-//options选项
+/**
+ * @Description: options选项
+ * @return nc
+ */
 const (
 	DEVNUM               = "developer_num"                               //开发者数量
 	DEVEQU               = "dev_equivalent"                              //开发当量(规模)
@@ -23,20 +26,27 @@ const (
 	DEVEQUEVERYGROUP     = "dev_equivalent_every_developer_group_period" //按照指定周期的平均开发当量
 )
 
-//签名类
+/**
+ * @Description:签名类
+ */
 type SignUtils struct {
 	params map[string]interface{}
 	key    string
 }
 
-//选项类
+/**
+ * @Description: 选项类
+ */
 type Options struct {
 	SelectColumn       string `json:"selectColumn"`
 	TargetTimezoneName string `json:"targetTimezoneName"`
 	SelectProjectId    string `json:"selectProjectId,omitempty"`
 }
 
-//实例化签名
+/**
+ * @Description: 实例化签名
+ * @return sign
+ */
 func NewSign() (sign *SignUtils) {
 	sign = new(SignUtils)
 	sign.key = MericoSecret
@@ -45,13 +55,20 @@ func NewSign() (sign *SignUtils) {
 	return sign
 }
 
+/**
+ * @Description: 设置nonStr
+ * @receiver s
+ * @param nonceStr nonStr为Merico签名必填字段
+ */
 func (s *SignUtils) SetNonceStr(nonceStr string) {
 	s.params["nonce_str"] = nonceStr
 }
 
-/*
-对map的key排序，返回有序的slice
-*/
+/**
+ * @Description: 对map的key排序，返回有序的slice
+ * @receiver s
+ * @return keys
+ */
 func (s *SignUtils) sortMapbyKey() (keys []string) {
 	for k := range s.params {
 		keys = append(keys, k)
@@ -60,24 +77,33 @@ func (s *SignUtils) sortMapbyKey() (keys []string) {
 	return keys
 }
 
-/*
-设置k-v键值对
-*/
+/**
+ * @Description: 设置k-v键值对
+ * @receiver s
+ * @param key
+ * @param value
+ */
 func (s *SignUtils) Set(key, value string) {
 	s.params[key] = value
 }
 
-/*
-设置数组和对象k-v
-*/
+/**
+ * @Description: 设置数组,对象类型的k-v
+ * @receiver s
+ * @param key
+ * @param value
+ * @return err
+ */
 func (s *SignUtils) SetObjectOrArray(key string, value interface{}) (err error) {
 	s.params[key] = value
 	return
 }
 
-/*
-生成sign
-*/
+/**
+ * @Description: 生成sign
+ * @receiver s
+ * @return result
+ */
 func (s *SignUtils) sign() (result string) {
 	//对key排序
 	keys := s.sortMapbyKey()
@@ -105,9 +131,12 @@ func (s *SignUtils) sign() (result string) {
 	return
 }
 
-/*
-获取要post的数据
-*/
+/**
+ * @Description: 获取需要post的数据
+ * @receiver s
+ * @return result
+ * @return err
+ */
 func (s *SignUtils) GetPostData() (result *strings.Reader, err error) {
 	//获取sign值
 	s.params["sign"] = s.sign()
@@ -140,7 +169,7 @@ func test() {
 		return
 	}
 
-	url := MERICO + "/openapi/openapi/developer/get-efficiency-metric"
+	url := util.Merico + "/openapi/openapi/developer/get-efficiency-metric"
 	fmt.Println(url)
 
 	fmt.Println(*res)
@@ -186,7 +215,7 @@ func testDeveloper() {
 		return
 	}
 
-	url := MERICO + "/openapi/openapi/developer/get-efficiency-metric"
+	url := util.Merico + "/openapi/openapi/developer/get-efficiency-metric"
 	fmt.Println(url)
 
 	fmt.Println(*res)
@@ -216,7 +245,7 @@ func testProjectAdd() {
 		return
 	}
 
-	url := MERICO + "/openapi/openapi/project/add"
+	url := util.Merico + "/openapi/openapi/project/add"
 	fmt.Println(url)
 
 	fmt.Println(*res)
@@ -248,7 +277,7 @@ func testGroupAdd() {
 		return
 	}
 
-	url := MERICO + "/openapi/openapi/group/add"
+	url := util.Merico + "/openapi/openapi/group/add"
 	fmt.Println(url)
 
 	fmt.Println(*res)
@@ -279,7 +308,7 @@ func testProjectGet() {
 		return
 	}
 
-	url := MERICO + "/openapi/openapi/project/get"
+	url := util.Merico + "/openapi/openapi/project/get"
 	fmt.Println(url)
 
 	fmt.Println(*res)
@@ -308,7 +337,7 @@ func testGroupfind() {
 		return
 	}
 
-	url := MERICO + "/openapi/openapi/group/find"
+	url := util.Merico + "/openapi/openapi/group/find"
 	fmt.Println(url)
 
 	fmt.Println(*res)

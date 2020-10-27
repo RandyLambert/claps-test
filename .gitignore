@@ -3,3 +3,5 @@
 /.env
 /logs
 /main
+/claps.service
+/.idea
