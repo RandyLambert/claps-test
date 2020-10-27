@@ -1,13 +1,11 @@
 package controller
 
 import (
-	"claps-test/middleware"
 	"claps-test/service"
 	"claps-test/util"
 	"errors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 /**
@@ -76,33 +74,6 @@ func AuthInfo(ctx *gin.Context) {
 	return
 }
 
-/**
- * @Description: 再无Token的情况下,返回Uid和Token,并且redis缓存uid-mcache,弃用
- * @param c
- * @return randomUid
- */
-func noToken(c *gin.Context) (randomUid string) {
-	resp := make(map[string]interface{})
-	randomUid = util.RandUp(32)
-
-	token, err := middleware.GenToken(randomUid)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusOK, gin.H{
-			"message": "generate token error.",
-		})
-	}
-	resp["token"] = token
-
-	mcache := util.MCache{}
-	err1 := util.Rdb.Set(randomUid, mcache, -1)
-	if err1 != nil {
-		util.HandleResponse(c, util.NewErr(err1, util.ErrDataBase, "cache set error"), nil)
-		return
-	}
-
-	util.HandleResponse(c, nil, resp)
-	return
-}
 
 /**
  * @Description: 模拟三目运算符号

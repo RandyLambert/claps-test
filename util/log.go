@@ -79,7 +79,7 @@ func setLogOutput() {
 		var err error
 		writer, err = os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0755)
 		if err != nil {
-			log.Panic("create file log.txt failed: %v", err)
+			log.Panic("create file log.txt failed: ", err)
 		}
 	} else {
 		writer = os.Stdout

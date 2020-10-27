@@ -43,8 +43,8 @@ func NewErr(err error, code int, message string) *Err {
  * @return string
  */
 func (err *Err) Error() string {
-	//return fmt.Sprintf("Err - code: %d, message: %s, error: %s", err.Code, err.Message, err.Errord)
-	return fmt.Sprintf("Err - code: %d, message: %s. ", err.Code, err.Message)
+	return fmt.Sprintf("Err - code: %d, message: %s, error: %s", err.Code, err.Message, err.Errord)
+	//return fmt.Sprintf("Err - code: %d, message: %s. ", err.Code, err.Message)
 }
 
 

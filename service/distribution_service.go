@@ -8,26 +8,111 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
+
+/**
+ * @Description: 根据metric分配钱
+ * @param transaction
+ * @param metric 分配算法
+ */
+func distribute(transaction *model.Transaction,metric string)  {
+	emailToMetric := make(map[string]decimal.Decimal)
+
+	//Get all member by projectId
+	members, err := model.USER.ListMembersByProjectId(transaction.ProjectId)
+	if err != nil {
+		log.Error(err.Error())
+		return
+	}
+
+
+	//Get groupId by projectId
+	groupId,err1 := GetGroupIdByProjectId(transaction.ProjectId)
+	if err1 != nil{
+		log.WithFields(log.Fields{
+			"code":   err1.Code,
+			"err":    err1.Errord,
+		}).Error(err1.Message)
+		return
+	}
+
+	//Get devValue
+	primaryEmailStrs,err := GetMetricByGroupIdAndUserEmails(groupId,metric,*members)
+	if err != nil{
+		log.Error("get devValue error:%v",err)
+		return
+	}
+
+	if len(primaryEmailStrs) == 0{
+		log.Error("analyze not finish, use IdenticalAmount")
+		distributionByIdenticalAmount(transaction)
+		return
+	}
+
+	//create the map email to metric
+	for _,v := range primaryEmailStrs{
+		emailToMetric[v.PrimaryEmail]	= v.Value
+	}
+
+	//calculate every member should get how much money
+	if err1 := model.ExecuteTx(func(tx *gorm.DB) error {
+		for i := range *members {
+			rate := emailToMetric[(*members)[i].Email]
+			amount := transaction.Amount.Mul(rate)
+
+			//获得相应的用户钱包
+			walletTotal, err := model.MEMBERWALLETDTO.GetMemberWalletByProjectIdAndUserIdAndBotIdAndAssetId(transaction.ProjectId, (*members)[i].Id, transaction.Receiver, transaction.AssetId)
+			if err != nil {
+				log.Error(err.Error())
+				return err
+			}
+			walletTotal.Total = walletTotal.Total.Add(amount)
+			walletTotal.Balance = walletTotal.Balance.Add(amount)
+
+			//更新钱包
+			err = model.MEMBERWALLETDTO.UpdateMemberWallet(walletTotal)
+			if err != nil {
+				log.Error(err.Error())
+				return err
+			}
+
+			err1 := WithdrawNowOrNot(&(*members)[i])
+			if err1 != nil {
+				log.Error(err1.Error())
+				text := "withdrawalWay等于withdrawByClaps，获得捐赠后直接转账失败" + metric
+				err = errors.New(text)
+				return err
+			}
+
+		}
+		return nil
+	}); err1 != nil {
+		err := util.NewErr(err1, util.ErrDataBase, metric+"插入提现记录事物出现问题")
+		log.Error(err.Error())
+		return
+	}
+}
+
 /**
  * @Description: 根据merico的接口获取DevValue,之后进行对对应project的members进行分配操作,并修改对应的member_wallet的balance和total字段
  * @param transaction
  */
 func distributionByMericoAlgorithm(transaction *model.Transaction) {
-
+	distribute(transaction,DEVVAL)
 }
+
 /**
  * @Description: 根据merico的接口获取对应project中members的commits值,之后进行对对应project的members进行分配操作,并修改对应的member_wallet的balance和total字段
  * @param transaction
  */
 func distributionByCommits(transaction *model.Transaction) {
-
+	distribute(transaction,COMMIT_NUM)
 }
 /**
  * @Description: 根据merico的接口获取对应project中members的changeLine值,之后进行对对应project的members进行分配操作,并修改对应的member_wallet的balance和total字段
  * @param transaction
  */
 func distributionByChangedLines(transaction *model.Transaction) {
-
+	distribute(transaction,CHANGE_LINES)
 }
 
 /**
@@ -86,6 +171,11 @@ func distributionByIdenticalAmount(transaction *model.Transaction) {
 
 }
 
+/**
+ * @Description: 立马提现或者等待用户去提现
+ * @param member
+ * @return err
+ */
 func WithdrawNowOrNot(member *model.User) (err *util.Err) {
 	//判断是否有未完成的提现
 	if member.WithdrawalWay == model.WithdrawByClaps {

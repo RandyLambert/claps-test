@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"claps-test/model"
@@ -6,6 +6,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -26,8 +27,8 @@ const (
 )
 
 type OneMember struct {
-	PrimaryEmail string		`json:"primary_email"`
-	Value 		 float64 	`json:"value"`
+	PrimaryEmail string				`json:"primary_email"`
+	Value 		 decimal.Decimal	`json:"value"`
 }
 
 type mericoReciveData struct {
@@ -160,26 +161,28 @@ func (s *SignUtils) getPostData() (result *strings.Reader, err error) {
 	return
 }
 
-func GetDevValueByGroupIdAndUserEmails(groupId string,members []model.User)(primaryEmailStrs []OneMember,err error){
-	recv,err := getDevValue(groupId,DEVVAL,members)
+func GetMetricByGroupIdAndUserEmails(groupId string,metric string,members []model.User)(primaryEmailStrs []OneMember,err error){
+	recv,err := getMetric(groupId,metric,members)
 	if err != nil{
 		return
 	}
 
 	//may exist sum of value is not 1 or value is integer,handle this situation
-	var sum float64
+	var sum decimal.Decimal
 	for _,v := range recv.Data{
-		sum += v.Value
+		sum = sum.Add(v.Value)
 	}
 
 	for _,v := range recv.Data{
-		v.Value = v.Value/sum
-		log.Info("sucess get devValue:%v",v)
+		v.Value = v.Value.Div(sum)
+		log.Info("success get devValue:%v",v)
 	}
 	primaryEmailStrs = recv.Data
+
+	return
 }
 
-func getDevValue(groupId string,selectColumn string,members []model.User)(recv *mericoReciveData,err error){
+func getMetric(groupId string,selectColumn string,members []model.User)(recv *mericoReciveData,err error){
 	signTool := newSign()
 	signTool.setNonceStr(util.RandUp(16))
 
@@ -236,11 +239,12 @@ func getDevValue(groupId string,selectColumn string,members []model.User)(recv *
 		return
 	}
 
-	if(recv.Code != 200){
+	if recv.Code != 200 {
 		log.Error("Merico return code:%v",recv.Code)
 		return
 	}
 
+	return
 }
 
 

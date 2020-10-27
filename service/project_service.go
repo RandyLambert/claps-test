@@ -145,3 +145,19 @@ func GetProjectBadge(badge *model.Badge) (err *util.Err) {
 	log.Debug(fiat)
 	return
 }
+
+/**
+ * @Description:
+ * @param projectId 项目Id
+ * @return groupId 根据project_to_merico_group查到
+ * @return err
+ */
+func GetGroupIdByProjectId(projectId int64)(groupId string,err *util.Err) {
+	ptm,err1 := model.PROJECTTOMERICOGROUP.GetByProjectId(projectId)
+	if err1 != nil {
+		err = util.NewErr(err1,util.ErrDataBase,"DB get groupId error")
+		return
+	}
+	groupId = ptm.MericoGroupId
+	return
+}
