@@ -3,18 +3,17 @@ package service
 import (
 	"claps-test/model"
 	"claps-test/util"
-	"errors"
 	"github.com/jinzhu/gorm"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
 
 /**
- * @Description: 根据metric分配钱
+ * @Description: 根据提供的不同参数,使用metric分配钱
  * @param transaction
- * @param metric 分配算法
+ * @param metric
  */
-func distribute(transaction *model.Transaction,metric string)  {
+func distribute(transaction *model.Transaction, metric string) {
 	emailToMetric := make(map[string]decimal.Decimal)
 
 	//Get all member by projectId
@@ -24,33 +23,32 @@ func distribute(transaction *model.Transaction,metric string)  {
 		return
 	}
 
-
 	//Get groupId by projectId
-	groupId,err1 := GetGroupIdByProjectId(transaction.ProjectId)
-	if err1 != nil{
+	groupId, err1 := GetGroupIdByProjectId(transaction.ProjectId)
+	if err1 != nil {
 		log.WithFields(log.Fields{
-			"code":   err1.Code,
-			"err":    err1.Errord,
+			"code": err1.Code,
+			"err":  err1.Errord,
 		}).Error(err1.Message)
 		return
 	}
 
 	//Get devValue
-	primaryEmailStrs,err := GetMetricByGroupIdAndUserEmails(groupId,metric,*members)
-	if err != nil{
-		log.Error("get devValue error:%v",err)
+	primaryEmailStrs, err := GetMetricByGroupIdAndUserEmails(groupId, metric, *members)
+	if err != nil {
+		log.Error("get devValue error:%v", err)
 		return
 	}
 
-	if len(primaryEmailStrs) == 0{
+	if len(primaryEmailStrs) == 0 {
 		log.Error("analyze not finish, use IdenticalAmount")
 		distributionByIdenticalAmount(transaction)
 		return
 	}
 
 	//create the map email to metric
-	for _,v := range primaryEmailStrs{
-		emailToMetric[v.PrimaryEmail]	= v.Value
+	for _, v := range primaryEmailStrs {
+		emailToMetric[v.PrimaryEmail] = v.Value
 	}
 
 	//calculate every member should get how much money
@@ -74,21 +72,20 @@ func distribute(transaction *model.Transaction,metric string)  {
 				log.Error(err.Error())
 				return err
 			}
-
-			err1 := WithdrawNowOrNot(&(*members)[i])
-			if err1 != nil {
-				log.Error(err1.Error())
-				text := "withdrawalWay等于withdrawByClaps，获得捐赠后直接转账失败" + metric
-				err = errors.New(text)
-				return err
-			}
-
 		}
 		return nil
 	}); err1 != nil {
 		err := util.NewErr(err1, util.ErrDataBase, metric+"插入提现记录事物出现问题")
 		log.Error(err.Error())
 		return
+	}
+
+	//自动提现的用户,在这里运行自动提现功能
+	for _, v := range *members {
+		err1 := WithdrawNowOrNot(&v)
+		if err1 != nil {
+			log.Error(err1.Error())
+		}
 	}
 }
 
@@ -97,7 +94,7 @@ func distribute(transaction *model.Transaction,metric string)  {
  * @param transaction
  */
 func distributionByMericoAlgorithm(transaction *model.Transaction) {
-	distribute(transaction,DEVVAL)
+	distribute(transaction, DEVVAL)
 }
 
 /**
@@ -105,14 +102,15 @@ func distributionByMericoAlgorithm(transaction *model.Transaction) {
  * @param transaction
  */
 func distributionByCommits(transaction *model.Transaction) {
-	distribute(transaction,COMMIT_NUM)
+	distribute(transaction, COMMIT_NUM)
 }
+
 /**
  * @Description: 根据merico的接口获取对应project中members的changeLine值,之后进行对对应project的members进行分配操作,并修改对应的member_wallet的balance和total字段
  * @param transaction
  */
 func distributionByChangedLines(transaction *model.Transaction) {
-	distribute(transaction,CHANGE_LINES)
+	distribute(transaction, CHANGE_LINES)
 }
 
 /**
@@ -127,7 +125,7 @@ func distributionByIdenticalAmount(transaction *model.Transaction) {
 		return
 	}
 
-	//做除法,如果members等于0上面就返回?
+	//做除法,如果members等于0上面就返回
 	memberNumbers := decimal.NewFromInt(int64(len(*members)))
 	amount := transaction.Amount.Div(memberNumbers)
 
@@ -153,20 +151,20 @@ func distributionByIdenticalAmount(transaction *model.Transaction) {
 				log.Error(err.Error())
 				return err
 			}
-
-			err1 := WithdrawNowOrNot(&(*members)[i])
-			if err1 != nil {
-				log.Error(err1.Error())
-				err = errors.New("withdrawalWay等于withdrawByClaps，获得捐赠后直接转账失败")
-				return err
-			}
-
 		}
 		return nil
 	}); err1 != nil {
 		err := util.NewErr(err1, util.ErrDataBase, "平均分配算法插入提现记录事物出现问题")
 		log.Error(err.Error())
 		return
+	}
+
+	//自动提现的用户,在这里运行自动提现功能
+	for _, v := range *members {
+		err1 := WithdrawNowOrNot(&v)
+		if err1 != nil {
+			log.Error(err1.Error())
+		}
 	}
 
 }

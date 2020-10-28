@@ -74,7 +74,6 @@ func AuthInfo(ctx *gin.Context) {
 	return
 }
 
-
 /**
  * @Description: 模拟三目运算符号
  * @param condition

@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
+
 /**
  * @Description: 返回数据库中asset表中的数据
  * @param ctx
@@ -16,6 +17,7 @@ func MixinAssets(ctx *gin.Context) {
 	assets, err := service.ListAssetsAllByDB()
 	util.HandleResponse(ctx, err, assets)
 }
+
 /**
  * @Description:  mixin oauth授权, 授权后更新数据库和缓存,由于有jwt中间件，所以一定存在cache中
  * @param ctx

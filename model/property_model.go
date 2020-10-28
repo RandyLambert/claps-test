@@ -1,6 +1,7 @@
 package model
 
 import "github.com/jinzhu/gorm"
+
 /**
  * @Description:注册自动迁移函数
  */
@@ -23,6 +24,7 @@ type Property struct {
 }
 
 var PROPERTY *Property
+
 /**
  * @Description: 获取对应值
  * @receiver prop
@@ -37,6 +39,7 @@ func (prop *Property) GetPropertyByKey(Key string) (property *Property, err erro
 	err = db.First(property).Error
 	return
 }
+
 /**
  * @Description: 更新或修改对应值
  * @receiver prop

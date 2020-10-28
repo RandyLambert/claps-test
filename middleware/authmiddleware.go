@@ -16,7 +16,6 @@ type MyClaims struct {
 	jwt.StandardClaims
 }
 
-
 /**
  * @Description: 检查是够绑定mixin,github一定是登录了,从数据库中查询问是否绑定mixin,绑定则更新缓存
  * @return gin.HandlerFunc
@@ -88,7 +87,7 @@ func GenToken(uid string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 
 	// 使用指定的secret签名并获得完整的编码后的字符串token
-	return token.SignedString (util.MySecret)
+	return token.SignedString(util.MySecret)
 
 }
 
@@ -116,7 +115,7 @@ func ParseToken(tokenString string) (*MyClaims, error) {
  * @Description: 判断请求的Token情况,经过该中间件验证,ctx中一定有cache的key,但是不一定授权了mixin
 	使用memory做缓存时重启可能导致token合法，但是没有对应cache,自动查询数据库，填充mixin是否登录
  * @return func(c *gin.Context)
- */
+*/
 func JWTAuthMiddleware() func(c *gin.Context) {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.Request.Header.Get("Authorization")

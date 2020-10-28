@@ -11,6 +11,7 @@ import (
 )
 
 var db *gorm.DB
+
 /**
  * @Description: 初始化数据库
  * @return *gorm.DB
@@ -87,6 +88,7 @@ var registeredMigrateHandlers []MigrateHandler
 func RegisterMigrateHandler(h MigrateHandler) {
 	registeredMigrateHandlers = append(registeredMigrateHandlers, h)
 }
+
 /**
  * @Description: model中init里注册的函数
  * @param db

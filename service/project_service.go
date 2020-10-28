@@ -5,6 +5,7 @@ import (
 	"claps-test/util"
 	log "github.com/sirupsen/logrus"
 )
+
 /**
  * @Description: 通过projectId查询,查询某个项目的详情
  * @param projectId
@@ -46,6 +47,7 @@ func GetProjectById(projectId int64) (projectDetailInfo *map[string]interface{},
 	}
 	return
 }
+
 /**
  * @Description: 获取数据库中所有project,暂时弃用
  * @return projects
@@ -58,6 +60,7 @@ func ListProjectsAll() (projects *[]model.Project, err *util.Err) {
 	}
 	return
 }
+
 /**
  * @Description: 通过query值获取project信息
  * @param q
@@ -72,6 +75,7 @@ func ListProjectsByQuery(q *model.PaginationQ) (projects *[]model.Project, numbe
 	}
 	return
 }
+
 /**
  * @Description: 查询某用户的所有项目,获取数据库中所有project
  * @param userId
@@ -86,6 +90,7 @@ func ListProjectsByUserId(userId int64) (projects *[]model.Project, err *util.Er
 
 	return
 }
+
 /**
  * @Description: 获取数据库中对应projectId的所有transaction,暂时弃用
  * @param projectId
@@ -100,6 +105,7 @@ func ListTransactionsByProjectId(projectId int64) (transactions *[]model.Transac
 	}
 	return
 }
+
 /**
  * @Description: 通过projectId和query值获取transaction信息
  * @param projectId
@@ -116,6 +122,7 @@ func ListTransactionsByProjectIdAndQuery(projectId int64, q *model.PaginationQ) 
 	}
 	return
 }
+
 /**
  * @Description: 通过projectId获取对应项目成员的信息
  * @param projectId
@@ -129,6 +136,7 @@ func ListMembersByProjectId(projectId int64) (members *[]model.User, err *util.E
 	}
 	return
 }
+
 /**
  * @Description: TODO 获取项目badge,未完成
  * @param badge
@@ -152,10 +160,10 @@ func GetProjectBadge(badge *model.Badge) (err *util.Err) {
  * @return groupId 根据project_to_merico_group查到
  * @return err
  */
-func GetGroupIdByProjectId(projectId int64)(groupId string,err *util.Err) {
-	ptm,err1 := model.PROJECTTOMERICOGROUP.GetByProjectId(projectId)
+func GetGroupIdByProjectId(projectId int64) (groupId string, err *util.Err) {
+	ptm, err1 := model.PROJECTTOMERICOGROUP.GetByProjectId(projectId)
 	if err1 != nil {
-		err = util.NewErr(err1,util.ErrDataBase,"DB get groupId error")
+		err = util.NewErr(err1, util.ErrDataBase, "DB get groupId error")
 		return
 	}
 	groupId = ptm.MericoGroupId

@@ -5,6 +5,7 @@ import (
 	"github.com/shopspring/decimal"
 	"time"
 )
+
 /**
  * @Description:注册自动迁移函数
  */
@@ -43,6 +44,7 @@ var (
 	MEMBERWALLET    *MemberWallet
 	MEMBERWALLETDTO *MemberWalletDto
 )
+
 /**
  * @Description: 更新对应memberWallet记录的值
  * @receiver MemberWallet
@@ -53,6 +55,7 @@ func (MemberWallet *MemberWalletDto) UpdateMemberWallet(memberWalletDto *MemberW
 	err = db.Debug().Table("member_wallet").Save(memberWalletDto).Error
 	return
 }
+
 /**
  * @Description: 清零member_wallet的balance值
  * @receiver MemberWallet
@@ -63,6 +66,7 @@ func (MemberWallet *MemberWallet) UpdateMemberWalletBalanceToZeroByUserId(userId
 	err = db.Debug().Table("member_wallet").Where("user_id = ?", userId).Updates(map[string]interface{}{"balance": "0"}).Error
 	return
 }
+
 /**
  * @Description: 通过userId获取对应member_wallets的total和balance值
  * @receiver MemberWallet
@@ -75,6 +79,7 @@ func (MemberWallet *MemberWalletDto) GetMemberWalletByUserId(userId int64) (memb
 	err = db.Debug().Table("member_wallet").Where("user_id = ?", userId).Scan(memberWalletDtos).Error
 	return
 }
+
 /**
  * @Description: 通过主键获取对应单条member_wallet的值
  * @receiver MemberWallet

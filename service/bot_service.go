@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/fox-one/mixin-sdk-go"
 )
+
 /**
  * @Description: 根据对应捐赠方式所对应的botId和要捐赠的assetId获取asset信息,主要需要Destination
  * @param botId

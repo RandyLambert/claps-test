@@ -2,7 +2,6 @@ package model
 
 import "github.com/jinzhu/gorm"
 
-
 /**
  * @Description:注册自动迁移函数
  */
@@ -25,7 +24,7 @@ var (
 	PROJECTTOMERICOGROUP *ProjectToMericoGroup
 )
 
-func (ptmg *ProjectToMericoGroup)GetByProjectId(projectId int64)(ptm *ProjectToMericoGroup,err error){
+func (ptmg *ProjectToMericoGroup) GetByProjectId(projectId int64) (ptm *ProjectToMericoGroup, err error) {
 	ptm = &ProjectToMericoGroup{}
 	err = db.Debug().Where("project_id=?", projectId).Find(ptm).Error
 	return

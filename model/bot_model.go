@@ -1,6 +1,7 @@
 package model
 
 import "github.com/jinzhu/gorm"
+
 /**
  * @Description:注册自动迁移函数
  */
@@ -40,6 +41,7 @@ var (
 	BOT    *Bot
 	BOTDTO *BotDto
 )
+
 /**
  * @Description: 通过botId获取bot信息
  * @receiver bot

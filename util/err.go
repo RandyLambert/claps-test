@@ -47,7 +47,6 @@ func (err *Err) Error() string {
 	//return fmt.Sprintf("Err - code: %d, message: %s. ", err.Code, err.Message)
 }
 
-
 /**
  * @Description: SendSuccessResp 返回成功请求
  * @param c

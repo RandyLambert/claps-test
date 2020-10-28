@@ -34,6 +34,7 @@ func setLogLevel(level string) {
 		logrus.SetLevel(logrus.InfoLevel)
 	}
 }
+
 /**
  * @Description: 设置log格式
  * @param formatter
@@ -45,6 +46,7 @@ func setLogFormatter(formatter string) {
 		logrus.SetFormatter(&logrus.TextFormatter{})
 	}
 }
+
 /**
  * @Description: 设置log输出文件
  */

@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/shopspring/decimal"
 )
+
 /**
  * @Description:注册自动迁移函数
  */
@@ -23,6 +24,7 @@ type Fiat struct {
 }
 
 var FIAT *Fiat
+
 /**
  * @Description: 更新汇率信息
  * @receiver fiat
@@ -33,6 +35,7 @@ func (fiat *Fiat) UpdateFiat(fiatData *Fiat) (err error) {
 	err = db.Debug().Save(fiatData).Error
 	return
 }
+
 /**
  * @Description: 从数据库中读取所有汇率信息
  * @receiver fiat
@@ -44,6 +47,7 @@ func (fiat *Fiat) ListFiatsAllByDB() (fiats *[]Fiat, err error) {
 	err = db.Find(fiats).Error
 	return
 }
+
 /**
  * @Description: 通过对应Code获取汇率信息
  * @receiver fiat

@@ -9,6 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
+
 /**
  * @Description: 为避免提现多次转账,先首次生成提现记录到数据库,提现记录状态为unfinished,如果某一个用户有unfinished的记录则不允许提现,
 每隔300毫秒,数据库中会异步获取为完成的提现记录,真正调用转账函数,如果转账成功,则修改转账记录状态为finished,否则不修改状态值,在此期间用户不能二次提现
@@ -18,7 +19,7 @@ import (
  * @param amount
  * @param mixinId
  * @return err
- */
+*/
 func InsertTransfer(botId, assetID, memo string, amount decimal.Decimal, mixinId string) (err error) {
 	transfer := &model.Transfer{
 		BotId:   botId,

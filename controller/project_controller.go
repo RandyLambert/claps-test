@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
+
 /**
  * @Description: 按照query值获取projects信息
  * @param ctx
@@ -46,6 +47,7 @@ func ProjectById(ctx *gin.Context) {
 	projectInfo, err := service.GetProjectById(projectId)
 	util.HandleResponse(ctx, err, projectInfo)
 }
+
 /**
  * @Description: 根据projectId获取对应Project的member信息
  * @param ctx
@@ -59,6 +61,7 @@ func ProjectMembers(ctx *gin.Context) {
 	members, err := service.ListMembersByProjectId(projectId)
 	util.HandleResponse(ctx, err, members)
 }
+
 /**
  * @Description: 根据对应的projectId和query值获取对应project获得的捐赠信息
  * @param ctx
@@ -87,6 +90,7 @@ func ProjectTransactions(ctx *gin.Context) {
 
 	return
 }
+
 /**
  * @Description: TODO 生成对应project的svg图
  * @param ctx

@@ -21,20 +21,20 @@ const CONTENTTYPE = "application/json"
  * @return nc
  */
 const (
-	DEVVAL               = "dev_value"                                   //开发价值
-	COMMIT_NUM			 = "commit_num"								 	 //commit number
-	CHANGE_LINES 		 = "loc"										 //change lines
+	DEVVAL       = "dev_value"  //开发价值
+	COMMIT_NUM   = "commit_num" //commit number
+	CHANGE_LINES = "loc"        //change lines
 )
 
 type OneMember struct {
-	PrimaryEmail string				`json:"primary_email"`
-	Value 		 decimal.Decimal	`json:"value"`
+	PrimaryEmail string          `json:"primary_email"`
+	Value        decimal.Decimal `json:"value"`
 }
 
 type mericoReciveData struct {
 	Message string      `json:"message"`
-	Code 	int         `json:"code"`
-	Data	[]OneMember `json:"data"`
+	Code    int         `json:"code"`
+	Data    []OneMember `json:"data"`
 }
 
 /**
@@ -52,7 +52,7 @@ type Options struct {
 	SelectColumn       string `json:"selectColumn"`
 	TargetTimezoneName string `json:"targetTimezoneName"`
 	SelectProjectId    string `json:"selectProjectId,omitempty"`
-	SelectGroupId	   string `json:"selectGroupId,omitempty"`
+	SelectGroupId      string `json:"selectGroupId,omitempty"`
 }
 
 /**
@@ -161,67 +161,67 @@ func (s *SignUtils) getPostData() (result *strings.Reader, err error) {
 	return
 }
 
-func GetMetricByGroupIdAndUserEmails(groupId string,metric string,members []model.User)(primaryEmailStrs []OneMember,err error){
-	recv,err := getMetric(groupId,metric,members)
-	if err != nil{
+func GetMetricByGroupIdAndUserEmails(groupId string, metric string, members []model.User) (primaryEmailStrs []OneMember, err error) {
+	recv, err := getMetric(groupId, metric, members)
+	if err != nil {
 		return
 	}
 
 	//may exist sum of value is not 1 or value is integer,handle this situation
 	var sum decimal.Decimal
-	for _,v := range recv.Data{
+	for _, v := range recv.Data {
 		sum = sum.Add(v.Value)
 	}
 
-	for _,v := range recv.Data{
+	for _, v := range recv.Data {
 		v.Value = v.Value.Div(sum)
-		log.Info("success get devValue:%v",v)
+		log.Info("success get devValue:%v", v)
 	}
 	primaryEmailStrs = recv.Data
 
 	return
 }
 
-func getMetric(groupId string,selectColumn string,members []model.User)(recv *mericoReciveData,err error){
+func getMetric(groupId string, selectColumn string, members []model.User) (recv *mericoReciveData, err error) {
 	signTool := newSign()
 	signTool.setNonceStr(util.RandUp(16))
 
 	//Set options
 	options := Options{
-		SelectColumn:     selectColumn,
+		SelectColumn:       selectColumn,
 		TargetTimezoneName: "UTC",
-		SelectGroupId:    groupId,
+		SelectGroupId:      groupId,
 	}
 
 	err = signTool.setObjectOrArray("options", options)
 	if err != nil {
-		log.Error("Sign set options error: %v",err)
+		log.Error("Sign set options error: %v", err)
 		return
 	}
 
 	//get All the email
 	var primaryEmails []string
 	//traverse emails and append it to primaryEmails
-	for _,v := range members{
-		primaryEmails = append(primaryEmails,v.Email)
+	for _, v := range members {
+		primaryEmails = append(primaryEmails, v.Email)
 	}
 
 	err = signTool.setObjectOrArray("primaryEmailStrs", primaryEmails)
 	if err != nil {
-		log.Error("Sign set objectOr Array error. ",err)
+		log.Error("Sign set objectOr Array error. ", err)
 		return
 	}
 
 	res, err := signTool.getPostData()
 	if err != nil {
-		log.Error("Sign get post data error. ",err)
+		log.Error("Sign get post data error. ", err)
 		return
 	}
 
 	url := util.Merico + "/openapi/openapi/developer/query-efficiency-metric"
 	resp, err := http.Post(url, CONTENTTYPE, res)
 	if err != nil {
-		log.Error("Sign post data error. ",err)
+		log.Error("Sign post data error. ", err)
 		fmt.Println(err)
 		return
 	}
@@ -233,18 +233,16 @@ func getMetric(groupId string,selectColumn string,members []model.User)(recv *me
 	}
 
 	recv = &mericoReciveData{}
-	err = json.Unmarshal(b,recv)
-	if err != nil{
-		log.Error("Unmarshal merico data error:%v.",err)
+	err = json.Unmarshal(b, recv)
+	if err != nil {
+		log.Error("Unmarshal merico data error:%v.", err)
 		return
 	}
 
 	if recv.Code != 200 {
-		log.Error("Merico return code:%v",recv.Code)
+		log.Error("Merico return code:%v", recv.Code)
 		return
 	}
 
 	return
 }
-
-

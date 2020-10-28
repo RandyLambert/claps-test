@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"time"
 )
+
 /**
  * @Description:注册自动迁移函数
  */
@@ -39,6 +40,7 @@ const (
 )
 
 var TRANSFER *Transfer
+
 /**
  * @Description: 首次插入或者更新transfer的status值
  * @receiver transfer
@@ -49,6 +51,7 @@ func (transfer *Transfer) InsertOrUpdateTransfer(transferData *Transfer) (err er
 	err = db.Debug().Save(transferData).Error
 	return
 }
+
 /**
  * @Description: 通过mixinId获取对应transfers的值,暂时废弃
  * @receiver transfer
@@ -61,6 +64,7 @@ func (transfer *Transfer) ListTransferByMixinId(mixinId string) (transfers *[]Tr
 	err = db.Debug().Where("mixin_id = ?", mixinId).Find(transfers).Error
 	return
 }
+
 /**
  * @Description: 通过mixinId获取对应transfers的值,暂时废弃
  * @receiver transfer
@@ -73,6 +77,7 @@ func (transfer *Transfer) getTransfersNumbersByMixinId(mixinId string) (number i
 	err = db.Debug().Table("transfer").Where("mixin_id = ?", mixinId).Count(&number).Error
 	return
 }
+
 /**
  * @Description: 通过mixinId和query值获取对应transfers的值
  * @receiver transfer
@@ -116,6 +121,7 @@ func (transfer *Transfer) ListTransfersByStatus(status string) (transfers *[]Tra
 	err = db.Where("status=?", status).Find(transfers).Error
 	return
 }
+
 /**
  * @Description: 统计该mixinId提现记录处于未完成状态的数量
  * @receiver transfer

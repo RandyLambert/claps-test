@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"time"
 )
+
 /**
  * @Description: 通过bot信息创建一个mixin客户端,完成主bot初始化和对应转账功能
  * @param bot
@@ -137,11 +138,10 @@ func SyncTransfer() {
 	}
 }
 
-
 /**
  * @Description: 每隔300毫秒,通过主bot异步获取mixin主网所有的转账信息,并通过判断是否有userId来判断这边转账是否针对与主bot下的子bot,
 	对符合条件的的转账按照所选择的分配方式获取对应给每个member需要分配多少对应虚拟货币的金额,并加到对应member的member_wallet的total和balance字段
- */
+*/
 func SyncSnapshots() {
 
 	ctx := context.TODO()
@@ -268,7 +268,6 @@ func SyncSnapshots() {
 	}
 }
 
-
 /**
  * @Description:每隔40min,异步更新数据库中的fiat表
  */
@@ -292,7 +291,6 @@ func SyncFiat() {
 	}
 
 }
-
 
 /**
  * @Description: 获取认证之后的客户端
@@ -325,7 +323,6 @@ func GetMixinAuthorizedClient(ctx *gin.Context, code string) (client *mixin.Clie
 
 	return
 }
-
 
 /**
  * @Description: 获取对应mixin用户信息

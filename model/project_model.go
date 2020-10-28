@@ -58,6 +58,7 @@ func (proj *Project) ListProjectsAll() (projects *[]Project, err error) {
 	err = db.Debug().Find(projects).Error
 	return
 }
+
 /**
  * @Description: 获取一共有多少条project记录
  * @receiver proj
@@ -69,6 +70,7 @@ func (proj *Project) getProjectsNumbers() (number int, err error) {
 	err = db.Debug().Table("project").Count(&number).Error
 	return
 }
+
 /**
  * @Description: 通过query获取projects
  * @receiver proj
@@ -142,6 +144,7 @@ func (projTotal *ProjectTotal) GetProjectTotalByBotId(BotId string) (projectTota
 		db.Debug().Table("bot").Select("project_id").Where("id=?", BotId).SubQuery()).Scan(projectTotal).Error
 	return
 }
+
 /**
  * @Description: 更新project的捐赠total和收到的捐赠笔数
  * @receiver projTotal
@@ -152,6 +155,7 @@ func (projTotal *ProjectTotal) UpdateProjectTotal(projectTotal *ProjectTotal) (e
 	err = db.Debug().Table("project").Save(projectTotal).Error
 	return
 }
+
 /**
  * @Description: 统计一个用户有获得了多少笔来自不同项目的捐赠捐赠
  * @receiver proj

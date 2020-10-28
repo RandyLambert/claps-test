@@ -5,6 +5,7 @@ import (
 	"claps-test/middleware"
 	"github.com/gin-gonic/gin"
 )
+
 /**
  * @Description: 注册所有路由
  * @param r

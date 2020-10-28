@@ -33,7 +33,6 @@ func ListEmailsByToken(githubToken string) (emails []*github.UserEmail, err *uti
 	return
 }
 
-
 /**
  * @Description: 通过userId获得对应各个币种的balance和total值转为usd之后的和,精度取4位
  * @param userId
@@ -112,7 +111,6 @@ func GetBalanceAndTotalByUserIdAndAssets(userId int64, assets *[]model.Asset) (e
 	return
 }
 
-
 /**
  * @Description: 通过mixinId获取transfers,暂时废弃
  * @param mixinId
@@ -126,7 +124,6 @@ func ListTransfersByMixinId(mixinId string) (transfers *[]model.Transfer, err *u
 	}
 	return
 }
-
 
 /**
  * @Description: 通过mixinId和query值获取transfers
@@ -144,7 +141,6 @@ func ListTransfersByProjectIdAndQuery(mixinId string, q *model.PaginationQ) (tra
 	}
 	return
 }
-
 
 /**
  * @Description: 统计一个用户有获得了多少笔来自不同项目的捐赠捐赠
@@ -174,7 +170,6 @@ func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
 	return
 }
 
-
 /**
  * @Description: 通过用户的userId获取对应绑定的mixinId
  * @param userId
@@ -190,7 +185,6 @@ func GetMixinIdByUserId(userId int64) (mixinId string, err *util.Err) {
 	mixinId = user.MixinId
 	return
 }
-
 
 /**
  * @Description: 更新用户的提现方式

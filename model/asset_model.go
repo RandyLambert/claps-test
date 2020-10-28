@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/shopspring/decimal"
 )
+
 /**
  * @Description:注册自动迁移函数
  */
@@ -35,6 +36,7 @@ var (
 	ASSET      *Asset
 	ASSETTOUSD *AssetIdToPriceUsd
 )
+
 /**
  * @Description:插入或定期更新asset表
  * @receiver asset
@@ -45,6 +47,7 @@ func (asset *Asset) UpdateAsset(assetData *Asset) (err error) {
 	err = db.Save(assetData).Error
 	return
 }
+
 /**
  * @Description:通过assetId从数据库获取对应asset信息
  * @receiver asset
@@ -57,6 +60,7 @@ func (asset *Asset) GetAssetById(assetId string) (assetData *Asset, err error) {
 	err = db.Where("asset_id=?", assetId).Find(assetData).Error
 	return
 }
+
 /**
  * @Description:获取数据库所有的asset信息
  * @receiver asset
@@ -68,6 +72,7 @@ func (asset *Asset) ListAssetsAllByDB() (assets *[]Asset, err error) {
 	err = db.Find(assets).Error
 	return
 }
+
 /**
  * @Description:获取对应asset对应的美元汇率
  * @receiver assetIdToPriceUsd

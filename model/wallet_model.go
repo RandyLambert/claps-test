@@ -5,6 +5,7 @@ import (
 	"github.com/shopspring/decimal"
 	"time"
 )
+
 /**
  * @Description:注册自动迁移函数
  */
@@ -38,6 +39,7 @@ var (
 	WALLET      *Wallet
 	WALLETTOTAL *WalletTotal
 )
+
 /**
  * @Description: 通过对应捐赠方式和对应币种获取该币种的total值
  * @receiver wallet
@@ -51,6 +53,7 @@ func (wallet *WalletTotal) GetWalletTotalByBotIdAndAssetId(botId string, assetId
 	err = db.Debug().Table("wallet").Where("bot_id=? AND asset_id=?", botId, assetId).Find(total).Error
 	return
 }
+
 /**
  * @Description: 更新对应币种的total值
  * @receiver wallet

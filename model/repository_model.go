@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"time"
 )
+
 /**
  * @Description:注册自动迁移函数
  */
