@@ -11,13 +11,14 @@ import (
 	"time"
 )
 
+const tokenExpireDuration = time.Hour * 72
 type MyClaims struct {
-	Uid string `json:"uid"`
+	Uid int64	`json:"uid"`
 	jwt.StandardClaims
 }
 
 /**
- * @Description: 检查是够绑定mixin,github一定是登录了,从数据库中查询问是否绑定mixin,绑定则更新缓存
+ * @Description: 检查是够绑定mixin,github一定是登录了,从数据库中查询问是否绑定mixin,经过该中间件ctx中一定有mixinId
  * @return gin.HandlerFunc
  */
 func MixinAuthMiddleware() gin.HandlerFunc {
@@ -28,40 +29,22 @@ func MixinAuthMiddleware() gin.HandlerFunc {
 			util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "ctx get uid error"), nil)
 			return
 		}
-		uid := val.(string)
-
-		mcache := &util.MCache{}
-		err1 := util.Rdb.Get(uid, mcache)
-		if err1 != nil {
-			util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), nil)
-			return
-		}
-
-		if mcache.MixinAuth {
-			ctx.Next()
-		}
+		uid := val.(int64)
 
 		//从数据库查询mixin_id
-		mixinId, err := service.GetMixinIdByUserId(*mcache.Github.ID)
+		mixinId, err := service.GetMixinIdByUserId(uid)
 		if err != nil {
 			util.HandleResponse(ctx, err, nil)
 			ctx.Abort()
 		}
 
 		if mixinId == "" {
-			util.HandleResponse(ctx, util.NewErr(err1, util.ErrUnauthorized, "mixin unauthorized"), nil)
+			util.HandleResponse(ctx, util.NewErr(errors.New("error"), util.ErrUnauthorized, "mixin unauthorized"), nil)
 			ctx.Abort()
 			return
 		} else {
-			//set cache ,next
-			mcache.MixinId = mixinId
-			mcache.MixinAuth = true
-			err1 = util.Rdb.Replace(uid, *mcache, -1)
-			if err1 != nil {
-				err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
-				util.HandleResponse(ctx, err, nil)
-				return
-			}
+			//set ctx,next
+			ctx.Set(util.MIXINID,mixinId)
 		}
 		ctx.Next()
 	}
@@ -73,12 +56,12 @@ func MixinAuthMiddleware() gin.HandlerFunc {
  * @return string
  * @return error
  */
-func GenToken(uid string) (string, error) {
+func GenToken(uid int64) (string, error) {
 
 	c := MyClaims{
 		uid,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(util.TokenExpireDuration).Unix(), // 过期时间
+			ExpiresAt: time.Now().Add(tokenExpireDuration).Unix(), // 过期时间
 			Issuer:    "sky",                                           // 签发人
 		},
 	}
@@ -112,14 +95,12 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 }
 
 /**
- * @Description: 判断请求的Token情况,经过该中间件验证,ctx中一定有cache的key,但是不一定授权了mixin
-	使用memory做缓存时重启可能导致token合法，但是没有对应cache,自动查询数据库，填充mixin是否登录
+ * @Description: 判断请求的Token情况,经过该中间件验证,ctx中一定有uid,但是不一定授权了mixin,自动查询数据库，填充mixin是否登录
  * @return func(c *gin.Context)
 */
 func JWTAuthMiddleware() func(c *gin.Context) {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.Request.Header.Get("Authorization")
-		log.Debug("authHeader = ", authHeader)
 
 		//无Token,需要授权github
 		if authHeader == "" {

@@ -5,7 +5,6 @@ import (
 	"claps-test/util"
 	"errors"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
 /**
@@ -30,60 +29,38 @@ func Environments(ctx *gin.Context) {
 func AuthInfo(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
-	//获取claim
-	uid, _ := ctx.Get(util.UID)
-	randomUid, _ := uid.(string)
-	log.Debug("RandomUid = ", randomUid)
+	var val interface{}
+	var ok bool
+	if val, ok = ctx.Get(util.UID); !ok {
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "ctx get uid error"), resp)
+		return
+	}
+	uid := val.(int64)
 
-	//从redis取出mcache
-	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(randomUid, mcache)
-	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(err1, util.ErrInternalServer, "get cacche error"), nil)
+	var mixinAuth bool
+	mixinId,err := service.GetMixinIdByUserId(uid)
+	if err != nil{
+		util.HandleResponse(ctx,err,resp)
+		return
+	}
+	//没有绑定mixin
+	if mixinId != ""{
+		mixinAuth = true
+	}else {
+		mixinAuth = false
+	}
+
+	user,err := service.GetUserById(uid)
+	if err != nil{
+		util.HandleResponse(ctx,err,resp)
 		return
 	}
 
-	//cache中没有mixin信息
-	if !mcache.MixinAuth {
-		//更新mixin信息
-		mixinId, err := service.GetMixinIdByUserId(*mcache.Github.ID)
-		if err != nil {
-			util.HandleResponse(ctx, err, nil)
-			return
-		}
-
-		if mixinId != "" {
-			//set cache ,next
-			mcache.MixinId = mixinId
-			mcache.MixinAuth = true
-			err1 = util.Rdb.Replace(randomUid, *mcache, -1)
-			if err1 != nil {
-				err = util.NewErr(errors.New("cache set error"), util.ErrDataBase, "")
-				util.HandleResponse(ctx, err, nil)
-				return
-			}
-		}
-	}
-
-	//从redis中取出github信息返回
-	resp["user"] = mcache.Github
+	resp["user"] = *user
 	resp["randomUid"] = uid
-	resp["mixinAuth"] = mcache.MixinAuth
+	resp["mixinAuth"] = mixinAuth
 
 	util.HandleResponse(ctx, nil, resp)
 	return
 }
 
-/**
- * @Description: 模拟三目运算符号
- * @param condition
- * @param trueVal
- * @param falseVal
- * @return interface{}
- */
-func If(condition bool, trueVal, falseVal interface{}) interface{} {
-	if condition {
-		return trueVal
-	}
-	return falseVal
-}

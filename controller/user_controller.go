@@ -17,23 +17,41 @@ func UserProfile(ctx *gin.Context) {
 	var err *util.Err
 	resp := make(map[string]interface{})
 
-	//获取github信息
-	mcache := util.MCache{}
-	uid := ctx.GetString(util.UID)
-	err1 := util.Rdb.Get(uid, &mcache)
-	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error."), nil)
-		return
-	}
+	//获取github userId
+	uid := ctx.GetInt64(util.UID)
 
 	//根据userId获取所有project信息,Total和Patrons字段添加
-	projects, err := service.ListProjectsByUserId(*mcache.Github.ID)
+	projects, err := service.ListProjectsByUserId(uid)
 	if err != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
 
-	resp["emails"] = mcache.GithubEmails
+	type emailObj struct {
+		Email 		string		`json:"email"`
+		Primary 	bool	`json:"primary"`
+		Verified	bool	`json:"verified"`
+		Visibility 	string	`json:"visibility"`
+	}
+
+
+	//从db中查询email
+	email,err := service.GetUserPrimaryEmailById(uid)
+	if err != nil{
+		util.HandleResponse(ctx,err,resp)
+		return
+	}
+
+	var emails []emailObj
+	primaryEmail := emailObj{
+		email,
+		true,
+		true,
+		"public",
+	}
+
+	emails = append(emails,primaryEmail)
+	resp["emails"] = emails
 	resp["projects"] = projects
 	util.HandleResponse(ctx, err, resp)
 }
@@ -53,15 +71,7 @@ func UserAssets(ctx *gin.Context) {
 		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "cache get uid error"), resp)
 		return
 	}
-	uid := val.(string)
-
-	//从redis获取cache
-	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(uid, mcache)
-	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), resp)
-		return
-	}
+	uid := val.(int64)
 
 	//获得所有币的信息
 	assets, err := service.ListAssetsAllByDB()
@@ -71,7 +81,7 @@ func UserAssets(ctx *gin.Context) {
 	}
 
 	//查询用户钱包,获得相应的余额,添加到币信息的后面
-	err2, dto := service.GetBalanceAndTotalByUserIdAndAssets(*mcache.Github.ID, assets)
+	err2, dto := service.GetBalanceAndTotalByUserIdAndAssets(uid, assets)
 	if err2 != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
@@ -88,30 +98,35 @@ func UserAssets(ctx *gin.Context) {
 func UserTransfer(ctx *gin.Context) {
 	resp := make(map[string]interface{})
 
+	/*
 	var val interface{}
 	var ok bool
 	if val, ok = ctx.Get(util.UID); !ok {
 		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "ctx get uid error"), resp)
 		return
 	}
-	uid := val.(string)
+	uid := val.(int64)
+	 */
 
-	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(uid, mcache)
-	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), resp)
-		return
-	}
 
 	query := &model.PaginationQ{}
-	err1 = ctx.ShouldBindQuery(query)
+	err1 := ctx.ShouldBindQuery(query)
 	if err1 != nil {
 		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrBadRequest, "transfer query error"), nil)
 		return
 	}
 
+	mixinId := ctx.GetString(util.MIXINID)
+	/*
+	mixinId,err := service.GetMixinIdByUserId(uid)
+	if err != nil{
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrBadRequest, "get mixin id error"), nil)
+		return
+	}
+	 */
+
 	//从transfer表中获取该用户的所有捐赠记录
-	transfers, number, err := service.ListTransfersByProjectIdAndQuery(mcache.MixinId, query)
+	transfers, number, err := service.ListTransfersByProjectIdAndQuery(mixinId, query)
 	if err != nil {
 		util.HandleResponse(ctx, err, nil)
 		return
@@ -136,14 +151,8 @@ func UserDonation(ctx *gin.Context) {
 		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "ctx get uid error"), resp)
 		return
 	}
-	uid := val.(string)
+	uid := val.(int64)
 
-	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(uid, mcache)
-	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), resp)
-		return
-	}
 
 	//读取所有的member_wallet表然后汇总
 	//获得所有币的信息
@@ -155,14 +164,14 @@ func UserDonation(ctx *gin.Context) {
 	log.Debug(*assets)
 
 	//查询用户钱包,获得相应的余额,添加到币信息的后面
-	err2, total, balance := service.GetBalanceAndTotalToUSDByUserId(*mcache.Github.ID, assets)
+	err2, total, balance := service.GetBalanceAndTotalToUSDByUserId(uid, assets)
 	if err2 != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
 
 	//从project里面寻找Donations
-	donations, err3 := service.SumProjectDonationsByUserId(*mcache.Github.ID)
+	donations, err3 := service.SumProjectDonationsByUserId(uid)
 	if err3 != nil {
 		util.HandleResponse(ctx, err3, resp)
 		return
@@ -188,17 +197,17 @@ func UserWithdraw(ctx *gin.Context) {
 		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "ctx get uid error"), resp)
 		return
 	}
-	uid := val.(string)
+	uid := val.(int64)
 
-	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(uid, mcache)
-	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), resp)
+	//已经绑定mixin,直接从ctx中取
+	mixinId := ctx.GetString(util.MIXINID)
+	/*
+	mixinId,err := service.GetMixinIdByUserId(uid)
+	if err != nil{
+		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "get mixin id error"), resp)
 		return
 	}
-
-	//已经绑定mixin,直接从缓存中取
-	mixinId := mcache.MixinId
+	 */
 
 	//判断是否有未完成的提现
 	err3 := service.IfUnfinishedTransfer(mixinId)
@@ -208,7 +217,7 @@ func UserWithdraw(ctx *gin.Context) {
 	}
 
 	//生成transfer记录
-	err2 := service.DoTransfer(*mcache.Github.ID, mixinId)
+	err2 := service.DoTransfer(uid, mixinId)
 	if err2 != nil {
 		util.HandleResponse(ctx, err2, nil)
 		return
@@ -231,14 +240,7 @@ func UserWithdrawalWay(ctx *gin.Context) {
 		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "ctx get uid error"), resp)
 		return
 	}
-	uid := val.(string)
-
-	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(uid, mcache)
-	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), resp)
-		return
-	}
+	uid := val.(int64)
 
 	withdrawalWay := ctx.DefaultPostForm("withdrawal_way", model.WithdrawByClaps)
 	if withdrawalWay != model.WithdrawByClaps && withdrawalWay != model.WithdrawByUser {
@@ -248,7 +250,7 @@ func UserWithdrawalWay(ctx *gin.Context) {
 	}
 
 	//更新withdrawalWay
-	err2 := service.UpdateUserWithdrawalWay(*mcache.Github.ID, withdrawalWay)
+	err2 := service.UpdateUserWithdrawalWay(uid, withdrawalWay)
 	if err2 != nil {
 		util.HandleResponse(ctx, err2, nil)
 		return

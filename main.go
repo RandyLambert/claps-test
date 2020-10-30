@@ -19,9 +19,6 @@ func initAllConfig() {
 	util.InitConfig()
 	util.InitMixin()
 	util.InitLog()
-	if err := util.InitClient(); err != nil {
-		log.Error(err)
-	}
 }
 
 func main() {

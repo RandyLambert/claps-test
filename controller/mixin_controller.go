@@ -5,7 +5,6 @@ import (
 	"claps-test/util"
 	"errors"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
 /**
@@ -31,7 +30,6 @@ func MixinOauth(ctx *gin.Context) {
 	var (
 		err    *util.Err
 		oauth_ oauth
-		//randomUid = ""
 	)
 	resp := make(map[string]interface{})
 
@@ -42,7 +40,6 @@ func MixinOauth(ctx *gin.Context) {
 		util.HandleResponse(ctx, err1, resp)
 		return
 	}
-	log.Debug("code = ", oauth_.Code)
 
 	var val interface{}
 	var ok bool
@@ -50,15 +47,7 @@ func MixinOauth(ctx *gin.Context) {
 		util.HandleResponse(ctx, util.NewErr(errors.New(""), util.ErrDataBase, "cache get uid error"), resp)
 		return
 	}
-	uid := val.(string)
-
-	//从缓存中获取cache
-	mcache := &util.MCache{}
-	err1 := util.Rdb.Get(uid, mcache)
-	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "cache get error"), resp)
-		return
-	}
+	uid := val.(int64)
 
 	//用code换取令牌
 	client, err := service.GetMixinAuthorizedClient(ctx, oauth_.Code)
@@ -74,20 +63,9 @@ func MixinOauth(ctx *gin.Context) {
 		return
 	}
 
-	//更新cache
-	mcache.MixinAuth = true
-	mcache.MixinId = user.UserID
-	err1 = util.Rdb.Replace(uid, *mcache, -1)
-	if err1 != nil {
-		err = util.NewErr(errors.New("cache error"), util.ErrDataBase, "")
-		util.HandleResponse(ctx, err, resp)
-		return
-	}
-
-	log.Debug("update mixin_id by user_id")
 	//github一定是登录,绑定mixin和github
 	//更新数据库中的mixin_id字段
-	err4 := service.UpdateUserMixinId(*mcache.Github.ID, user.UserID)
+	err4 := service.UpdateUserMixinId(uid, user.UserID)
 	if err4 != nil {
 		util.HandleResponse(ctx, err4, nil)
 		return

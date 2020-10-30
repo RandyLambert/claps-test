@@ -41,13 +41,26 @@ var (
 )
 
 /**
+ * @Description: 根据id获取user完整信息
+ * @receiver u
+ * @param id
+ * @return user
+ * @return err
+ */
+func (u *User) GetUserById(id int64) (user *User, err error) {
+	user = &User{}
+	err = db.Debug().Where("id=?", id).Find(user).Error
+	return
+}
+
+/**
  * @Description: 从数据库中通过ID获取user信息,存储在user中,引用传值
  * @receiver user
  * @param id
  * @return userData
  * @return err
  */
-func (user *UserMixinId) GetUserById(id int64) (userData *UserMixinId, err error) {
+func (user *UserMixinId) GetMixinIdById(id int64) (userData *UserMixinId, err error) {
 	userData = &UserMixinId{}
 	err = db.Debug().Table("user").Where("id = ?", id).Scan(userData).Error
 	return

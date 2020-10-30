@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	UID = "UID"
+	UID 	= 	"UID"
+	MIXINID = 	"MIXINID"
 )
 
 type MCache struct {

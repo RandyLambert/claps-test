@@ -6,11 +6,10 @@ import (
 	"claps-test/service"
 	"claps-test/util"
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-github/v32/github"
 )
 
 /**
- * @Description: 用code换取Token,此时没有发放token,没有cache,成功授权后发放token,设置cache
+ * @Description: 用code换取Token,此时没有发放token,成功授权后发放token,token中记录github的userId
  * @param ctx
  */
 func Oauth(ctx *gin.Context) {
@@ -54,12 +53,14 @@ func Oauth(ctx *gin.Context) {
 	}
 
 	//生成token
-	randomUid := util.RandUp(32)
+	//randomUid := util.RandUp(32)
+	randomUid := *user.ID
 	jwtToken, err1 := middleware.GenToken(randomUid)
 	if err1 != nil {
 		util.HandleResponse(ctx, util.NewErr(err1, util.ErrInternalServer, "gen token error"), nil)
 		return
 	}
+
 
 	//向数据库中存储user信息
 	u := model.User{}
@@ -72,36 +73,21 @@ func Oauth(ctx *gin.Context) {
 		u.DisplayName = *user.Name
 	}
 	for _, v := range emails {
+		//主email,参与分钱
 		if *v.Primary {
 			u.Email = *v.Email
 			break
 		}
 	}
 
+	//每次授权后都更新数据库中的信息
 	err = service.InsertOrUpdateUser(&u)
 	if err != nil {
 		util.HandleResponse(ctx, err, resp)
 		return
 	}
 
-	//redis存储user信息
-	mcache := &util.MCache{}
-	emailForCache := []github.UserEmail{}
-	for _, val := range emails {
-		emailForCache = append(emailForCache, *val)
-	}
-	mcache.Github = *user
-	mcache.GithubEmails = emailForCache
-	mcache.GithubAuth = true
-
-	//cache的key是randomUid
-	//err1 = util.Rdb.Set(strconv.FormatInt(*user.ID,10),mcache,-1)
-	err1 = util.Rdb.Set(randomUid, *mcache, -1)
-	if err1 != nil {
-		util.HandleResponse(ctx, util.NewErr(err1, util.ErrDataBase, "set cache error"), nil)
-		return
-	}
-
+	//token 的uid是github的userId
 	resp["token"] = jwtToken
 	util.HandleResponse(ctx, nil, resp)
 }

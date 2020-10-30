@@ -177,7 +177,7 @@ func UpdateUserMixinId(userId int64, mixinId string) (err *util.Err) {
  * @return err
  */
 func GetMixinIdByUserId(userId int64) (mixinId string, err *util.Err) {
-	user, err1 := model.USERMIXINID.GetUserById(userId)
+	user, err1 := model.USERMIXINID.GetMixinIdById(userId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "从数据库查询user信息错误")
 		return
@@ -196,6 +196,23 @@ func UpdateUserWithdrawalWay(userId int64, withdrawWal string) (err *util.Err) {
 	err1 := model.USER.UpdateUserWithdrawalWay(userId, withdrawWal)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "更新数据库withdrawalWay信息错误")
+	}
+	return
+}
+
+func GetUserPrimaryEmailById(id int64)(email string,err *util.Err) {
+	user,err1 := model.USER.GetUserById(id)
+	if err1 != nil{
+		err = util.NewErr(err1,util.ErrDataBase,"get user by id error")
+	}
+	email = user.Email
+	return
+}
+
+func GetUserById(id int64)(user *model.User,err *util.Err)  {
+	user,err1 := model.USER.GetUserById(id)
+	if err1 != nil{
+		err = util.NewErr(err1,util.ErrDataBase,"get user by id error")
 	}
 	return
 }
