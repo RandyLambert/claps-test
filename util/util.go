@@ -2,7 +2,7 @@ package util
 
 import (
 	"github.com/google/go-github/v32/github"
-	"math/rand"
+	"crypto/rand"
 )
 
 const (
@@ -18,7 +18,7 @@ type MCache struct {
 	MixinAuth    bool
 }
 
-var longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_sky")
+var longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_")
 
 /**
  * @Description: 生成一个长度为n的随机字符串
