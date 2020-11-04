@@ -33,7 +33,7 @@ func distribute(transaction *model.Transaction, metric string) {
 		return
 	}
 
-	//Get devValue
+	//Get Value
 	primaryEmailStrs, err := GetMetricByGroupIdAndUserEmails(groupId, metric, *members)
 	if err != nil {
 		log.Error("get devValue error:%v", err)

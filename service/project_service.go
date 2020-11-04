@@ -26,7 +26,7 @@ func GetProjectById(projectId int64) (projectDetailInfo *map[string]interface{},
 		return
 	}
 
-	//mambers格式不同,删除project_id和userid字段
+	//members格式不同,删除projectId和userId字段
 	members, err1 := model.USER.ListMembersByProjectId(projectId)
 	if err1 != nil {
 		err = util.NewErr(err1, util.ErrDataBase, "获取项目成员失败")
